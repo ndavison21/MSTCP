@@ -43,9 +43,9 @@ public class TCPSender {
     Vector<byte[]> packetList;  // list of generated packets
     Timer timer;                // for timeouts
     Semaphore s;                // guard for base and nextSeqSum
-    boolean transferComplete;   // if receiver has acked all packets of file
+    boolean transferComplete;   // if receiver has ACKed all packets of file
     
-    // used to start/stop th timer
+    // used to start/stop the timer
     public void setTimer(boolean newTimer) {
         if (timer != null) timer.cancel(); // stops the current timer
         if (newTimer) {
@@ -57,14 +57,14 @@ public class TCPSender {
     // handles the sending of data
     public class OutThread extends Thread {
         private DatagramSocket socket;
-        private int dstPort;
+        private int dstPort;  // send to this port
         private InetAddress dstAddress;
-        private int srcPort; // when would this be used?
+        private int recvPort; // receive ACKs on this port. Currently unused because we don't communicate it.
         
-        public OutThread(DatagramSocket socket, int dstPort, int srcPort) {
+        public OutThread(DatagramSocket socket, int dstPort, int recvPort) {
             this.socket = socket;
             this.dstPort = dstPort;
-            this.srcPort = srcPort;
+            this.recvPort = recvPort;
             
         }
         
@@ -91,7 +91,7 @@ public class TCPSender {
             System.out.println("TCPSender: OutThread: Started");
             try {
                 dstAddress = InetAddress.getByName("127.0.0.1"); // resolve the dstAddress
-                FileInputStream fis = new FileInputStream(new File(path));
+                FileInputStream fis = new FileInputStream(new File(path + filename));
                 
                 try {
                     System.out.println("TCPSender: OutThread: Beginning Sending Packets");
@@ -155,7 +155,7 @@ public class TCPSender {
                 e.printStackTrace();
                 System.exit(-1);
             } catch (FileNotFoundException e) {
-                System.err.println("TCPSender: OutThread: Unable to find file " + path);
+                System.err.println("TCPSender: OutThread: Unable to find file " + path + filename);
                 e.printStackTrace();
                 System.exit(-1);
             } catch (IOException e) {
@@ -184,7 +184,7 @@ public class TCPSender {
             else return -1;
         }
         
-        // process to receive ACKs, updating base
+        // process to receive ACKs, updating base of window as it goes along
         public void run() {
             System.out.println("TCPSender: InThread: Started");
             byte[] ackBytes = new byte[12];
@@ -202,7 +202,7 @@ public class TCPSender {
                             nextSeqNum = base; // reset nextSeqNum
                             s.release();
                         } else if(ackNum == -2) { // teardown signal
-                            transferComplete = true;
+                            transferComplete = true; // we done here
                             System.out.println("TCPSender: InThread: Teardown ACK received");
                         } else { // normal ACK
                             base = ackNum++;  // update base number
@@ -244,12 +244,12 @@ public class TCPSender {
         }
     }
     
-    public TCPSender(int outSocketPort, int inSocketPort, String path, String filename) {
+    public TCPSender(int dstPort, int recvPort, String path, String filename) {
         System.out.println("TCPSender: Starting Up TCPSender");
         
         base = 0;
         nextSeqNum = 0;
-        this.path = path;
+        this.path = path; //((path.substring(path.length()-1)).equals("/")) ? path : path + "/"; // properly format path;
         this.filename = filename;
         packetList = new Vector<byte[]>(winSize);
         transferComplete = false;
@@ -258,12 +258,12 @@ public class TCPSender {
         
         try {
             // create the sockets
-            outSocket =  new DatagramSocket();
-            inSocket = new DatagramSocket(inSocketPort);
+            outSocket =  new DatagramSocket();      // bind to any available port
+            inSocket = new DatagramSocket(recvPort); // bind to port inSocketPort
             
             // create the threads to process data
-            InThread inThread = new InThread(inSocket);
-            OutThread outThread = new OutThread(outSocket, outSocketPort, inSocketPort);
+            InThread inThread = new InThread(inSocket); // receive ACKs through inSocket
+            OutThread outThread = new OutThread(outSocket, dstPort, recvPort);
             inThread.start();
             outThread.start();
         } catch (SocketException e) {
@@ -274,7 +274,7 @@ public class TCPSender {
     }
     
     public static void main(String[] args) {
-        new TCPSender(14415,14416,".","hello.txt");
+        new TCPSender(14415,14416,"","hello.txt"); // dstPort, recvPort, path, filename
     }
 
 }
