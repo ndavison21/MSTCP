@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class TCPPacket {
-    public static boolean useTCP = true;
     
     private int srcPort    = 0;    // 16 bits, port at sender
     private int destPort   = 0;    // 16 bits, port at receiver

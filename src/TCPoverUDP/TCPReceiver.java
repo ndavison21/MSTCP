@@ -11,7 +11,6 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.zip.CRC32;
 
 /**
  * 
@@ -52,106 +51,56 @@ public class TCPReceiver {
                     
                     inSocket.receive(inPkt); // receive a packet
                     
-                    if (TCPPacket.useTCP) {
-                        System.out.println("TCPReceiver: Received TCP Packet");
-                        
-                        
-                        int tcpDataOffset = (inData[12] >> 4); // in 32 bit words
-                        int tcpHeaderLength = tcpDataOffset * 4; // in bytes
-                        TCPPacket tcpPacket = new TCPPacket(Arrays.copyOfRange(inData, 0, tcpHeaderLength));
                     
-                        if (tcpPacket.verifyChecksum()) {
-                            System.out.println("TCPReceiver: Valid TCP Checksum");
+                    int tcpDataOffset = (inData[12] >> 4); // in 32 bit words
+                    int tcpHeaderLength = tcpDataOffset * 4; // in bytes
+                    TCPPacket tcpPacket = new TCPPacket(Arrays.copyOfRange(inData, 0, tcpHeaderLength));
+                    
+                    System.out.println("TCPReceiver: Received TCP Packet: " + tcpPacket.getSeqNum());
+                
+                    if (tcpPacket.verifyChecksum()) {
+                        
+                        int seqNum = tcpPacket.getSeqNum();
+                        
+                        if (seqNum == nextSeqNum) { // if packet received in order
                             
-                            int seqNum = tcpPacket.getSeqNum();
-                            
-                            if (seqNum == nextSeqNum) { // if packet received in order
-                                
-                                if (tcpPacket.isFIN()) { // if final packet (no data) then send teardown ACK
-                                    byte[] ackPkt = generateTCPPacket(tcpPacket.getDestPort(), tcpPacket.getSrcPort(), seqNum, tcpPacket.getWindowSize());
-                                    for (int i=0; i<20; i++) outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort)); // send 20 in case some are lost in the way
-                                    transferComplete = true; // we done here
-                                    continue; // end listener
-                                } else { // otherwise send a normal ACK
-                                    byte[] ackPkt = generateTCPPacket(tcpPacket.getDestPort(), tcpPacket.getSrcPort(), seqNum, tcpPacket.getWindowSize());
-                                    outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
-                                }
-                                
-                                if (seqNum == 0 && prevSeqNum == -1) { // if first packet
-                                    int filenameLength = ByteBuffer.wrap(Arrays.copyOfRange(inData, tcpHeaderLength, tcpHeaderLength + 4)).getInt();
-                                    String filename = new String(Arrays.copyOfRange(inData, tcpHeaderLength + 4, tcpHeaderLength + 4 + filenameLength)); // decode filename
-                                    System.out.println("TCPReceiver: Receiving file " + filename);
-                                    
-                                    File file = new File(path + "received_" + filename); // create the file
-                                    if (!file.exists()) file.createNewFile();
-                                    fos = new FileOutputStream(file);
-                                    fos.write(inData, tcpHeaderLength + 4 + filenameLength, inPkt.getLength() - (tcpHeaderLength + 4) - filenameLength); // initial data
-                                } else { // otherwise just continue to add it to the current file
-                                    fos.write(inData, tcpHeaderLength, inPkt.getLength() - tcpHeaderLength);
-                                }
-                                
-                                nextSeqNum++; // update nextSeqNum
-                                prevSeqNum = seqNum; // update prevSeqNum      
-                            } else { // if duplicate packet then send duplicate ACK
-                                byte[] ackPkt = generateTCPPacket(tcpPacket.getDestPort(), tcpPacket.getSrcPort(), prevSeqNum, tcpPacket.getWindowSize());
+                            if (tcpPacket.isFIN()) { // if final packet (no data) then send teardown ACK
+                                System.out.println("TCPReceiver: Sending TCP ACK + FIN: " + seqNum);
+                                byte[] ackPkt = generateTCPPacket(tcpPacket.getDestPort(), tcpPacket.getSrcPort(), seqNum, tcpPacket.getWindowSize());
+                                for (int i=0; i<20; i++) outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort)); // send 20 in case some are lost in the way
+                                transferComplete = true; // we done here
+                                continue; // end listener
+                            } else { // otherwise send a normal ACK
+                                byte[] ackPkt = generateTCPPacket(tcpPacket.getDestPort(), tcpPacket.getSrcPort(), seqNum, tcpPacket.getWindowSize());
+                                System.out.println("TCPReceiver: Sending TCP ACK: " + seqNum);
                                 outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
-                                
                             }
-                        } else { // packet is corrupted so we send duplicate ACK
-                            System.out.println("TCPReceiver: Invalid TCP Checksum");
+                            
+                            if (seqNum == 0 && prevSeqNum == -1) { // if first packet
+                                int filenameLength = ByteBuffer.wrap(Arrays.copyOfRange(inData, tcpHeaderLength, tcpHeaderLength + 4)).getInt();
+                                String filename = new String(Arrays.copyOfRange(inData, tcpHeaderLength + 4, tcpHeaderLength + 4 + filenameLength)); // decode filename
+                                System.out.println("TCPReceiver: Receiving file " + filename);
+                                
+                                File file = new File(path + "received_" + filename); // create the file
+                                if (!file.exists()) file.createNewFile();
+                                fos = new FileOutputStream(file);
+                                fos.write(inData, tcpHeaderLength + 4 + filenameLength, inPkt.getLength() - (tcpHeaderLength + 4) - filenameLength); // initial data
+                            } else { // otherwise just continue to add it to the current file
+                                fos.write(inData, tcpHeaderLength, inPkt.getLength() - tcpHeaderLength);
+                            }
+                            
+                            nextSeqNum++; // update nextSeqNum
+                            prevSeqNum = seqNum; // update prevSeqNum      
+                        } else { // if duplicate packet then send duplicate ACK
                             byte[] ackPkt = generateTCPPacket(tcpPacket.getDestPort(), tcpPacket.getSrcPort(), prevSeqNum, tcpPacket.getWindowSize());
+                            System.out.println("TCPReceiver: Sending Duplicate TCP ACK (duplicate): " + prevSeqNum);
                             outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
-                            System.out.println("TCPReceiver: Corrupted packet dropped, sent duplicate ACK " + prevSeqNum);
                         }
-                        
-                    } else {
-                        // verify checksum
-                        byte[] receivedChecksum = Arrays.copyOfRange(inData, 0, 8);
-                        CRC32 checksum = new CRC32();
-                        checksum.update(Arrays.copyOfRange(inData, 8, inPkt.getLength()));
-                        byte[] calculatedChecksum = ByteBuffer.allocate(8).putLong(checksum.getValue()).array();
-                        
-                        if (Arrays.equals(receivedChecksum, calculatedChecksum)) { // if packet not corrupted
-                            
-                            int seqNum = ByteBuffer.wrap(Arrays.copyOfRange(inData, 8, 12)).getInt();
-                            
-                            if (seqNum == nextSeqNum) { // if packet received in order
-                                
-                                if (inPkt.getLength() == 12) { // if final packet (no data) then send teardown ACK
-                                    byte[] ackPkt = generatePacket(-2); // teardown signal
-                                    for (int i=0; i<20; i++) outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort)); // send 20 in case some are lost in the way
-                                    transferComplete = true; // we done here
-                                    continue; // end listener
-                                } else { // otherwise send a normal ACK
-                                    byte[] ackPkt = generatePacket(seqNum);
-                                    outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
-                                }
-                                
-                                if (seqNum == 0 && prevSeqNum == -1) { // if first packet
-                                    int filenameLength = ByteBuffer.wrap(Arrays.copyOfRange(inData, 12, 16)).getInt(); // first 12 bytes are 
-                                    String filename = new String(Arrays.copyOfRange(inData, 16, 16+filenameLength)); // decode filename
-                                    System.out.println("TCPReceiver: Receiving file " + filename);
-                                    
-                                    File file = new File(path + "received_" + filename); // create the file
-                                    if (!file.exists()) file.createNewFile();
-                                    fos = new FileOutputStream(file);
-                                    fos.write(inData, 16 + filenameLength, inPkt.getLength() - 16 - filenameLength); // initial data
-                                } else { // otherwise just continue to add it to the current file
-                                    fos.write(inData, 12, inPkt.getLength() - 12);
-                                }
-                                
-                                nextSeqNum++; // update nextSeqNum
-                                prevSeqNum = seqNum; // update prevSeqNum      
-                            } else { // if duplicate packet then send duplicate ACK
-                                byte[] ackPkt = generatePacket(prevSeqNum);
-                                outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
-                                
-                            }
-                        } else { // packet is corrupted so we send duplicate ACK
-                            byte[] ackPkt = generatePacket(prevSeqNum);
-                            outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
-                            System.out.println("TCPReceiver: Corrupted packet dropped, sent duplicate ACK " + prevSeqNum);
-                        }                        
+                    } else { // packet is corrupted so we send duplicate ACK
+                        byte[] ackPkt = generateTCPPacket(tcpPacket.getDestPort(), tcpPacket.getSrcPort(), prevSeqNum, tcpPacket.getWindowSize());
+                        System.out.println("TCPReceiver: Sending Duplicate TCP ACK (corrupted): " + prevSeqNum);
+                        outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
+                        System.out.println("TCPReceiver: Corrupted packet dropped, sent duplicate ACK " + prevSeqNum);
                     }
                 }
                 if (fos != null) fos.close();
@@ -176,22 +125,6 @@ public class TCPReceiver {
             e.printStackTrace();
         }
         
-    }
-    
-    
-    // Generate ACK packets
-    public byte[] generatePacket(int ackNum) {
-        byte[] ackNumBytes = ByteBuffer.allocate(4).putInt(ackNum).array();
-        
-        // calculate checksum
-        CRC32 checksum = new CRC32();
-        checksum.update(ackNumBytes);
-        
-        // assemble ACK
-        ByteBuffer pktBuffer = ByteBuffer.allocate(12);
-        pktBuffer.put(ByteBuffer.allocate(8).putLong(checksum.getValue()).array());
-        pktBuffer.put(ackNumBytes);
-        return pktBuffer.array();
     }
     
     // Generate TCP ACK packet

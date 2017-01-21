@@ -47,11 +47,11 @@ public class TCPSender {
     
     // used to start/stop the timer
     public void setTimer(boolean newTimer) {
-//        if (timer != null) timer.cancel(); // stops the current timer
-//        if (newTimer) {
-//            timer = new Timer(); // start a new one if necessary
-//            timer.schedule(new Timeout(), timeoutVal);
-//        }
+        if (timer != null) timer.cancel(); // stops the current timer
+        if (newTimer) {
+            timer = new Timer(); // start a new one if necessary
+            timer.schedule(new Timeout(), timeoutVal);
+        }
     }
     
     // handles the sending of data
@@ -66,24 +66,6 @@ public class TCPSender {
             this.dstPort = dstPort;
             this.recvPort = recvPort;
             
-        }
-        
-        // attaches a header to the data bytes
-        public byte[] generatePacket(int seqNum, byte[] dataBytes) {
-            byte[] seqNumBytes = ByteBuffer.allocate(4).putInt(seqNum).array();
-            
-            // generates the checksum
-            CRC32 checksum = new CRC32();
-            checksum.update(seqNumBytes);
-            checksum.update(dataBytes);
-            byte[] checksumBytes = ByteBuffer.allocate(8).putLong(checksum.getValue()).array();
-            
-            // putting together the packet
-            ByteBuffer packetBuffer = ByteBuffer.allocate(8 + 4 + dataBytes.length);
-            packetBuffer.put(checksumBytes);
-            packetBuffer.put(seqNumBytes);
-            packetBuffer.put(dataBytes);
-            return packetBuffer.array();
         }
         
         // attaches a TCP header to the data bytes
@@ -127,25 +109,16 @@ public class TCPSender {
                                     bb.put(filenameLengthBytes);
                                     bb.put(filenameBytes);
                                     bb.put(dataBytes);
-                                    if (TCPPacket.useTCP)
-                                        outData = generateTCPPacket(nextSeqNum, bb.array(), finalSeqNum);
-                                    else
-                                        outData = generatePacket(nextSeqNum, bb.array());
+                                    outData = generateTCPPacket(nextSeqNum, bb.array(), finalSeqNum);
                                 } else { // for subsequent packets just send data
                                     byte[] dataBuffer = new byte[dataSize];
                                     int dataLength = fis.read(dataBuffer, 0, dataSize);
                                     if (dataLength == -1) { // if no more data then send nothing (finalSeqNum)
                                         finalSeqNum = true;
-                                        if (TCPPacket.useTCP) {
-                                            outData = generateTCPPacket(nextSeqNum, new byte[0], finalSeqNum);
-                                        } else
-                                            outData = generatePacket(nextSeqNum, new byte[0]);
+                                        outData = generateTCPPacket(nextSeqNum, new byte[0], finalSeqNum);
                                     } else { // otherwise send the valid data
                                         byte[] dataBytes = Arrays.copyOfRange(dataBuffer, 0, dataLength);
-                                        if (TCPPacket.useTCP)
-                                            outData = generateTCPPacket(nextSeqNum, dataBytes, finalSeqNum);
-                                        else
-                                            outData = generatePacket(nextSeqNum, dataBytes);
+                                        outData = generateTCPPacket(nextSeqNum, dataBytes, finalSeqNum);
                                     }
                                 }
                                 packetList.add(outData); // store so we don't have to reconstruct
@@ -209,7 +182,7 @@ public class TCPSender {
         // process to receive ACKs, updating base of window as it goes along
         public void run() {
             System.out.println("TCPSender: InThread: Started");
-            byte[] ackBytes = new byte[TCPPacket.useTCP ? 20 : 12];
+            byte[] ackBytes = new byte[20];
             DatagramPacket ack = new DatagramPacket(ackBytes, ackBytes.length);
             
             try {
@@ -217,46 +190,26 @@ public class TCPSender {
                 while (!transferComplete) { // while there are still packets to be ACKed
                     socket.receive(ack);
                     
-                    if (TCPPacket.useTCP) {
-                        TCPPacket tcpPacket = new TCPPacket(ackBytes);
-                        if (tcpPacket.isACK() && tcpPacket.getACK() != -1) { // is ACK and is not corrupted
-                            if (base == tcpPacket.getACK() + 1) { // duplicate ACK
-                                s.acquire();
-                                setTimer(false); // stop timer
-                                nextSeqNum = base; // reset nextSeqNum
-                                s.release();
-                            } else if (tcpPacket.isFIN()){ // teardown signal
-                                transferComplete = true; // we done here
-                                System.out.println("TCPSender: InThread: Teardown ACK received");
-                            } else { // normal ACK
-                                base = tcpPacket.getACK() + 1;  // update base number
-                                s.acquire();
-                                if (base == nextSeqNum) setTimer(false); // if there are no unacknowledge packets then stop timer
-                                else setTimer(true); // otherwise wait for next packet
-                                s.release();
-                            }
+                    TCPPacket tcpPacket = new TCPPacket(ackBytes);
+                    System.out.println("TCPSender: InThread: Received TCP ACK: " + tcpPacket.getACK());
+                    if (tcpPacket.isACK() && tcpPacket.getACK() != -1) { // is ACK and is not corrupted
+                        if (base == tcpPacket.getACK() + 1) { // duplicate ACK
+                            s.acquire();
+                            setTimer(false); // stop timer
+                            nextSeqNum = base; // reset nextSeqNum
+                            s.release();
+                        } else if (tcpPacket.isFIN()){ // teardown signal
+                            transferComplete = true; // we done here
+                            System.out.println("TCPSender: InThread: Teardown ACK received");
+                        } else { // normal ACK
+                            base = tcpPacket.getACK() + 1;  // update base number
+                            s.acquire();
+                            if (base == nextSeqNum) setTimer(false); // if there are no unacknowledge packets then stop timer
+                            else setTimer(true); // otherwise wait for next packet
+                            s.release();
                         }
-                    } else {
-                        int ackNum = decodePacket(ackBytes);
-                        if (ackNum != -1) { // if ACK is not corrupted
-                            if (base == ackNum + 1) { // duplicate ACK
-                                s.acquire();
-                                setTimer(false); // stop timer
-                                nextSeqNum = base; // reset nextSeqNum
-                                s.release();
-                            } else if(ackNum == -2) { // teardown signal
-                                transferComplete = true; // we done here
-                                System.out.println("TCPSender: InThread: Teardown ACK received");
-                            } else { // normal ACK
-                                base = ackNum++;  // update base number
-                                s.acquire();
-                                if (base == nextSeqNum) setTimer(false); // if there are no unacknowledge packets then stop timer
-                                else setTimer(true); // otherwise wait for next packet
-                                s.release();
-                            }
-                        }
-                        // if ACK corrupted then nothing we can do
                     }
+
                     
 
                 }
