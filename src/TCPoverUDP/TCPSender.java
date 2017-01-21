@@ -59,7 +59,7 @@ public class TCPSender {
         private DatagramSocket socket;
         private int dstPort;  // send to this port
         private InetAddress dstAddress;
-        private int recvPort; // receive ACKs on this port. Currently unused because we don't communicate it.
+        private int recvPort; // receive ACKs on this port. Currently unused (hardcoded at other end)
         
         public OutThread(DatagramSocket socket, int dstPort, int recvPort) {
             this.socket = socket;
@@ -68,7 +68,7 @@ public class TCPSender {
             
         }
         
-        // constructs the packet header
+        // attaches a header to the data bytes
         public byte[] generatePacket(int seqNum, byte[] dataBytes) {
             byte[] seqNumBytes = ByteBuffer.allocate(4).putInt(seqNum).array();
             
@@ -82,6 +82,18 @@ public class TCPSender {
             ByteBuffer packetBuffer = ByteBuffer.allocate(8 + 4 + dataBytes.length);
             packetBuffer.put(checksumBytes);
             packetBuffer.put(seqNumBytes);
+            packetBuffer.put(dataBytes);
+            return packetBuffer.array();
+        }
+        
+        // attaches a TCP header to the data bytes
+        public byte[] generateTCPPacket(int seqNum, byte[] dataBytes, boolean finalSeqNum) {
+            TCPPacket tcpPacket = new TCPPacket(this.recvPort, this.dstPort, seqNum, TCPSender.winSize);
+            if (finalSeqNum) tcpPacket.setFIN();
+            byte[] tcpBytes = tcpPacket.bytes();
+            
+            ByteBuffer packetBuffer = ByteBuffer.allocate(tcpBytes.length + dataBytes.length);
+            packetBuffer.put(tcpBytes);
             packetBuffer.put(dataBytes);
             return packetBuffer.array();
         }
@@ -115,16 +127,25 @@ public class TCPSender {
                                     bb.put(filenameLengthBytes);
                                     bb.put(filenameBytes);
                                     bb.put(dataBytes);
-                                    outData = generatePacket(nextSeqNum, bb.array());
+                                    if (TCPPacket.useTCP)
+                                        outData = generateTCPPacket(nextSeqNum, bb.array(), finalSeqNum);
+                                    else
+                                        outData = generatePacket(nextSeqNum, bb.array());
                                 } else { // for subsequent packets just send data
                                     byte[] dataBuffer = new byte[dataSize];
                                     int dataLength = fis.read(dataBuffer, 0, dataSize);
                                     if (dataLength == -1) { // if no more data then send nothing (finalSeqNum)
                                         finalSeqNum = true;
-                                        outData = generatePacket(nextSeqNum, new byte[0]);
+                                        if (TCPPacket.useTCP) {
+                                            outData = generateTCPPacket(nextSeqNum, new byte[0], finalSeqNum);
+                                        } else
+                                            outData = generatePacket(nextSeqNum, new byte[0]);
                                     } else { // otherwise send the valid data
                                         byte[] dataBytes = Arrays.copyOfRange(dataBuffer, 0, dataLength);
-                                        outData = generatePacket(nextSeqNum, dataBytes);
+                                        if (TCPPacket.useTCP)
+                                            outData = generateTCPPacket(nextSeqNum, dataBytes, finalSeqNum);
+                                        else
+                                            outData = generatePacket(nextSeqNum, dataBytes);
                                     }
                                 }
                                 packetList.add(outData); // store so we don't have to reconstruct

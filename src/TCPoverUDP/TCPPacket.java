@@ -4,6 +4,8 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class TCPPacket {
+    public static boolean useTCP = true;
+    
     private int srcPort    = 0;    // 16 bits, port at sender
     private int destPort   = 0;    // 16 bits, port at receiver
     private int seqNum     = 0;    // 32 bits, if SYN flag set then the initial sequence number, otherwise the accumulated sequence number
