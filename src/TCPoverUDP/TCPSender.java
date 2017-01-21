@@ -32,8 +32,8 @@ import java.util.zip.CRC32;
  *
  */
 public class TCPSender {
-    static int dataSize = 988; // checksum: 8, sequNum: 4, data <= 988, so 1000 Bytes total
-    static int winSize = 10;
+    static int dataSize = 100; // checksum: 8, sequNum: 4, data <= 988, so 1000 Bytes total
+    static int winSize = 2;
     static int timeoutVal = 300; // ms
     
     int base;                   // base sequence number of the window
@@ -47,11 +47,11 @@ public class TCPSender {
     
     // used to start/stop the timer
     public void setTimer(boolean newTimer) {
-        if (timer != null) timer.cancel(); // stops the current timer
-        if (newTimer) {
-            timer = new Timer(); // start a new one if necessary
-            timer.schedule(new Timeout(), timeoutVal);
-        }
+//        if (timer != null) timer.cancel(); // stops the current timer
+//        if (newTimer) {
+//            timer = new Timer(); // start a new one if necessary
+//            timer.schedule(new Timeout(), timeoutVal);
+//        }
     }
     
     // handles the sending of data
@@ -195,7 +195,7 @@ public class TCPSender {
         }
         
         // returns -1 if corrupted, otherwise just returns ACK number
-        int decodPacket(byte[] packetBytes) {
+        int decodePacket(byte[] packetBytes) {
             byte[] receivedChecksumBytes = Arrays.copyOfRange(packetBytes, 0, 8);
             byte[] ackNumBytes = Arrays.copyOfRange(packetBytes, 8, 12);
             CRC32 checksum = new CRC32();
@@ -205,35 +205,60 @@ public class TCPSender {
             else return -1;
         }
         
+        
         // process to receive ACKs, updating base of window as it goes along
         public void run() {
             System.out.println("TCPSender: InThread: Started");
-            byte[] ackBytes = new byte[12];
+            byte[] ackBytes = new byte[TCPPacket.useTCP ? 20 : 12];
             DatagramPacket ack = new DatagramPacket(ackBytes, ackBytes.length);
             
             try {
                 System.out.println("TCPSender: InThread: Beginning waiting for ACKs");
                 while (!transferComplete) { // while there are still packets to be ACKed
                     socket.receive(ack);
-                    int ackNum = decodPacket(ackBytes);
-                    if (ackNum != -1) { // if ACK is not corrupted
-                        if (base == ackNum + 1) { // duplicate ACK
-                            s.acquire();
-                            setTimer(false); // stop timer
-                            nextSeqNum = base; // reset nextSeqNum
-                            s.release();
-                        } else if(ackNum == -2) { // teardown signal
-                            transferComplete = true; // we done here
-                            System.out.println("TCPSender: InThread: Teardown ACK received");
-                        } else { // normal ACK
-                            base = ackNum++;  // update base number
-                            s.acquire();
-                            if (base == nextSeqNum) setTimer(false); // if there are no unacknowledge packets then stop timer
-                            else setTimer(true); // otherwise wait for next packet
-                            s.release();
+                    
+                    if (TCPPacket.useTCP) {
+                        TCPPacket tcpPacket = new TCPPacket(ackBytes);
+                        if (tcpPacket.isACK() && tcpPacket.getACK() != -1) { // is ACK and is not corrupted
+                            if (base == tcpPacket.getACK() + 1) { // duplicate ACK
+                                s.acquire();
+                                setTimer(false); // stop timer
+                                nextSeqNum = base; // reset nextSeqNum
+                                s.release();
+                            } else if (tcpPacket.isFIN()){ // teardown signal
+                                transferComplete = true; // we done here
+                                System.out.println("TCPSender: InThread: Teardown ACK received");
+                            } else { // normal ACK
+                                base = tcpPacket.getACK() + 1;  // update base number
+                                s.acquire();
+                                if (base == nextSeqNum) setTimer(false); // if there are no unacknowledge packets then stop timer
+                                else setTimer(true); // otherwise wait for next packet
+                                s.release();
+                            }
                         }
+                    } else {
+                        int ackNum = decodePacket(ackBytes);
+                        if (ackNum != -1) { // if ACK is not corrupted
+                            if (base == ackNum + 1) { // duplicate ACK
+                                s.acquire();
+                                setTimer(false); // stop timer
+                                nextSeqNum = base; // reset nextSeqNum
+                                s.release();
+                            } else if(ackNum == -2) { // teardown signal
+                                transferComplete = true; // we done here
+                                System.out.println("TCPSender: InThread: Teardown ACK received");
+                            } else { // normal ACK
+                                base = ackNum++;  // update base number
+                                s.acquire();
+                                if (base == nextSeqNum) setTimer(false); // if there are no unacknowledge packets then stop timer
+                                else setTimer(true); // otherwise wait for next packet
+                                s.release();
+                            }
+                        }
+                        // if ACK corrupted then nothing we can do
                     }
-                    // if ACK corrupted then nothing we can do
+                    
+
                 }
             } catch (InterruptedException e) {
                 System.err.println("TCPSender: InThread: Exception while claiming semaphore. Attempting to carry on.");
@@ -295,7 +320,7 @@ public class TCPSender {
     }
     
     public static void main(String[] args) {
-        new TCPSender(14415,14416,"","hello.txt"); // dstPort, recvPort, path, filename
+        new TCPSender(14415,14416,"","hello_repeat.txt"); // dstPort, recvPort, path, filename
     }
 
 }

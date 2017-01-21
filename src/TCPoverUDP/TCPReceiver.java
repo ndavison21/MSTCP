@@ -59,10 +59,6 @@ public class TCPReceiver {
                         int tcpDataOffset = (inData[12] >> 4); // in 32 bit words
                         int tcpHeaderLength = tcpDataOffset * 4; // in bytes
                         TCPPacket tcpPacket = new TCPPacket(Arrays.copyOfRange(inData, 0, tcpHeaderLength));
-                        System.out.println("TCPReceiver: Source Port: " + tcpPacket.getSrcPort());
-                        System.out.println("TCPReceiver: Destination Port: " + tcpPacket.getDestPort());
-                        System.out.println("TCPReceiver: Sequence Number: " + tcpPacket.getSeqNum());
-                        System.out.println("TCPReceiver: Data Offset: " + tcpPacket.getDataOffset());
                     
                         if (tcpPacket.verifyChecksum()) {
                             System.out.println("TCPReceiver: Valid TCP Checksum");
@@ -72,12 +68,12 @@ public class TCPReceiver {
                             if (seqNum == nextSeqNum) { // if packet received in order
                                 
                                 if (tcpPacket.isFIN()) { // if final packet (no data) then send teardown ACK
-                                    byte[] ackPkt = generatePacket(-2); // teardown signal
+                                    byte[] ackPkt = generateTCPPacket(tcpPacket.getDestPort(), tcpPacket.getSrcPort(), seqNum, tcpPacket.getWindowSize());
                                     for (int i=0; i<20; i++) outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort)); // send 20 in case some are lost in the way
                                     transferComplete = true; // we done here
                                     continue; // end listener
                                 } else { // otherwise send a normal ACK
-                                    byte[] ackPkt = generatePacket(seqNum);
+                                    byte[] ackPkt = generateTCPPacket(tcpPacket.getDestPort(), tcpPacket.getSrcPort(), seqNum, tcpPacket.getWindowSize());
                                     outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
                                 }
                                 
@@ -97,15 +93,15 @@ public class TCPReceiver {
                                 nextSeqNum++; // update nextSeqNum
                                 prevSeqNum = seqNum; // update prevSeqNum      
                             } else { // if duplicate packet then send duplicate ACK
-                                byte[] ackPkt = generatePacket(prevSeqNum);
+                                byte[] ackPkt = generateTCPPacket(tcpPacket.getDestPort(), tcpPacket.getSrcPort(), prevSeqNum, tcpPacket.getWindowSize());
                                 outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
                                 
                             }
                         } else { // packet is corrupted so we send duplicate ACK
                             System.out.println("TCPReceiver: Invalid TCP Checksum");
-                            byte[] ackPkt = generatePacket(prevSeqNum);
+                            byte[] ackPkt = generateTCPPacket(tcpPacket.getDestPort(), tcpPacket.getSrcPort(), prevSeqNum, tcpPacket.getWindowSize());
                             outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
-                            System.out.println("TCPReceiver: Corrupted packet dropped, sent diplicate ACK " + prevSeqNum);
+                            System.out.println("TCPReceiver: Corrupted packet dropped, sent duplicate ACK " + prevSeqNum);
                         }
                         
                     } else {
@@ -154,7 +150,7 @@ public class TCPReceiver {
                         } else { // packet is corrupted so we send duplicate ACK
                             byte[] ackPkt = generatePacket(prevSeqNum);
                             outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
-                            System.out.println("TCPReceiver: Corrupted packet dropped, sent diplicate ACK " + prevSeqNum);
+                            System.out.println("TCPReceiver: Corrupted packet dropped, sent duplicate ACK " + prevSeqNum);
                         }                        
                     }
                 }
@@ -196,6 +192,13 @@ public class TCPReceiver {
         pktBuffer.put(ByteBuffer.allocate(8).putLong(checksum.getValue()).array());
         pktBuffer.put(ackNumBytes);
         return pktBuffer.array();
+    }
+    
+    // Generate TCP ACK packet
+    public byte[] generateTCPPacket(int srcPort, int destPort, int ackNum, int windowSize) {
+        TCPPacket tcpPacket = new TCPPacket(srcPort, destPort, -1, windowSize);
+        tcpPacket.setACK(ackNum);
+        return tcpPacket.bytes();
     }
     
     public static void main(String[] args) {
