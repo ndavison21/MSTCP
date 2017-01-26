@@ -15,7 +15,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
-import java.util.zip.CRC32;
 
 /**
  * 
@@ -36,6 +35,7 @@ public class TCPSender {
     static int winSize = 2;
     static int timeoutVal = 300; // ms
     
+    int initialSeqNum;          // first sequence number of the connection
     int base;                   // base sequence number of the window
     int nextSeqNum;             // next sequence number in window
     String path;                // path of file to be sent
@@ -69,15 +69,22 @@ public class TCPSender {
         }
         
         // attaches a TCP header to the data bytes
-        public byte[] generateTCPPacket(int seqNum, byte[] dataBytes, boolean finalSeqNum) {
+        public byte[] generateTCPPacket(int seqNum, byte[] dataBytes, boolean synAck, boolean finalSeqNum) {
             TCPPacket tcpPacket = new TCPPacket(this.recvPort, this.dstPort, seqNum, TCPSender.winSize);
-            if (finalSeqNum) tcpPacket.setFIN();
+            if (synAck) {
+                tcpPacket.setSYN();
+                tcpPacket.setACK(seqNum);
+            } else if (finalSeqNum) tcpPacket.setFIN();
             byte[] tcpBytes = tcpPacket.bytes();
             
             ByteBuffer packetBuffer = ByteBuffer.allocate(tcpBytes.length + dataBytes.length);
             packetBuffer.put(tcpBytes);
             packetBuffer.put(dataBytes);
             return packetBuffer.array();
+        }
+        
+        public void sendSynAck(byte[] synAckBytes) throws IOException {
+            socket.send(new DatagramPacket(synAckBytes, synAckBytes.length, dstAddress, dstPort)); // send the packet
         }
         
         // process to send packets, updating nextSeqNum
@@ -90,16 +97,17 @@ public class TCPSender {
                 try {
                     System.out.println("TCPSender: OutThread: Beginning Sending Packets");
                     while (!transferComplete) { // while there are still packets to send
+                        
                         if (nextSeqNum < base + winSize) { // if the window is not yet full, then send more packets
                             s.acquire();
-                            if (base == nextSeqNum) setTimer(true); // if sending the first packet of the window, start timer
+                            if (base != initialSeqNum && base == nextSeqNum) setTimer(true); // if sending the first packet of the window, start timer
                             byte[] outData = new byte[10];
                             boolean finalSeqNum = false;
                             
-                            if (nextSeqNum < packetList.size()) { // if packet has been constructed before (happens if we have gone-back-n)
-                                outData = packetList.get(nextSeqNum);
+                            if (nextSeqNum - initialSeqNum < packetList.size()) { // if packet has been constructed before (happens if we have gone-back-n)
+                                outData = packetList.get(nextSeqNum - initialSeqNum);
                             } else {
-                                if (nextSeqNum == 0) { // if it's the first packet then include the file information
+                                if (nextSeqNum == initialSeqNum) { // if it's the first packet then include SYN + ACK and the file information
                                     byte[] filenameBytes = filename.getBytes();
                                     byte[] filenameLengthBytes = ByteBuffer.allocate(4).putInt(filenameBytes.length).array();
                                     byte[] dataBuffer = new byte[dataSize];
@@ -109,16 +117,16 @@ public class TCPSender {
                                     bb.put(filenameLengthBytes);
                                     bb.put(filenameBytes);
                                     bb.put(dataBytes);
-                                    outData = generateTCPPacket(nextSeqNum, bb.array(), finalSeqNum);
+                                    outData = generateTCPPacket(nextSeqNum, bb.array(), true, finalSeqNum);
                                 } else { // for subsequent packets just send data
                                     byte[] dataBuffer = new byte[dataSize];
                                     int dataLength = fis.read(dataBuffer, 0, dataSize);
                                     if (dataLength == -1) { // if no more data then send nothing (finalSeqNum)
                                         finalSeqNum = true;
-                                        outData = generateTCPPacket(nextSeqNum, new byte[0], finalSeqNum);
+                                        outData = generateTCPPacket(nextSeqNum, new byte[0], false, finalSeqNum);
                                     } else { // otherwise send the valid data
                                         byte[] dataBytes = Arrays.copyOfRange(dataBuffer, 0, dataLength);
-                                        outData = generateTCPPacket(nextSeqNum, dataBytes, finalSeqNum);
+                                        outData = generateTCPPacket(nextSeqNum, dataBytes, false, finalSeqNum);
                                     }
                                 }
                                 packetList.add(outData); // store so we don't have to reconstruct
@@ -162,20 +170,10 @@ public class TCPSender {
     
     public class InThread extends Thread {
         private DatagramSocket socket;
+        private boolean connectionEstablished = false;
         
         public InThread(DatagramSocket socket) {
             this.socket = socket;
-        }
-        
-        // returns -1 if corrupted, otherwise just returns ACK number
-        int decodePacket(byte[] packetBytes) {
-            byte[] receivedChecksumBytes = Arrays.copyOfRange(packetBytes, 0, 8);
-            byte[] ackNumBytes = Arrays.copyOfRange(packetBytes, 8, 12);
-            CRC32 checksum = new CRC32();
-            checksum.update(ackNumBytes);
-            byte[] calculatedChecksumBytes = ByteBuffer.allocate(8).putLong(checksum.getValue()).array();
-            if (Arrays.equals(receivedChecksumBytes, calculatedChecksumBytes)) return ByteBuffer.wrap(ackNumBytes).getInt();
-            else return -1;
         }
         
         
@@ -186,20 +184,48 @@ public class TCPSender {
             DatagramPacket ack = new DatagramPacket(ackBytes, ackBytes.length);
             
             try {
-                System.out.println("TCPSender: InThread: Beginning waiting for ACKs");
+                System.out.println("TCPSender: InThread: Waiting for SYN");
+                DatagramSocket outSocket = null;
+                OutThread outThread = null;
+                
+                // receive the SYN
+                while (!connectionEstablished) {
+                    socket.receive(ack); // (blocks until received)
+                    TCPPacket synPacket = new TCPPacket(ackBytes);
+                    if (synPacket.isSYN()) {
+                        System.out.println("TCPSender: InThread: SYN Received, initial sequence number " + synPacket.getSeqNum());
+
+                        s.acquire();                        
+                        // initialising sequence numbers
+                        initialSeqNum = synPacket.getSeqNum();
+                        base = initialSeqNum;
+                        nextSeqNum = initialSeqNum;
+                        connectionEstablished = true;
+                        s.release();
+                        
+                        // Creating Thread to send data
+                        outSocket = new DatagramSocket();
+                        outThread = new OutThread(outSocket, synPacket.getSrcPort(), synPacket.getDestPort());
+                        outThread.start();
+                    }
+                }
+                
+                
+                System.out.println("TCPSender: InThread: Waiting for ACKs");
                 while (!transferComplete) { // while there are still packets to be ACKed
                     socket.receive(ack);
                     
                     TCPPacket tcpPacket = new TCPPacket(ackBytes);
                     System.out.println("TCPSender: InThread: Received TCP ACK: " + tcpPacket.getACK());
                     if (tcpPacket.isACK() && tcpPacket.getACK() != -1) { // is ACK and is not corrupted
-                        if (base == tcpPacket.getACK() + 1) { // duplicate ACK
+                        if (base > tcpPacket.getACK()) { // duplicate ACK
                             s.acquire();
                             setTimer(false); // stop timer
                             nextSeqNum = base; // reset nextSeqNum
                             s.release();
                         } else if (tcpPacket.isFIN()){ // teardown signal
                             transferComplete = true; // we done here
+                            setTimer(false);
                             System.out.println("TCPSender: InThread: Teardown ACK received");
                         } else { // normal ACK
                             base = tcpPacket.getACK() + 1;  // update base number
@@ -227,7 +253,7 @@ public class TCPSender {
     
     public class Timeout extends TimerTask {
         public void run() {
-            System.out.println("TCPSender: Timeout: Go-Back-N Triggered");
+            System.out.println("TCPSender: Timeout: Go-Back-N Triggered, going back to packet " + base);
             goBackN();
         }
     }
@@ -243,37 +269,32 @@ public class TCPSender {
         }
     }
     
-    public TCPSender(int dstPort, int recvPort, String path, String filename) {
+    public TCPSender(int recvPort, String path, String filename) {
         System.out.println("TCPSender: Starting Up TCPSender");
-        
-        base = 0;
-        nextSeqNum = 0;
+      
         this.path = path; //((path.substring(path.length()-1)).equals("/")) ? path : path + "/"; // properly format path;
         this.filename = filename;
         packetList = new Vector<byte[]>(winSize);
         transferComplete = false;
-        DatagramSocket outSocket, inSocket;
+        DatagramSocket inSocket;
         s = new Semaphore(1);
         
         try {
-            // create the sockets
-            outSocket =  new DatagramSocket();      // bind to any available port
-            inSocket = new DatagramSocket(recvPort); // bind to port inSocketPort
+            // create the socket
+            inSocket = new DatagramSocket(recvPort); // bind to port recvPort
             
             // create the threads to process data
             InThread inThread = new InThread(inSocket); // receive ACKs through inSocket
-            OutThread outThread = new OutThread(outSocket, dstPort, recvPort);
             inThread.start();
-            outThread.start();
         } catch (SocketException e) {
-            System.err.println("TCPSender: Exception while creating sockets");
+            System.err.println("TCPSender: Exception while creating inSocket");
             e.printStackTrace();
             System.exit(-1);
         }
     }
     
     public static void main(String[] args) {
-        new TCPSender(14415,14416,"","hello_repeat.txt"); // dstPort, recvPort, path, filename
+        new TCPSender(14416,"","hello_repeat.txt"); // dstPort, recvPort, path, filename
     }
 
 }
