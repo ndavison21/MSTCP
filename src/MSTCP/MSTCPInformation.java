@@ -6,7 +6,7 @@ import java.util.Vector;
 
 public class MSTCPInformation {
 
-    int connectionID;
+    int receiverID;
     String filename;
     int fileSize = -1;    
     Vector<SourceInformation> sources;
@@ -14,21 +14,21 @@ public class MSTCPInformation {
     
     // For sending with SYN
     public MSTCPInformation(int connectionID, String filename) {
-        this.connectionID = connectionID;
+        this.receiverID = connectionID;
         this.filename = filename;
     }
     
     // For sending with SYN + ACK
     public MSTCPInformation(Vector<SourceInformation> sources, int connectionID, String filename, int filesize) {
         this.sources = sources;
-        this.connectionID = connectionID;
+        this.receiverID = connectionID;
         this.filename = filename;
         this.fileSize = filesize;
     }
     
     public MSTCPInformation(byte[] bytes) throws UnknownHostException {
         ByteBuffer bb = ByteBuffer.wrap(bytes);
-        this.connectionID = bb.getInt();
+        this.receiverID = bb.getInt();
         byte[] filenameBytes = new byte[bb.getInt()];
         bb.get(filenameBytes);
         this.filename = new String(filenameBytes);
@@ -71,7 +71,7 @@ public class MSTCPInformation {
         
         
         ByteBuffer bb = ByteBuffer.allocate(size);
-        bb.putInt(connectionID);
+        bb.putInt(receiverID);
         bb.putInt(filename.getBytes().length);
         bb.put(filename.getBytes());
         

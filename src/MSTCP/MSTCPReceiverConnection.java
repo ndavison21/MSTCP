@@ -15,11 +15,9 @@ import java.util.concurrent.Semaphore;
 
 public class MSTCPReceiverConnection extends Thread {
     static int timeoutVal = 300; // ms
-    int winSize = 1;
+    int winSize = 2;
     
-    int receiverID;   // identifies the receiver of the data
     int connectionID; // identifies this connection between the receiver and a source
-    String filename;  // the file being transferred
     
     DatagramSocket inSocket, outSocket;  // sockets to receive data and send ACKs
     int recvPort, dstPort;               // ports to receive data and semd ACKs
@@ -37,7 +35,7 @@ public class MSTCPReceiverConnection extends Thread {
     LinkedBlockingQueue<TCPPacket> receivedData; // data received in response to a request
     
     MSTCPReceiver receiver;             // receiver that coordinates connections
-    boolean MS_JOIN;                    // first connection or joining existing
+    boolean ms_join;
     
     int synAttempts = 0;
     int reqAttempts = 0;
@@ -84,7 +82,7 @@ public class MSTCPReceiverConnection extends Thread {
         TCPPacket synPacket = new TCPPacket(recvPort, dstPort, nextSeqNum, winSize);
         synPacket.setSYN();
         
-        MSTCPInformation msInfo = new MSTCPInformation(receiverID, filename);
+        MSTCPInformation msInfo = receiver.mstcpInformation;
         synPacket.setData(msInfo.bytes());
         
         byte[] synBytes = synPacket.bytes();
@@ -110,11 +108,15 @@ public class MSTCPReceiverConnection extends Thread {
                     setSYNTimer(false);
                     connectionEstablished = true;
                     // (ACK is included with first request)
+                    
+                    if (!ms_join) { // if first connection then need to set MSTCPInformation
+                        receivedData.put(tcpPacket);
+                    }
                 }
             }
             return true;
         } catch (Exception e) {
-            System.err.println("MSTCPConnection: Exception Received while Establishing Connection");
+            System.err.println("MSTCPReceiverConnection: Exception Received while Establishing Connection");
             e.printStackTrace();
             return false;
         }
@@ -130,11 +132,10 @@ public class MSTCPReceiverConnection extends Thread {
     
     public class dataTimeout extends TimerTask {
         public void run() {
-            System.out.println("TCPReceiver: Timeout: Resending SYN");
             try {
                 goBackN();
             } catch (Exception e) {
-                System.err.println("TCPReceiver: Timeout: Exception while trying to send SYN");
+                System.err.println("MSTCPReceiverConnection: Timeout: Exception while trying to send SYN");
                 e.printStackTrace();
             }
         }
@@ -179,6 +180,9 @@ public class MSTCPReceiverConnection extends Thread {
                                 else setDataTimer(true);                     // otherwise start waiting for the next response
                                 s.release();
                                 
+                                if (tcpPacket.isFIN())
+                                    receiver.transferComplete = true;
+                                
                                 // pass data to receiver
                                 receivedData.put(tcpPacket);
                             }
@@ -188,7 +192,7 @@ public class MSTCPReceiverConnection extends Thread {
                 
                 setDataTimer(false);
             } catch (Exception e) {
-                System.err.println("MSTCPConnection: InThread: Exception Encountered while Receiving Data. Attempting to Carry On");
+                System.err.println("MSTCPReceiverConnection: InThread: Exception Encountered while Receiving Data. Attempting to Carry On");
                 e.printStackTrace();
             } finally {
                 inSocket.close();
@@ -240,7 +244,7 @@ public class MSTCPReceiverConnection extends Thread {
                     
                 }
             } catch (Exception e) {
-                System.err.println("MSTCPConnection: InThread: Exception Encountered while Receiving Data. Attempting to Carry On");
+                System.err.println("MSTCPReceiverConnection: InThread: Exception Encountered while Receiving Data. Attempting to Carry On");
                 e.printStackTrace();
             } finally {
                 outSocket.close();
@@ -249,19 +253,15 @@ public class MSTCPReceiverConnection extends Thread {
     }
     
     
-    public MSTCPReceiverConnection(String addr, int recvPort, int dstPort, boolean MS_JOIN, MSTCPReceiver receiver, 
-            int connectionID, int receiverID, String filename) {
-        System.out.println("MSTCPConnection: Starting Up");
+    public MSTCPReceiverConnection(String addr, int recvPort, int dstPort, MSTCPReceiver receiver, int connectionID, boolean ms_join) {
         
         try {
             this.dstAddress = InetAddress.getByName(addr);
             this.recvPort = recvPort;
             this.dstPort = dstPort;
             this.receiver = receiver;
-            this.MS_JOIN = MS_JOIN;
             this.connectionID = connectionID;
-            this.receiverID = receiverID;
-            this.filename = filename;
+            this.ms_join = ms_join;
                     
             
             inSocket = new DatagramSocket(recvPort); // receive packets on port recvPort
@@ -280,7 +280,7 @@ public class MSTCPReceiverConnection extends Thread {
             }
             
         } catch (Exception e) {
-            System.err.println("MSTCPConnection: Exception Encountered: Attempting to Carry On");
+            System.err.println("MSTCPReceiverConnection: Exception Encountered: Attempting to Carry On");
             e.printStackTrace();
         }
     }
