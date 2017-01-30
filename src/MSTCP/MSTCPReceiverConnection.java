@@ -5,7 +5,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -13,14 +12,14 @@ import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
-import MSTCP.TCPPacket;
-
 
 public class MSTCPReceiverConnection extends Thread {
     static int timeoutVal = 300; // ms
     int winSize = 1;
     
-    int id;
+    int receiverID;   // identifies the receiver of the data
+    int connectionID; // identifies this connection between the receiver and a source
+    String filename;  // the file being transferred
     
     DatagramSocket inSocket, outSocket;  // sockets to receive data and send ACKs
     int recvPort, dstPort;               // ports to receive data and semd ACKs
@@ -35,13 +34,16 @@ public class MSTCPReceiverConnection extends Thread {
     Vector<byte[]> sentRequests;         // list of sent requests
     Timer synTimer;                      // for timeouts
     Timer dataTimer;
-    LinkedBlockingQueue<byte[]> receivedData; // data received in response to a request
+    LinkedBlockingQueue<TCPPacket> receivedData; // data received in response to a request
     
     MSTCPReceiver receiver;             // receiver that coordinates connections
     boolean MS_JOIN;                    // first connection or joining existing
     
-    /** Connection Establishment Functionality and Method **/
     int synAttempts = 0;
+    int reqAttempts = 0;
+    
+    
+    /** Connection Establishment Functionality and Method **/
     
     public class SYNTimeout extends TimerTask {
         public void run() {
@@ -79,10 +81,12 @@ public class MSTCPReceiverConnection extends Thread {
         base = initialSeqNum;
         s.release();
         
-        // TODO: set MS_JOIN if necessary
-        
         TCPPacket synPacket = new TCPPacket(recvPort, dstPort, nextSeqNum, winSize);
         synPacket.setSYN();
+        
+        MSTCPInformation msInfo = new MSTCPInformation(receiverID, filename);
+        synPacket.setData(msInfo.bytes());
+        
         byte[] synBytes = synPacket.bytes();
         outSocket.send(new DatagramPacket(synBytes, synBytes.length, dstAddress, dstPort));
         setSYNTimer(true); // timeout if there's no reply
@@ -158,9 +162,7 @@ public class MSTCPReceiverConnection extends Thread {
                 
                 while (!receiver.transferComplete) {
                     inSocket.receive(data);
-                    int tcpDataOffset = (inData[12] >> 4); // in 32 bit words
-                    int tcpHeaderLength = tcpDataOffset * 4; // in bytes
-                    TCPPacket tcpPacket = new TCPPacket(Arrays.copyOfRange(inData, 0, tcpHeaderLength));
+                    TCPPacket tcpPacket = new TCPPacket(inData);
                     
                     if (tcpPacket.verifyChecksum()) { // if packet is corrupted there is not much we can do
                         if (tcpPacket.isACK() && tcpPacket.getACK() != -1) {
@@ -169,7 +171,7 @@ public class MSTCPReceiverConnection extends Thread {
                                 setDataTimer(false);
                                 nextSeqNum = base;
                                 s.release();
-                            } else { // normal ACK and DATA
+                            } else { // normal ACK and Data
                                 // processing ACK
                                 s.acquire();
                                 base = tcpPacket.getACK() + 1; // update base of window
@@ -178,7 +180,7 @@ public class MSTCPReceiverConnection extends Thread {
                                 s.release();
                                 
                                 // pass data to receiver
-                                receivedData.put(Arrays.copyOfRange(inData, tcpHeaderLength, inData.length));
+                                receivedData.put(tcpPacket);
                             }
                         }
                     }
@@ -195,22 +197,16 @@ public class MSTCPReceiverConnection extends Thread {
     }
     
     
-    /** OutThread Functionality and Class **/
     
+    /** OutThread Functionality and Class **/
     
     // attaches a TCP header to the data bytes
     public byte[] generateTCPPacket(int seqNum, byte[] dataBytes, boolean ack) {
-        TCPPacket tcpPacket = new TCPPacket(this.recvPort, this.dstPort, seqNum, this.winSize);
-        if (ack) {
+        TCPPacket tcpPacket = new TCPPacket(this.recvPort, this.dstPort, seqNum, this.winSize, dataBytes);
+        if (ack)
             tcpPacket.setACK(initialSeqNum);
-        }
         
-        byte[] tcpBytes = tcpPacket.bytes();
-        
-        ByteBuffer packetBuffer = ByteBuffer.allocate(tcpBytes.length + dataBytes.length);
-        packetBuffer.put(tcpBytes);
-        packetBuffer.put(dataBytes);
-        return packetBuffer.array();
+        return tcpPacket.bytes();
     }
     
     
@@ -230,7 +226,7 @@ public class MSTCPReceiverConnection extends Thread {
                         if (nextSeqNum - initialSeqNum < sentRequests.size()) { // request has been constructed before (there has been a go-back-n)
                             request = sentRequests.get(nextSeqNum - initialSeqNum);
                         } else {
-                            int blocktoRequest = receiver.blockToRequest(id);
+                            int blocktoRequest = receiver.blockToRequest(connectionID);
                             ByteBuffer bb = ByteBuffer.allocate(4);
                             bb.putInt(blocktoRequest);
                             request = generateTCPPacket(nextSeqNum, bb.array(), (nextSeqNum == initialSeqNum)); // if first packet then set ACK to complete connection set up
@@ -253,7 +249,8 @@ public class MSTCPReceiverConnection extends Thread {
     }
     
     
-    public MSTCPReceiverConnection(String addr, int recvPort, int dstPort, boolean MS_JOIN, MSTCPReceiver receiver, int id) {
+    public MSTCPReceiverConnection(String addr, int recvPort, int dstPort, boolean MS_JOIN, MSTCPReceiver receiver, 
+            int connectionID, int receiverID, String filename) {
         System.out.println("MSTCPConnection: Starting Up");
         
         try {
@@ -262,14 +259,17 @@ public class MSTCPReceiverConnection extends Thread {
             this.dstPort = dstPort;
             this.receiver = receiver;
             this.MS_JOIN = MS_JOIN;
-            this.id = id;
+            this.connectionID = connectionID;
+            this.receiverID = receiverID;
+            this.filename = filename;
+                    
             
             inSocket = new DatagramSocket(recvPort); // receive packets on port recvPort
             outSocket = new DatagramSocket();        // send REQs and ACKs on any available port
             
             s = new Semaphore(1);
             sentRequests = new Vector<byte[]>(winSize);
-            receivedData = new LinkedBlockingQueue<byte[]>();
+            receivedData = new LinkedBlockingQueue<TCPPacket>();
             
             InThread inThread = new InThread();
             OutThread outThread = new OutThread();

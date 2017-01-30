@@ -13,6 +13,8 @@ public class MSTCPReceiver {
     boolean transferComplete = false;
     int next_id = 0;
     
+    int fileSize = -1;
+    
     
     public MSTCPReceiver(String addr, int recvPort, int dstPort, String path) {
         System.out.println("MSTCPReceiver: Starting Up MSTCP Connection");
