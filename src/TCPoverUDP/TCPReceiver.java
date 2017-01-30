@@ -17,24 +17,25 @@ import java.util.TimerTask;
 
 /**
  * 
- * @author Nathanael Davison = nd359
+ * @author Nathanael Davison - nd359
  * 
  *      Simple implementation of Go-Back-N over UDP
  *          - See comments on TCPSender for more information
  *
  */
 public class TCPReceiver {
-    static int pktSize = 1000; // checksum: 8, sequNum: 4, data <= 988, so 1000 Bytes total
-    DatagramSocket inSocket, outSocket;
-    int initialSeqNum;
-    int prevSeqNum = -1;                   // sequence number of previous, in-order, packet received
-    int nextSeqNum;                   // next expected sequence number    
-    Timer timer;                      // for timeouts while setting up connection
-    boolean sentSyn = false;
-    int recvPort, dstPort;
-    InetAddress dstAddress;
+    static int pktSize = 1000;           // TCP Packet: 160, data <= 840, so 1000 Bytes total
+    DatagramSocket inSocket, outSocket;  // sockets to receive data and send ACKs
+    int recvPort, dstPort;               // ports to receive data and semd ACKs
+    InetAddress dstAddress;              // address of data source
+    int initialSeqNum;                   // random first sequence number
+    int prevSeqNum = -1;                 // sequence number of previous, in-order, packet received
+    int nextSeqNum;                      // next expected sequence number    
+    Timer timer;                         // for timeouts while setting up connection
 
     
+    // Need to resend SYN if we get no response
+    // TODO: Give up after a while
     public class Timeout extends TimerTask {
         public void run() {
             System.out.println("TCPReceiver: Timeout: Resending SYN");
@@ -57,6 +58,7 @@ public class TCPReceiver {
     }
     
     private void sendSYN() throws IOException {
+        // Choose a random initial sequence number
         Random rand = new Random();
         initialSeqNum = rand.nextInt(100);
         nextSeqNum = initialSeqNum;
@@ -66,14 +68,13 @@ public class TCPReceiver {
         TCPPacket synPacket = new TCPPacket(recvPort, dstPort, nextSeqNum, TCPSender.winSize);
         synPacket.setSYN();
         byte[] synBytes = synPacket.bytes();
-        sentSyn = true;
         outSocket.send(new DatagramPacket(synBytes, synBytes.length, dstAddress, dstPort));
-        setTimer(true);
+        setTimer(true); // timeout if there's no reply
     }
     
     
     
-    public TCPReceiver(int recvPort, int dstPort, String path) {
+    public TCPReceiver(String addr, int recvPort, int dstPort, String path) {
         System.out.println("TCPReceiver: Starting Up TCPReceiver");
         this.recvPort = recvPort;
         this.dstPort = dstPort;
@@ -89,7 +90,7 @@ public class TCPReceiver {
             System.out.println("TCPReveiver: Started Up");
             
             try {
-                dstAddress = InetAddress.getByName("127.0.0.1");
+                dstAddress = InetAddress.getByName(addr);
                 byte[] inData = new byte[pktSize];
                 DatagramPacket inPkt = new DatagramPacket(inData, inData.length);
                 FileOutputStream fos = null;
@@ -198,7 +199,7 @@ public class TCPReceiver {
     }
     
     public static void main(String[] args) {
-        new TCPReceiver(14415,14416,"./"); // recvPort, dstPort
+        new TCPReceiver("127.0.0.1", 14415,14416,"./"); // recvPort, dstPort
     }
 
 }
