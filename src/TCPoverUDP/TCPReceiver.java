@@ -121,6 +121,7 @@ public class TCPReceiver {
                         
                         if (seqNum == nextSeqNum) { // if packet received in order
                             
+                            // sending ACK
                             if (tcpPacket.isSYN() && tcpPacket.isACK() && tcpPacket.getACK() == initialSeqNum) {
                                 System.out.println("TCPReceiver: SYN + ACK received, sending ACK: " + seqNum);
                                 setTimer(false);
@@ -129,7 +130,8 @@ public class TCPReceiver {
                             } else if (tcpPacket.isFIN()) { // if final packet (no data) then send teardown ACK
                                 System.out.println("TCPReceiver: Sending TCP ACK + FIN: " + seqNum);
                                 byte[] ackPkt = generateTCPACKPacket(tcpPacket.getDestPort(), tcpPacket.getSrcPort(), seqNum, tcpPacket.getWindowSize(), true);
-                                for (int i=0; i<20; i++) outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort)); // send 20 in case some are lost in the way
+                                for (int i=0; i<20; i++)
+                                    outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort)); // send 20 in case some are lost in the way
                                 transferComplete = true; // we done here
                                 continue; // end listener
                             } else { // otherwise send a normal ACK
@@ -138,6 +140,7 @@ public class TCPReceiver {
                                 outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
                             }
                             
+                            // Writing data
                             if (seqNum == initialSeqNum && prevSeqNum == -1) { // if first packet
                                 int filenameLength = ByteBuffer.wrap(Arrays.copyOfRange(inData, tcpHeaderLength, tcpHeaderLength + 4)).getInt();
                                 String filename = new String(Arrays.copyOfRange(inData, tcpHeaderLength + 4, tcpHeaderLength + 4 + filenameLength)); // decode filename
@@ -165,7 +168,8 @@ public class TCPReceiver {
                         System.out.println("TCPReceiver: Corrupted packet dropped, sent duplicate ACK " + prevSeqNum);
                     }
                 }
-                if (fos != null) fos.close();
+                if (fos != null)
+                    fos.close();
             } catch (UnknownHostException e) {
                 System.err.println("TCPReceiver: Unable to resolve host");
                 e.printStackTrace();

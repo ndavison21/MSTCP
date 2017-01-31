@@ -178,7 +178,10 @@ public class TCPPacket {
         this.checksum = ByteBuffer.wrap(packetBytes, 16, 2).getShort();
         this.urgentPointer = ByteBuffer.wrap(packetBytes, 18, 2).getShort();
         
-        if (dataOffset > 5) this.options = Arrays.copyOfRange(packetBytes, 20, packetBytes.length);
+        if (dataOffset > 5)
+            this.options = Arrays.copyOfRange(packetBytes, 20, packetBytes.length);
+        if (dataOffset * 4 < packetBytes.length)
+            this.data = Arrays.copyOfRange(packetBytes, dataOffset * 4, packetBytes.length);
                 
     }
     
@@ -210,7 +213,7 @@ public class TCPPacket {
     public byte[] bytes() {
         byte[] packetBytes = constructByteBuffer().array();
 
-        short sum = calculateChecksum();
+        short sum = calculateChecksum(packetBytes);
         packetBytes[16] = (byte) (sum >> 8);
         packetBytes[17] = (byte) (sum);
 
@@ -218,17 +221,28 @@ public class TCPPacket {
     }
     
     public short calculateChecksum() {
-        byte[] packetBytes = constructByteBuffer().array();
-        
+        return calculateChecksum(constructByteBuffer().array());
+    }
+    
+    public short calculateChecksum(byte[] packetBytes) {        
         short sum = 0;
         for (int i=0; i<packetBytes.length; i++) {
             sum += packetBytes[i];
         }
-        
         return sum;
     }
    
     public boolean verifyChecksum() {
         return this.checksum == calculateChecksum();
+    }
+    
+    public static void main(String[] args) {
+        byte[] data = {0, 1, 2, 3, -1, -2, -3, -4};
+        TCPPacket pkt1 = new TCPPacket(14000, 15000, 50, 10, data);
+        pkt1.setACK(54);
+        byte[] pkt1Bytes = pkt1.bytes();
+        TCPPacket pkt2 = new TCPPacket(pkt1Bytes);
+        boolean result = pkt2.verifyChecksum();
+        System.out.println(result);
     }
 }

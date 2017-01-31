@@ -1,34 +1,30 @@
 package MSTCP;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
 public class SourceInformation {
-    InetAddress address;
+    String address;
     int port;
+    boolean connected = false;
     
     public byte[] bytes() {
-        String addr = address.getHostAddress();
-        ByteBuffer bb = ByteBuffer.allocate(addr.getBytes().length + 4);
-        bb.put(addr.getBytes());
+        ByteBuffer bb = ByteBuffer.allocate(address.getBytes().length + 5);
+        bb.put(address.getBytes());
+        bb.put((byte)(connected ? 1 : 0));
         return bb.array();
     }
-    
-    public SourceInformation(InetAddress address, int port) {
+     
+    public SourceInformation(String address, int port) {
         this.address = address;
         this.port = port;
     }
     
-    public SourceInformation(String address, int port) throws UnknownHostException {
-        this(InetAddress.getByName(address), port);
-    }
-    
-    public SourceInformation(byte[] info) throws UnknownHostException {
+    public SourceInformation(byte[] info) {
         ByteBuffer bb = ByteBuffer.wrap(info);
-        byte[] addr = new byte[info.length - 4];
+        byte[] addr = new byte[info.length - 5];
         bb.get(addr);
-        address = InetAddress.getByName(new String(addr));
+        this.address = new String(addr);
         this.port = bb.getInt();
+        this.connected = bb.get() != 0;
     }
 }
