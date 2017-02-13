@@ -25,6 +25,11 @@ public class MSTCPReceiver {
     MSTCPInformation mstcpInformation;           // information about the MSTCP connection
     int nextBlock = 0;                           // next block to request
     
+    int alpha;
+    int alpha_scale = 512; // optimise calculation of alpha
+    int bytes_acked;
+    int cwnd_total;
+    
     
 
     
