@@ -47,14 +47,50 @@ public class MSTCPSender {
             inSocket = new DatagramSocket(recvPort);
             outSocket = new DatagramSocket();
             
-            byte[] reqBytes = new byte[MSTCPReceiver.requestSize];
-            DatagramPacket req = new DatagramPacket(reqBytes, reqBytes.length);
             
             RandomAccessFile raf = null;
             
+            System.out.println("MSTCPSender: Waiting for SYN");
+            
+            while(initialSeqNum == -1) {
+                byte[] synBytes = new byte[1000];
+                DatagramPacket syn = new DatagramPacket(synBytes, synBytes.length);
+                inSocket.receive(syn);
+                TCPPacket synPacket = new TCPPacket(synBytes);
+                if (synPacket.verifyChecksum() && synPacket.isSYN()) {
+                    int seqNum = synPacket.getSeqNum();
+                    System.out.println("MSTCPSender: SYN Received, initial sequence number " + seqNum);
+                    initialSeqNum = seqNum;
+                    nextSeqNum = initialSeqNum;
+                    
+                    dstAddress = syn.getAddress(); // when moving to lower level we'll need to get this from IP
+                    dstPort = synPacket.getSrcPort();
+                    
+                    mstcpInfo = new MSTCPInformation(synPacket.getData());
+                    mstcpInfo.sources = this.sources;
+                    for (SourceInformation s: mstcpInfo.sources) { // set this sender to connected
+                        if (s.address == srcInfo.address && s.port == srcInfo.port) {
+                            s.connected = true;
+                            srcInfo.connected = true;
+                        }
+                    }
+                    
+                    File file = new File(path + mstcpInfo.filename); // open file TODO: handle case where file can't be found
+                    raf = new RandomAccessFile(file, "r"); // RandomAccessFile so we can seek specific blocks
+                    
+                    mstcpInfo.fileSize = file.length();
+                    
+                    byte[] ackPkt = generateTCPPacket(nextSeqNum, mstcpInfo.bytes(), true, false);
+                    outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
+                }
+            }
+            
+            
+            byte[] reqBytes = new byte[MSTCPReceiver.requestSize];
+            DatagramPacket req = new DatagramPacket(reqBytes, reqBytes.length);   
             byte[] dataBytes = new byte[MSTCPReceiver.blockSize];
             
-            System.out.println("MSTCPSender: Waiting for SYN");
+            System.out.println("MSTCPSender: Waiting for Block Requests");
             while(!transferComplete) {
                 for (int i=0; i < reqBytes.length; i++)
                     reqBytes[i] = 0; // zero out, stop leftovers from previous iteration
@@ -67,39 +103,13 @@ public class MSTCPSender {
                 
                 if (reqPacket.verifyChecksum()) {
                     int seqNum = reqPacket.getSeqNum();
-                    if (initialSeqNum == -1) { // expecting a SYN
-                        if (reqPacket.isSYN()) {
-                            System.out.println("MSTCPSender: SYN Received, initial sequence number " + reqPacket.getSeqNum());
-                            initialSeqNum = seqNum;
-                            nextSeqNum = initialSeqNum;
-                            
-                            dstAddress = req.getAddress(); // when moving to lower level we'll need to get this from IP
-                            dstPort = reqPacket.getSrcPort();
-                            
-                            mstcpInfo = new MSTCPInformation(reqPacket.getData());
-                            mstcpInfo.sources = this.sources;
-                            for (SourceInformation s: mstcpInfo.sources) { // set this sender to connected
-                                if (s.address == srcInfo.address && s.port == srcInfo.port) {
-                                    s.connected = true;
-                                    srcInfo.connected = true;
-                                }
-                            }
-                            
-                            File file = new File(path + mstcpInfo.filename); // open file TODO: handle case where file can't be found
-                            raf = new RandomAccessFile(file, "r"); // RandomAccessFile so we can seek specific blocks
-                            
-                            mstcpInfo.fileSize = file.length();
-                            
-                            byte[] ackPkt = generateTCPPacket(nextSeqNum, mstcpInfo.bytes(), true, false);
-                            outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
-                        }
-                    } else if (seqNum == nextSeqNum) { // packet received in order, send block
+                    if (seqNum == nextSeqNum) { // packet received in order, send block
                         System.out.println("MSTCPSender: Request " + seqNum + " received in order");
                         int block = ByteBuffer.wrap(reqPacket.getData()).getInt();
                         System.out.println("MSTCPSender: Block requested " + block);
                         raf.seek(block * MSTCPReceiver.blockSize); // find block
                         raf.read(dataBytes);
-                        if (block >= (mstcpInfo.fileSize / MSTCPReceiver.blockSize) + 1) { // if final block then send fin
+                        if (block > mstcpInfo.fileSize / MSTCPReceiver.blockSize) { // if final block then send fin
                             byte[] ackPkt = generateTCPPacket(nextSeqNum, dataBytes, false, true);
                             for (int i=0; i<20; i++) // send 20 in case any get lost
                                 outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));

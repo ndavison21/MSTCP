@@ -6,10 +6,10 @@ import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class MSTCPReceiver {
-    static int headerSize  = 160;  // TCP Header (with no options): 160 bytes
-    static int requestSize = 164;  // TCP Header: 160 , Request (block to send): 4 bytes
-    static int blockSize   = 840;  // Send blocks of 840 bytes
-    static int pktSize     = 1000; // TCP Header: 160, blocks <= 840, so 1000 Bytes total
+    static int headerSize  = 20;  // TCP Header (with no options): 20 bytes
+    static int requestSize = 24;  // TCP Header: 20 , Request (block to send): 4 bytes
+    static int blockSize   = 980;  // Send blocks of 980 bytes
+    static int pktSize     = 1000; // TCP Header: 20, blocks <= 980, so 1000 Bytes total
     static int synLimit    = 50;   // number if times to try SYN before giving up
     static int noOfSources = 1;    // number of sources to connect to
     
@@ -95,6 +95,7 @@ public class MSTCPReceiver {
     
     
     public static void main(String[] args) {
-        new MSTCPReceiver("127.0.0.1", 14000, 15000, "./", "me.jpg"); // recvPort, dstPort
+        new MSTCPReceiver("127.0.0.1", 14000, 15000, "./", "hello_repeat.txt"); // recvPort, dstPort
+        // new MSTCPReceiver("127.0.0.1", 14000, 15000, "./", "me.jpg"); // recvPort, dstPort
     }
 }

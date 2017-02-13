@@ -60,12 +60,12 @@ public class MSTCPReceiverConnection extends Thread {
     }
     
     public void setSYNTimer(boolean newTimer) {
-//        if (synTimer != null)
-//            synTimer.cancel(); // stops the current timer
-//        if (newTimer) {
-//            synTimer = new Timer(); // start a new one if necessary
-//            synTimer.schedule(new SYNTimeout(), timeoutVal);
-//        }
+        if (synTimer != null)
+            synTimer.cancel(); // stops the current timer
+        if (newTimer) {
+            synTimer = new Timer(); // start a new one if necessary
+            synTimer.schedule(new SYNTimeout(), timeoutVal);
+        }
     }
     
     
@@ -96,7 +96,7 @@ public class MSTCPReceiverConnection extends Thread {
         try {
             boolean connectionEstablished = false;
             
-            byte[] inData = new byte[MSTCPReceiver.headerSize];
+            byte[] inData = new byte[1000];
             DatagramPacket inPkt = new DatagramPacket(inData, inData.length);
             
             sendSYN();
@@ -145,11 +145,11 @@ public class MSTCPReceiverConnection extends Thread {
     
     
     public void setDataTimer(boolean newTimer) {
-//        if (synTimer != null) synTimer.cancel(); // stops the current timer
-//        if (newTimer) {
-//            synTimer = new Timer(); // start a new one if necessary
-//            synTimer.schedule(new dataTimeout(), timeoutVal);
-//        }
+        if (synTimer != null) synTimer.cancel(); // stops the current timer
+        if (newTimer) {
+            synTimer = new Timer(); // start a new one if necessary
+            synTimer.schedule(new dataTimeout(), timeoutVal);
+        }
     }
     
     
