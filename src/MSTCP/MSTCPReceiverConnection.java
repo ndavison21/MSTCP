@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.Random;
 import java.util.Timer;
@@ -14,23 +16,23 @@ import java.util.concurrent.Semaphore;
 
 
 public class MSTCPReceiverConnection extends Thread {
-    static int timeoutVal = 300; // ms
+    static final int timeoutVal = Integer.MAX_VALUE; // ms
+    static final int mss = MSTCPReceiver.pktSize;        // TODO: verify what this should be    
     
-    Semaphore sem_cwnd;               // guard for cwnd
-    int cwnd = 1;                     // size of the congestion window
-    int mss = MSTCPReceiver.pktSize;  // TODO: verify what this should be
-    float rtt_avg;                    // average RTT (measured per RTT, not per ACK)
-    long time_sent;                   // used for caclculating RTT
-    long time_received;               // used for caclculating RTT
-    int rtt_seqNum = -1;              // seqNum of the packet being used to measure RTT
-    int rtts_measured;                // used for calculating iterative mean
+    int cwnd = 1;                           // size of the congestion window in packets
+    int cwnd_bytes = MSTCPReceiver.pktSize; // size of the congestion window in bytes
+    double rtt_avg;                         // average RTT (measured per RTT, not per ACK)
+    long time_sent;                         // used for caclculating RTT
+    long time_received;                     // used for caclculating RTT
+    int rtt_seqNum = -1;                    // seqNum of the packet being used to measure RTT
+    int rtts_measured;                      // used for calculating iterative mean
     
-    int connectionID; // identifies this connection between the receiver and a source
+    final int connectionID; // identifies this connection between the receiver and a source
     
-    DatagramSocket inSocket, outSocket;  // sockets to receive data and send ACKs
-    int recvPort, dstPort;               // ports to receive data and semd ACKs
-    InetAddress dstAddress;              // address of data source
-    int initialSeqNum;                   // random first sequence number
+    final DatagramSocket inSocket, outSocket;  // sockets to receive data and send ACKs
+    final int recvPort, dstPort;               // ports to receive data and semd ACKs
+    final InetAddress dstAddress;              // address of data source
+    final int initialSeqNum;                   // random first sequence number
     int base;                            // sequence number of previous, in-order, packet received
     int nextSeqNum;                      // next expected sequence number
     int prevSeqNum = -1;                 
@@ -42,8 +44,8 @@ public class MSTCPReceiverConnection extends Thread {
     Timer dataTimer;
     LinkedBlockingQueue<TCPPacket> receivedData; // data received in response to a request
     
-    MSTCPReceiver receiver;             // receiver that coordinates connections
-    boolean ms_join;
+    final MSTCPReceiver receiver;             // receiver that coordinates connections
+    final boolean ms_join;
     
     int synAttempts = 0;
     int reqAttempts = 0;
@@ -59,10 +61,10 @@ public class MSTCPReceiverConnection extends Thread {
                     synAttempts++;
                     sendSYN();
                 } else { // give up
-                    System.err.println("MSTCPReceiverConnection: Too Many failed SYNs. Giving Up.");
+                    System.err.println("MSTCPReceiverConnection " + connectionID + ": Too Many failed SYNs. Giving Up.");
                 }
             } catch (Exception e) {
-                System.err.println("MSTCPReceiverConnection: SYNTimeout: Exception while trying to send SYN. Attempting to Carry On");
+                System.err.println("MSTCPReceiverConnection " + connectionID + ": SYNTimeout: Exception while trying to send SYN. Attempting to Carry On");
                 e.printStackTrace();
             }
         }
@@ -80,12 +82,9 @@ public class MSTCPReceiverConnection extends Thread {
     
    
     private void sendSYN() throws IOException, InterruptedException {
-        System.out.println("MSTCPReceiverConnection: Sending SYN to " + dstAddress.toString() + ", port " + dstPort + ", attempt " + synAttempts);
-        // Choose a random initial sequence number
-        Random rand = new Random();
+        System.out.println("MSTCPReceiverConnection " + connectionID + ": Sending SYN to " + dstAddress.toString() + ", port " + dstPort + ", attempt " + synAttempts);
         
         sem_seqNum.acquire();
-        initialSeqNum = rand.nextInt(100);
         nextSeqNum = initialSeqNum;
         base = initialSeqNum;
         sem_seqNum.release();
@@ -117,9 +116,11 @@ public class MSTCPReceiverConnection extends Thread {
                 TCPPacket tcpPacket = new TCPPacket(inData);
                 
                 if (tcpPacket.verifyChecksum() && tcpPacket.isSYN() && tcpPacket.isACK() && tcpPacket.getACK() == initialSeqNum) {
-                    System.out.println("MSTCPReceiverConnection: Received SYN + ACK");
+                    System.out.println("MSTCPReceiverConnection " + connectionID + ": Received SYN + ACK");
                     rtt_avg = time_received - time_sent;
                     rtts_measured++;
+                    if (ms_join)
+                        receiver.computeAlpha();
                     setSYNTimer(false);
                     connectionEstablished = true;
                     // (ACK is included with first request)
@@ -131,7 +132,7 @@ public class MSTCPReceiverConnection extends Thread {
             }
             return true;
         } catch (Exception e) {
-            System.err.println("MSTCPReceiverConnection: Exception Received while Establishing Connection");
+            System.err.println("MSTCPReceiverConnection " + connectionID + ": Exception Received while Establishing Connection");
             e.printStackTrace();
             return false;
         }
@@ -144,12 +145,17 @@ public class MSTCPReceiverConnection extends Thread {
         nextSeqNum = base; // do the go-back-n
         sem_seqNum.release();
         
+        receiver.computeAlpha();
         rtt_seqNum = -1;
-        sem_cwnd.acquire(); // update congestion window
-        if (cwnd > 1)
-            cwnd /= 1;
-        // TODO: recalculate alpha
-        sem_cwnd.release();
+        receiver.sem_cwnd.acquire(); // update congestion window
+        int dec = cwnd_bytes / 2;
+        receiver.cwnd_bytes_total -= dec;
+        cwnd_bytes -= dec;
+        cwnd = cwnd_bytes / MSTCPReceiver.pktSize;
+        if (cwnd < 1)
+            cwnd = 1;
+        receiver.computeAlpha();
+        receiver.sem_cwnd.release();
     }
     
     public class dataTimeout extends TimerTask {
@@ -157,7 +163,7 @@ public class MSTCPReceiverConnection extends Thread {
             try {
                 goBackN();
             } catch (Exception e) {
-                System.err.println("MSTCPReceiverConnection: Timeout: Exception while trying to send SYN");
+                System.err.println("MSTCPReceiverConnection " + connectionID + ": Timeout: Exception while trying to send SYN");
                 e.printStackTrace();
             }
         }
@@ -190,7 +196,7 @@ public class MSTCPReceiverConnection extends Thread {
                     
                     if (tcpPacket.verifyChecksum()) { // if packet is corrupted there is not much we can do
                         if (tcpPacket.isACK() && tcpPacket.getACK() != -1) {
-                            if (base > tcpPacket.getACK()) { // duplicate ACK, need to go back
+                            if (base > tcpPacket.getACK()) { // duplicate ACK, (packet corrupted in transit) need to go back
                                 rtt_seqNum = -1;
                                 sem_seqNum.acquire();
                                 setDataTimer(false);
@@ -198,11 +204,12 @@ public class MSTCPReceiverConnection extends Thread {
                                 sem_seqNum.release();
                             } else { // normal ACK and Data
                                 // processing ACK
-                                if (tcpPacket.getACK() == rtt_seqNum) {
+                                if (tcpPacket.getACK() == rtt_seqNum) { // packet used to measure RTT
                                     rtt_seqNum = -1;
                                     rtts_measured++;
                                     rtt_avg = rtt_avg + ((1/((float)rtts_measured)) * ((time_received-time_sent) - rtt_avg));
-                                    System.out.println("Avg RTT: " + rtt_avg);
+                                    System.out.println("Avg RTT of connection " + connectionID + ": " + rtt_avg);
+                                    receiver.computeAlpha();
                                 }
                                 sem_seqNum.acquire();
                                 base = tcpPacket.getACK() + 1; // update base of window
@@ -210,23 +217,34 @@ public class MSTCPReceiverConnection extends Thread {
                                 else setDataTimer(true);                     // otherwise start waiting for the next response
                                 sem_seqNum.release();
                                 
+                                receiver.sem_cwnd.acquire();
+                                int bytes_acked = tcpPacket.getData().length;
+                                int global = (int) ((receiver.alpha * bytes_acked * mss) / (receiver.alpha_scale * receiver.cwnd_bytes_total));
+                                int local = (bytes_acked * mss) / cwnd_bytes;
+                                receiver.cwnd_bytes_total += Math.min(global, local);
+                                cwnd_bytes += Math.min(global, local);
+                                cwnd = cwnd_bytes /= MSTCPReceiver.pktSize;
+                                if (cwnd < 1)
+                                    cwnd = 1;
+                                receiver.sem_cwnd.release();
+                                
                                 receiver.transferComplete = tcpPacket.isFIN();
                                 if (receiver.transferComplete)
-                                    System.out.println("MSTCPReceiverConnection: InThread: Received FIN. We done here.");
+                                    System.out.println("MSTCPReceiverConnection " + connectionID + ": InThread: Received FIN. We done here.");
 
-                                System.out.println("MSTCPReceiverConnection: InThread: Received block from " + dstAddress + ", port " + dstPort);
+                                System.out.println("MSTCPReceiverConnection " + connectionID + ": InThread: Received block from " + dstAddress + ", port " + dstPort);
                                 // pass data to receiver
                                 receivedData.put(tcpPacket);
                             }
                         }
                     } else{
-                        System.out.println("MSTCPReceiverConnection: InThread: Data was corrupted");
+                        System.out.println("MSTCPReceiverConnection " + connectionID + ": InThread: Data was corrupted");
                     }
                 }
                 
                 setDataTimer(false);
             } catch (Exception e) {
-                System.err.println("MSTCPReceiverConnection: InThread: Exception Encountered while Receiving Data. Attempting to Carry On");
+                System.err.println("MSTCPReceiverConnection " + connectionID + ": InThread: Exception Encountered while Receiving Data. Attempting to Carry On");
                 e.printStackTrace();
             } finally {
                 inSocket.close();
@@ -273,7 +291,7 @@ public class MSTCPReceiverConnection extends Thread {
                             request = generateTCPPacket(nextSeqNum, bb.array(), (nextSeqNum == initialSeqNum), false); // if first packet then set ACK to complete connection set up
                             sentRequests.add(request);
                         }
-                        System.out.println("MSTCPReceiverConnection: Sending Request to " + dstAddress + ", port " + dstPort);
+                        System.out.println("MSTCPReceiverConnection " + connectionID + ": Sending Request to " + dstAddress + ", port " + dstPort);
                         if (rtt_seqNum == -1) {
                             rtt_seqNum = nextSeqNum;
                             time_sent = System.currentTimeMillis();
@@ -291,7 +309,7 @@ public class MSTCPReceiverConnection extends Thread {
                     outSocket.send(new DatagramPacket(request, request.length, dstAddress, dstPort));
                 
             } catch (Exception e) {
-                System.err.println("MSTCPReceiverConnection: InThread: Exception Encountered while Receiving Data. Attempting to Carry On");
+                System.err.println("MSTCPReceiverConnection " + connectionID + ": InThread: Exception Encountered while Receiving Data. Attempting to Carry On");
                 e.printStackTrace();
             } finally {
                 outSocket.close();
@@ -311,33 +329,29 @@ public class MSTCPReceiverConnection extends Thread {
     }
     
     
-    public MSTCPReceiverConnection(String addr, int recvPort, int dstPort, MSTCPReceiver receiver, int connectionID, boolean ms_join) {
-        System.out.println();
-        try {
-            this.dstAddress = InetAddress.getByName(addr);
-            this.recvPort = recvPort;
-            this.dstPort = dstPort;
-            this.receiver = receiver;
-            this.connectionID = connectionID;
-            this.ms_join = ms_join;
-                    
-            
-            inSocket = new DatagramSocket(recvPort); // receive packets on port recvPort
-            outSocket = new DatagramSocket();        // send REQs and ACKs on any available port
-            
-            sem_seqNum = new Semaphore(1);
-            sem_cwnd = new Semaphore(1);
-            sentRequests = new Vector<byte[]>(cwnd);
-            receivedData = new LinkedBlockingQueue<TCPPacket>();
-            
-            if (!ms_join)
-                this.run(); // if first connection then we must wait for connection to be established before continuing
-            else
-                this.start(); // for subsequent ones we don't want to have to wait
+    public MSTCPReceiverConnection(String addr, int recvPort, int dstPort, MSTCPReceiver receiver, int connectionID, boolean ms_join) throws SocketException, UnknownHostException {
+        this.dstAddress = InetAddress.getByName(addr);
+        this.recvPort = recvPort;
+        this.dstPort = dstPort;
+        this.receiver = receiver;
+        this.connectionID = connectionID;
+        this.ms_join = ms_join;
 
-        } catch (Exception e) {
-            System.err.println("MSTCPReceiverConnection: Exception Encountered: Attempting to Carry On");
-            e.printStackTrace();
-        }
+        inSocket = new DatagramSocket(recvPort); // receive packets on port recvPort
+        outSocket = new DatagramSocket();        // send REQs and ACKs on any available port    
+        
+        // Choose a random initial sequence number
+        Random rand = new Random();
+        initialSeqNum = rand.nextInt(100);                
+
+        
+        sem_seqNum = new Semaphore(1);
+        sentRequests = new Vector<byte[]>(cwnd);
+        receivedData = new LinkedBlockingQueue<TCPPacket>();
+        
+        if (!ms_join)
+            this.run(); // if first connection then we must wait for connection to be established before continuing
+        else
+            this.start(); // for subsequent ones we don't want to have to wait
     }
 }

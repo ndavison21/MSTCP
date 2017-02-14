@@ -10,6 +10,7 @@ public class SourceInformation {
     public byte[] bytes() {
         ByteBuffer bb = ByteBuffer.allocate(address.getBytes().length + 5);
         bb.put(address.getBytes());
+        bb.putInt(port);
         bb.put((byte)(connected ? 1 : 0));
         return bb.array();
     }

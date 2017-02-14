@@ -2,16 +2,19 @@ package MSTCP;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 
 public class MSTCPReceiver {
-    static int headerSize  = 20;  // TCP Header (with no options): 20 bytes
-    static int requestSize = 24;  // TCP Header: 20 , Request (block to send): 4 bytes
-    static int blockSize   = 980;  // Send blocks of 980 bytes
-    static int pktSize     = 1000; // TCP Header: 20, blocks <= 980, so 1000 Bytes total
-    static int synLimit    = 50;   // number if times to try SYN before giving up
-    static int noOfSources = 1;    // number of sources to connect to
+    static final int headerSize  = 20;  // TCP Header (with no options): 20 bytes
+    static final int requestSize = 24;  // TCP Header: 20 , Request (block to send): 4 bytes
+    static final int blockSize   = 980;  // Send blocks of 980 bytes
+    static final int pktSize     = 1000; // TCP Header: 20, blocks <= 980, so 1000 Bytes total
+    static final int synLimit    = 50;   // number if times to try SYN before giving up
+    static final int noOfSources = 2;    // number of sources to connect to
     
     LinkedBlockingQueue<ConnectionToRequestMap> connectionToBlockQueue; // queue of elements mapping connections to the block requested on that connection 
     
@@ -28,16 +31,15 @@ public class MSTCPReceiver {
     int alpha;
     int alpha_scale = 512; // optimise calculation of alpha
     int bytes_acked;
-    int cwnd_total;
+    Semaphore sem_cwnd;
+    int cwnd_bytes_total;
     
     
-
-    
-    
-    public MSTCPReceiver(String addr, int recvPort, int dstPort, String path, String filename) {
+    public MSTCPReceiver(String addr, int recvPort, int dstPort, String path, String filename) throws InterruptedException, SocketException, UnknownHostException {
         System.out.println("MSTCPReceiver: Starting Up MSTCP Connection. File: " + filename);
         this.mstcpInformation = new MSTCPInformation(0, filename);
         this.nextRecvPort = recvPort;
+        sem_cwnd = new Semaphore(1);
         connections = new Vector<MSTCPReceiverConnection>(noOfSources);
         connectionToBlockQueue = new LinkedBlockingQueue<ConnectionToRequestMap>();
         
@@ -45,6 +47,11 @@ public class MSTCPReceiver {
         System.out.println("MSTCPReceiver: Connecting to " + addr + " on port " + dstPort);
         MSTCPReceiverConnection connection = new MSTCPReceiverConnection(addr, nextRecvPort++, dstPort, this, nextConnectionID++, false);
         connections.addElement(connection);
+        sem_cwnd.acquire();
+        cwnd_bytes_total += connection.cwnd_bytes;
+        sem_cwnd.release();
+        computeAlpha();
+        
         
         try {
             File file = new File(path + "received_" + filename);
@@ -85,6 +92,26 @@ public class MSTCPReceiver {
 
     }
     
+    // computing alpha for coupled congestion control, calculated once per RTT or on packet drop
+    public synchronized void computeAlpha() {
+        int max = 0, sum = 0, a;
+        for (MSTCPReceiverConnection c: connections) {
+            if (c.rtt_avg <= 0)
+                continue;
+            a = (int) (c.cwnd_bytes / (c.rtt_avg * c.rtt_avg));
+            if (a > max)
+                max = a;
+            sum += a;
+        }
+        if (sum == 0) {
+            System.err.println("MSTCPReceiver: Unable to compute alpha: sum is zero");
+            return;
+        }
+        System.out.println(cwnd_bytes_total + " " + alpha_scale + " " + max + " " + sum);
+        alpha = cwnd_bytes_total * alpha_scale * (max / sum);
+        System.out.println("MSTCPReceiver: Recomputed Alpha: " + alpha);
+    }
+    
     // Generate requests, mapping block requested to connection sent on
     public synchronized int blockToRequest(int connection) throws InterruptedException {
         if (requestsComplete)
@@ -99,7 +126,7 @@ public class MSTCPReceiver {
     
     
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException, SocketException, UnknownHostException {
         new MSTCPReceiver("127.0.0.1", 14000, 15000, "./", "hello_repeat.txt"); // recvPort, dstPort
         // new MSTCPReceiver("127.0.0.1", 14000, 15000, "./", "me.jpg"); // recvPort, dstPort
     }
