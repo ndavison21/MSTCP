@@ -1,14 +1,24 @@
 package MSTCP;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.Vector;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
+/*
+ * VM ARGUMENT: -Djava.util.logging.SimpleFormatter.format="%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n"
+ */
 public class MSTCPSender {
+    Logger logger;
+    
     SourceInformation srcInfo;
     InetAddress dstAddress;
     int dstPort;
@@ -34,8 +44,20 @@ public class MSTCPSender {
     }
     
     public MSTCPSender(int recvPort, String path, Vector<SourceInformation> sources) {
-        System.out.println("MSTCPSender: Starting up MSTCPSender on port " + recvPort);
-        
+        logger = Logger.getLogger( MSTCPSender.class.getName() + recvPort );
+        try {
+            FileHandler handler = new FileHandler("./logs/MSTCPSender_" + recvPort +".log", 8096, 1, true);
+            handler.setFormatter(new SimpleFormatter());
+            logger.setUseParentHandlers(false);
+            logger.addHandler(handler);
+            logger.setLevel(Level.ALL);
+        } catch (SecurityException | IOException e1) {
+            System.err.println("MSTCPSender: Unable to Connect to Logger");
+            e1.printStackTrace();
+            return;
+        }
+        logger.info("*** NEW RUN ***");
+        logger.info(recvPort + ": Starting up MSTCPSender on port " + recvPort);
         this.recvPort = recvPort;
         this.path = path;
         this.srcInfo = new SourceInformation("127.0.0.1", recvPort); // TODO: Change to getting public IP not loopback
@@ -50,7 +72,7 @@ public class MSTCPSender {
             
             RandomAccessFile raf = null;
             
-            System.out.println("MSTCPSender: Waiting for SYN");
+            System.out.println("MSTCPSender " + recvPort + ": Waiting for SYN");
             
             while(initialSeqNum == -1) {
                 byte[] synBytes = new byte[1000];
@@ -59,7 +81,8 @@ public class MSTCPSender {
                 TCPPacket synPacket = new TCPPacket(synBytes);
                 if (synPacket.verifyChecksum() && synPacket.isSYN()) {
                     int seqNum = synPacket.getSeqNum();
-                    System.out.println("MSTCPSender: SYN Received, initial sequence number " + seqNum);
+                    logger.log(Level.FINE, "MSTCPSender " + recvPort + ": SYN Received, initial sequence number " + seqNum);
+                    // System.out.println("MSTCPSender " + recvPort + ": SYN Received, initial sequence number " + seqNum);
                     initialSeqNum = seqNum;
                     nextSeqNum = initialSeqNum;
                     
@@ -90,7 +113,7 @@ public class MSTCPSender {
             DatagramPacket req = new DatagramPacket(reqBytes, reqBytes.length);   
             byte[] dataBytes = new byte[MSTCPReceiver.blockSize];
             
-            System.out.println("MSTCPSender: Waiting for Block Requests");
+            System.out.println("MSTCPSender " + recvPort + ": Waiting for Block Requests");
             while(!transferComplete) {
                 for (int i=0; i < reqBytes.length; i++)
                     reqBytes[i] = 0; // zero out, stop leftovers from previous iteration
@@ -104,9 +127,9 @@ public class MSTCPSender {
                 if (reqPacket.verifyChecksum()) {
                     int seqNum = reqPacket.getSeqNum();
                     if (seqNum == nextSeqNum) { // packet received in order, send block
-                        System.out.println("MSTCPSender: Request " + seqNum + " received in order");
+                        System.out.println("MSTCPSender " + recvPort + ": Request " + seqNum + " received in order");
                         int block = ByteBuffer.wrap(reqPacket.getData()).getInt();
-                        System.out.println("MSTCPSender: Block requested " + block);
+                        System.out.println("MSTCPSender " + recvPort + ": Block requested " + block);
                         raf.seek(block * MSTCPReceiver.blockSize); // find block
                         raf.read(dataBytes);
                         if (block > mstcpInfo.fileSize / MSTCPReceiver.blockSize) { // if final block then send fin
@@ -115,14 +138,14 @@ public class MSTCPSender {
                                 outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
                             transferComplete = true; // we done here
                         } else {
-                            System.out.println("MSTCPSender: Sending Block " + block + " to " + dstAddress + " on port " + dstPort);
+                            System.out.println("MSTCPSender " + recvPort + ": Sending Block " + block + " to " + dstAddress + " on port " + dstPort);
                             byte[] ackPkt = generateTCPPacket(nextSeqNum, dataBytes, false, false);
                             outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
                             nextSeqNum++;
                             prevSeqNum = seqNum;
                         }
                     } else { // duplicate packet so we send duplicate ACK and Data
-                        System.out.println("MSTCPSender: Duplicate request " + seqNum + " received");
+                        System.out.println("MSTCPSender " + recvPort + ": Duplicate request " + seqNum + " received");
                         int block = ByteBuffer.wrap(reqPacket.getData()).getInt();
                         raf.seek(block * MSTCPReceiver.blockSize);
                         raf.read(dataBytes);
@@ -132,7 +155,7 @@ public class MSTCPSender {
                     
                     transferComplete = reqPacket.isFIN();
                 } else { // packet corrupted so send duplicate ACK
-                    System.out.println("MSTCPSender: Corrupted packet received, sending duplicate ACK " + prevSeqNum);
+                    System.out.println("MSTCPSender " + recvPort + ": Corrupted packet received, sending duplicate ACK " + prevSeqNum);
                     if (initialSeqNum == -1)
                         continue;
                     byte[] ackPkt = generateTCPPacket(prevSeqNum, null, false, false);
@@ -144,7 +167,7 @@ public class MSTCPSender {
                 raf.close();
         
         } catch (Exception e) {
-            System.err.println("MSTCPSender: Exception encountered.");
+            System.err.println("MSTCPSender " + recvPort + ": Exception encountered.");
             e.printStackTrace();
         }
        

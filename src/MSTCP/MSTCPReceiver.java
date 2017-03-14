@@ -101,15 +101,15 @@ public class MSTCPReceiver {
             a = (int) (c.cwnd_bytes / (c.rtt_avg * c.rtt_avg));
             if (a > max)
                 max = a;
-            sum += a;
+            sum += c.cwnd_bytes / c.rtt_avg;
         }
         if (sum == 0) {
             System.err.println("MSTCPReceiver: Unable to compute alpha: sum is zero");
             return;
         }
-        System.out.println(cwnd_bytes_total + " " + alpha_scale + " " + max + " " + sum);
-        alpha = cwnd_bytes_total * alpha_scale * (max / sum);
-        System.out.println("MSTCPReceiver: Recomputed Alpha: " + alpha);
+        // System.out.println("cwnd_bytes_total: " + cwnd_bytes_total + " alpha_scale: " + alpha_scale + " max: " + max + " sum^2: " + sum*sum);
+        alpha = ((cwnd_bytes_total * alpha_scale) / (sum*sum)) * max;
+        // System.out.println("MSTCPReceiver: Recomputed Alpha: " + alpha);
     }
     
     // Generate requests, mapping block requested to connection sent on

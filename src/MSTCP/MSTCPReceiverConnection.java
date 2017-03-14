@@ -141,6 +141,7 @@ public class MSTCPReceiverConnection extends Thread {
     /** Functionality Shared between InThread and OutThread **/
     
     private void goBackN() throws InterruptedException {
+        System.out.println("MSTCPReceiverConnection " + connectionID + ": GoBackN Triggered");
         sem_seqNum.acquire();
         nextSeqNum = base; // do the go-back-n
         sem_seqNum.release();
@@ -219,8 +220,20 @@ public class MSTCPReceiverConnection extends Thread {
                                 
                                 receiver.sem_cwnd.acquire();
                                 int bytes_acked = tcpPacket.getData().length;
-                                int global = (int) ((receiver.alpha * bytes_acked * mss) / (receiver.alpha_scale * receiver.cwnd_bytes_total));
+                                System.out.println("MSTCPReceiverConnection " + connectionID + ": *** BEFORE ***");
+                                System.out.println("MSTCPReceiverConnection " + connectionID + ": receiver.alpha: " + receiver.alpha);
+                                System.out.println("MSTCPReceiverConnection " + connectionID + ": cwnd_bytes: " + cwnd_bytes);
+                                System.out.println("MSTCPReceiverConnection " + connectionID + ": receiver.cwnd_bytes_total: " + receiver.cwnd_bytes_total);
+//                                System.out.println("MSTCPReceiverConnection " + connectionID + ": bytes_acked: " + bytes_acked);
+//                                System.out.println("MSTCPReceiverConnection " + connectionID + ": mss: " + mss);
+//                                System.out.println("MSTCPReceiverConnection " + connectionID + ": receiver.alpha_scale: " + receiver.alpha_scale);
+                                int global = (receiver.alpha / receiver.alpha_scale) * ((bytes_acked * mss) / receiver.cwnd_bytes_total);
                                 int local = (bytes_acked * mss) / cwnd_bytes;
+                                System.out.println("MSTCPReceiverConnection " + connectionID + ": global: " + global + " local: " + local);
+                                System.out.println("MSTCPReceiverConnection " + connectionID + ": *** AFTER ***");
+                                System.out.println("MSTCPReceiverConnection " + connectionID + ": receiver.alpha: " + receiver.alpha);
+                                System.out.println("MSTCPReceiverConnection " + connectionID + ": cwnd_bytes: " + cwnd_bytes);
+                                System.out.println("MSTCPReceiverConnection " + connectionID + ": receiver.cwnd_bytes_total: " + receiver.cwnd_bytes_total);
                                 receiver.cwnd_bytes_total += Math.min(global, local);
                                 cwnd_bytes += Math.min(global, local);
                                 cwnd = cwnd_bytes /= MSTCPReceiver.pktSize;
