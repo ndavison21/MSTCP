@@ -26,7 +26,7 @@ public class Test {
         TimeUnit.SECONDS.sleep(2);
         
         //new MSTCPReceiver("127.0.0.1", 14000, 15000, "./", "hello_repeat.txt"); // recvPort, dstPort
-        new MSTCPReceiver("127.0.0.1", 14000, 15000, "./", "hello_repeat_repeat.txt"); // recvPort, dstPort
+        new MSTCPReceiver("127.0.0.1", 14000, 15000, "./", "me.jpg"); // recvPort, dstPort
         //new MSTCPReceiver("127.0.0.1", 14000, 15000, "./", "me.jpg"); // recvPort, dstPort
     }
 }

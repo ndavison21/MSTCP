@@ -2,11 +2,16 @@ package MSTCP;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class MSTCPReceiver {
     static final int headerSize  = 20;  // TCP Header (with no options): 20 bytes
@@ -15,6 +20,8 @@ public class MSTCPReceiver {
     static final int pktSize     = 1000; // TCP Header: 20, blocks <= 980, so 1000 Bytes total
     static final int synLimit    = 50;   // number if times to try SYN before giving up
     static final int noOfSources = 2;    // number of sources to connect to
+    
+    Logger logger;
     
     LinkedBlockingQueue<ConnectionToRequestMap> connectionToBlockQueue; // queue of elements mapping connections to the block requested on that connection 
     
@@ -36,7 +43,21 @@ public class MSTCPReceiver {
     
     
     public MSTCPReceiver(String addr, int recvPort, int dstPort, String path, String filename) throws InterruptedException, SocketException, UnknownHostException {
-        System.out.println("MSTCPReceiver: Starting Up MSTCP Connection. File: " + filename);
+        logger = Logger.getLogger( MSTCPSender.class.getName());
+        try {
+            FileHandler handler = new FileHandler("./logs/MSTCPReceiver.log", 8096, 1, true);
+            handler.setFormatter(new SimpleFormatter());
+            logger.setUseParentHandlers(false);
+            logger.addHandler(handler);
+            logger.setLevel(Level.ALL);
+        } catch (SecurityException | IOException e1) {
+        	System.err.println("MSTCPReceiver: Unable to Connect to Logger");
+            e1.printStackTrace();
+            return;
+        }
+        logger.info("*** NEW RUN ***");
+    	
+    	logger.info("Starting Up MSTCP Connection. File: " + filename);
         this.mstcpInformation = new MSTCPInformation(0, filename);
         this.nextRecvPort = recvPort;
         sem_cwnd = new Semaphore(1);
@@ -44,7 +65,7 @@ public class MSTCPReceiver {
         connectionToBlockQueue = new LinkedBlockingQueue<ConnectionToRequestMap>();
         
         // start the first connection (sets filesize and sources)
-        System.out.println("MSTCPReceiver: Connecting to " + addr + " on port " + dstPort);
+        logger.info("Connecting to " + addr + " on port " + dstPort);
         MSTCPReceiverConnection connection = new MSTCPReceiverConnection(addr, nextRecvPort++, dstPort, this, nextConnectionID++, false);
         connections.addElement(connection);
         sem_cwnd.acquire();
@@ -64,7 +85,7 @@ public class MSTCPReceiver {
                 for (SourceInformation s: mstcpInformation.sources) {
                     if (!s.connected) {
                         unusedConnections = true;
-                        System.out.println("MSTCPReceiver: Connecting to " + s.address + " on port " + s.port);
+                        logger.info("Connecting to " + s.address + " on port " + s.port);
                         MSTCPReceiverConnection conn = new MSTCPReceiverConnection(s.address, nextRecvPort++, s.port, this, nextConnectionID++, true);
                         connections.addElement(conn);
                         s.connected = true;
@@ -86,8 +107,8 @@ public class MSTCPReceiver {
             fos.close();
             
         } catch (Exception e) {
-            System.err.println("MSTCPReceiver: Exception Received while Establishing Connection");
-            e.printStackTrace();
+            logger.warning("Exception Received while Establishing Connection");
+            logger.warning(e.toString());
         }
 
     }
@@ -104,12 +125,12 @@ public class MSTCPReceiver {
             sum += c.cwnd_bytes / c.rtt_avg;
         }
         if (sum == 0) {
-            System.err.println("MSTCPReceiver: Unable to compute alpha: sum is zero");
+            logger.warning("Unable to compute alpha: sum is zero");
             return;
         }
         // System.out.println("cwnd_bytes_total: " + cwnd_bytes_total + " alpha_scale: " + alpha_scale + " max: " + max + " sum^2: " + sum*sum);
         alpha = ((cwnd_bytes_total * alpha_scale) / (sum*sum)) * max;
-        // System.out.println("MSTCPReceiver: Recomputed Alpha: " + alpha);
+        // logger.info("Recomputed Alpha: " + alpha);
     }
     
     // Generate requests, mapping block requested to connection sent on
@@ -117,7 +138,7 @@ public class MSTCPReceiver {
         if (requestsComplete)
             return -1;
         
-        System.out.println("MSTCPReceiver: Requesting block " + nextBlock + " on connnection " + connection);
+        logger.info("Requesting block " + nextBlock + " on connnection " + connection);
         connectionToBlockQueue.put(new ConnectionToRequestMap(connection, nextBlock));
         if (nextBlock >= ((mstcpInformation.fileSize / MSTCPReceiver.blockSize)))
             requestsComplete = true;
