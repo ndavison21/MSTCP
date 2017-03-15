@@ -7,6 +7,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
+import java.util.Random;
 import java.util.Vector;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -18,6 +19,11 @@ import java.util.logging.SimpleFormatter;
  */
 public class MSTCPSender {
     Logger logger;
+    
+    // artificially introducing latency
+    Random rand = new Random();
+    int latency = 1500;
+    boolean delay = true;
     
     SourceInformation srcInfo;
     InetAddress dstAddress;
@@ -31,22 +37,31 @@ public class MSTCPSender {
     int nextSeqNum = -1;
     int winSize;
     
+    boolean sent_fin = false;
+    
     Vector<SourceInformation> sources;
     MSTCPInformation mstcpInfo;
     
-    public byte[] generateTCPPacket(int seqNum, byte[] dataBytes, boolean syn, boolean fin) {
+    public byte[] generateTCPPacket(int seqNum, byte[] dataBytes, boolean syn, boolean fin, int time_req) {
         TCPPacket tcpPacket = new TCPPacket(this.recvPort, this.dstPort, seqNum, this.winSize, dataBytes);
         if (syn)
             tcpPacket.setSYN();
 
         tcpPacket.setACK(seqNum);
+        
+        tcpPacket.setTime_req(time_req);
+        tcpPacket.setTime_ack();
         return tcpPacket.bytes();
+    }
+
+    private void delay() throws InterruptedException {
+        Thread.sleep(latency + rand.nextInt(300) - 150);
     }
     
     public MSTCPSender(int recvPort, String path, Vector<SourceInformation> sources) {
         logger = Logger.getLogger( MSTCPSender.class.getName() + recvPort );
         try {
-            FileHandler handler = new FileHandler("./logs/MSTCPSender_" + recvPort +".log", 8096, 1, true);
+            FileHandler handler = new FileHandler("./logs/MSTCPSender_" + recvPort +".log", 8096, 1, false);
             handler.setFormatter(new SimpleFormatter());
             logger.setUseParentHandlers(false);
             logger.addHandler(handler);
@@ -58,6 +73,7 @@ public class MSTCPSender {
         }
         logger.info("*** NEW RUN ***");
         logger.info(recvPort + ": Starting up MSTCPSender on port " + recvPort);
+       
         this.recvPort = recvPort;
         this.path = path;
         this.srcInfo = new SourceInformation("127.0.0.1", recvPort); // TODO: Change to getting public IP not loopback
@@ -78,10 +94,14 @@ public class MSTCPSender {
                 byte[] synBytes = new byte[1000];
                 DatagramPacket syn = new DatagramPacket(synBytes, synBytes.length);
                 inSocket.receive(syn);
+                if (delay) delay();
+                int time_recv = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
                 TCPPacket synPacket = new TCPPacket(synBytes);
                 if (synPacket.verifyChecksum() && synPacket.isSYN()) {
                     int seqNum = synPacket.getSeqNum();
-                    logger.info(recvPort + ": SYN Received, initial sequence number " + seqNum);
+                    int time_req = time_recv - synPacket.getTime_req();
+                    time_req = time_req < 0 ? (Integer.MAX_VALUE - synPacket.getTime_req()) + time_recv : time_req;
+                    logger.info(recvPort + ": SYN Received, initial sequence number " + seqNum + ". Request Latency: " + time_req);
                     initialSeqNum = seqNum;
                     nextSeqNum = initialSeqNum;
                     
@@ -102,7 +122,7 @@ public class MSTCPSender {
                     
                     mstcpInfo.fileSize = file.length();
                     
-                    byte[] ackPkt = generateTCPPacket(nextSeqNum, mstcpInfo.bytes(), true, false);
+                    byte[] ackPkt = generateTCPPacket(nextSeqNum, mstcpInfo.bytes(), true, false, time_req);
                     outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
                 }
             }
@@ -121,25 +141,38 @@ public class MSTCPSender {
                 
                 
                 inSocket.receive(req);
+                logger.info(recvPort + ": Packet Received.");
+                if (delay) delay();
+                int time_recv = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
                 TCPPacket reqPacket = new TCPPacket(reqBytes);
+                int time_req = time_recv - reqPacket.getTime_req();
+                time_req = time_req < 0 ? (Integer.MAX_VALUE - reqPacket.getTime_req()) + time_recv : time_req;
                 
                 if (reqPacket.verifyChecksum()) {
+                    
                     int seqNum = reqPacket.getSeqNum();
                     if (seqNum == nextSeqNum) { // packet received in order, send block
                     	logger.info(recvPort + ": Request " + seqNum + " received in order");
+
                         int block = ByteBuffer.wrap(reqPacket.getData()).getInt();
                         logger.info(recvPort + ": Block requested " + block);
-                        raf.seek(block * MSTCPReceiver.blockSize); // find block
-                        raf.read(dataBytes);
-                        if (block > mstcpInfo.fileSize / MSTCPReceiver.blockSize) { // if final block then send fin
-                            byte[] ackPkt = generateTCPPacket(nextSeqNum, dataBytes, false, true);
-                            for (int i=0; i<20; i++) // send 20 in case any get lost
-                                outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
-                            transferComplete = true; // we done here
-                        } else {
-                        	logger.info(recvPort + ": Sending Block " + block + " to " + dstAddress + " on port " + dstPort);
-                            byte[] ackPkt = generateTCPPacket(nextSeqNum, dataBytes, false, false);
+                        
+                        if (sent_fin && reqPacket.isACK()) {
+                            logger.info(recvPort + ": We Done Here.");
+                            transferComplete = true;
+                        } else if (reqPacket.isFIN()) {
+                            sent_fin = true;
+                            logger.info(recvPort + ": Sending FIN to " + dstAddress + " on port " + dstPort);
+                            byte[] ackPkt = generateTCPPacket(nextSeqNum, dataBytes, false, true, time_req);
                             outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
+                        } else {
+                            raf.seek(block * MSTCPReceiver.blockSize); // find block
+                            raf.read(dataBytes);
+                            
+                            logger.info(recvPort + ": Sending Block " + block + " to " + dstAddress + " on port " + dstPort);
+                            byte[] ackPkt = generateTCPPacket(nextSeqNum, dataBytes, false, false, time_req);
+                            outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
+                            
                             nextSeqNum++;
                             prevSeqNum = seqNum;
                         }
@@ -148,26 +181,28 @@ public class MSTCPSender {
                         int block = ByteBuffer.wrap(reqPacket.getData()).getInt();
                         raf.seek(block * MSTCPReceiver.blockSize);
                         raf.read(dataBytes);
-                        byte[] ackPkt = generateTCPPacket(nextSeqNum, dataBytes, false, false);
+                        byte[] ackPkt = generateTCPPacket(nextSeqNum, dataBytes, false, false, time_req);
                         outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
                     }
                     
-                    transferComplete = reqPacket.isFIN();
                 } else { // packet corrupted so send duplicate ACK
                 	logger.info(recvPort + ": Corrupted packet received, sending duplicate ACK " + prevSeqNum);
                     if (initialSeqNum == -1)
                         continue;
-                    byte[] ackPkt = generateTCPPacket(prevSeqNum, null, false, false);
+                    byte[] ackPkt = generateTCPPacket(prevSeqNum, null, false, false, time_req);
                     outSocket.send(new DatagramPacket(ackPkt, ackPkt.length, dstAddress, dstPort));
                 }
             }
+            
+            logger.info(recvPort + ": Transfer Complete.");
             
             if (raf != null)
                 raf.close();
         
         } catch (Exception e) {
             logger.warning(recvPort + ": Exception encountered.");
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e.getMessage(), e);
+            return;
         }
        
     }

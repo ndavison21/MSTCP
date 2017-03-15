@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class TCPPacket {
+    static int BASE_SIZE = 224; // base size of the TCP packet in bytes (7 32-bit words)
     
     private int srcPort    = 0;    // 16 bits, port at sender
     private int dstPort    = 0;    // 16 bits, port at receiver
@@ -16,6 +17,10 @@ public class TCPPacket {
     private int urgentPointer = 0; // 16 bits, if URG flag set then offset to last urgent data byte
     private byte[] options = null; // 0-320 bits divisible by 32, final byte includes any padding
     private byte[] data = null;    // (0-840 bytes) data the TCP is a header of
+    
+    private int time_req = -1; // 32 bits, in a request records the time the packet was sent. In an ack records the latency of the request.
+    private int time_ack = -1; // 32 bits, in a request is empty. In an ack Records the time the packet was sent.
+    
     
     private int paddingLength = 0;
     
@@ -30,8 +35,8 @@ public class TCPPacket {
         
         int optionsLength = (options == null ? 0 : options.length) * 8;
 
-        paddingLength = (160 + optionsLength) % 32;
-        dataOffset = (160 + optionsLength + paddingLength) / 32;
+        paddingLength = (BASE_SIZE + optionsLength) % 32;
+        dataOffset = (BASE_SIZE + optionsLength + paddingLength) / 32;
     }
     
    
@@ -40,8 +45,8 @@ public class TCPPacket {
         this.dstPort = destPort;
         this.seqNum = seqNum;
         this.windowSize = windowSize;
-        paddingLength = 160 % 32;
-        dataOffset = (160 + paddingLength) / 32;
+        paddingLength = BASE_SIZE % 32;
+        dataOffset = (BASE_SIZE + paddingLength) / 32;
     }
     
     public TCPPacket(int srcPort, int destPort, int seqNum, int ackNum, int flags, int windowSize,
@@ -53,7 +58,6 @@ public class TCPPacket {
     public TCPPacket(int srcPort, int destPort, int seqNum, int windowSize, byte[] data) {
         this(srcPort, destPort, seqNum, windowSize);
         this.data = data;
-
     }
 
     public int getSrcPort() {
@@ -124,6 +128,26 @@ public class TCPPacket {
     public void setFlags(int flags) {
         this.flags = flags;
     }
+    
+    public int getTime_req() {
+        return this.time_req;
+    }
+    
+    public void setTime_req() {
+        this.time_req = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
+    }
+    
+    public void setTime_req(int time_req) {
+        this.time_req = time_req;
+    }
+    
+    public int getTime_ack() {
+        return this.time_ack;
+    }
+    
+    public void setTime_ack() {
+        this.time_ack = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
+    }
 
     public int getWindowSize() {
         return windowSize;
@@ -148,7 +172,7 @@ public class TCPPacket {
                 this.options = options;
             }
             
-            this.dataOffset = 5 + (this.options.length / 4);
+            this.dataOffset = (BASE_SIZE / 32) + (this.options.length / 4);
                 
         }
     }
@@ -178,7 +202,10 @@ public class TCPPacket {
         this.checksum = ByteBuffer.wrap(packetBytes, 16, 2).getShort();
         this.urgentPointer = ByteBuffer.wrap(packetBytes, 18, 2).getShort();
         
-        if (dataOffset > 5)
+        this.time_req = ByteBuffer.wrap(packetBytes, 20, 4).getInt();
+        this.time_ack = ByteBuffer.wrap(packetBytes, 24, 4).getInt();
+        
+        if (dataOffset > (BASE_SIZE / 32))
             this.options = Arrays.copyOfRange(packetBytes, 20, packetBytes.length);
         if (dataOffset * 4 < packetBytes.length)
             this.data = Arrays.copyOfRange(packetBytes, dataOffset * 4, packetBytes.length);
@@ -188,7 +215,7 @@ public class TCPPacket {
     
     
     private ByteBuffer constructByteBuffer() {
-        ByteBuffer bb = ByteBuffer.allocate(dataOffset * 4 + (data == null ? 0 : data.length));
+        ByteBuffer bb = ByteBuffer.allocate( (dataOffset * 4) + (data == null ? 0 : data.length));
         
         bb.putShort((short) srcPort);
         bb.putShort((short) dstPort);
@@ -202,6 +229,10 @@ public class TCPPacket {
         bb.putShort((short) windowSize);
         bb.putShort((short) 0); // checksum done below
         bb.putShort((short) urgentPointer);
+        
+        bb.putInt(time_req);
+        bb.putInt(time_ack);
+        
         if (options != null && options.length > 0) 
             bb.put(options);
         if (data != null)
@@ -216,6 +247,7 @@ public class TCPPacket {
         short sum = calculateChecksum(packetBytes);
         packetBytes[16] = (byte) (sum >> 8);
         packetBytes[17] = (byte) (sum);
+        
 
         return packetBytes;
     }
@@ -240,6 +272,8 @@ public class TCPPacket {
         byte[] data = {0, 1, 2, 3, -1, -2, -3, -4};
         TCPPacket pkt1 = new TCPPacket(14000, 15000, 50, 10, data);
         pkt1.setACK(54);
+        pkt1.setTime_ack();
+        pkt1.setTime_req();
         byte[] pkt1Bytes = pkt1.bytes();
         TCPPacket pkt2 = new TCPPacket(pkt1Bytes);
         boolean result = pkt2.verifyChecksum();

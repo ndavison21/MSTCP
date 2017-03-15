@@ -22,14 +22,18 @@ import java.util.logging.SimpleFormatter;
 public class MSTCPReceiverConnection extends Thread {
 	Logger logger;
 	
+    // artificially introducing latency
+    Random rand = new Random();
+    int latency = 1500;
+    boolean delay = true;
+	
     static final int timeoutVal = Integer.MAX_VALUE; // ms
     static final int mss = MSTCPReceiver.pktSize;        // TODO: verify what this should be    
     
     int cwnd = 1;                           // size of the congestion window in packets
     int cwnd_bytes = MSTCPReceiver.pktSize; // size of the congestion window in bytes
     double rtt_avg;                         // average RTT (measured per RTT, not per ACK)
-    long time_sent;                         // used for caclculating RTT
-    long time_received;                     // used for caclculating RTT
+    int time_recv;                     // used for caclculating RTT
     int rtt_seqNum = -1;                    // seqNum of the packet being used to measure RTT
     int rtts_measured;                      // used for calculating iterative mean
     
@@ -43,7 +47,8 @@ public class MSTCPReceiverConnection extends Thread {
     int nextSeqNum;                      // next expected sequence number
     int prevSeqNum = -1;                 
     Semaphore sem_seqNum;                // guard for base and nextSeqSum
-    boolean complete = false;            // no more requests coming
+    boolean sent_fin = false;            // no more requests coming
+    boolean got_fin = false;
     
     Vector<byte[]> sentRequests;         // list of sent requests
     Timer synTimer;                      // for timeouts
@@ -56,6 +61,9 @@ public class MSTCPReceiverConnection extends Thread {
     int synAttempts = 0;
     int reqAttempts = 0;
     
+    private void delay() throws InterruptedException {
+        Thread.sleep(latency + rand.nextInt(300) - 150);
+    }
     
     
     /** Connection Establishment Functionality and Method **/
@@ -70,8 +78,9 @@ public class MSTCPReceiverConnection extends Thread {
                 	logger.warning(connectionID + ": Too Many failed SYNs. Giving Up.");
                 }
             } catch (Exception e) {
-            	logger.warning(connectionID + ": SYNTimeout: Exception while trying to send SYN. Attempting to Carry On");
-            	logger.warning(e.toString());
+            	logger.warning(connectionID + ": SYNTimeout: Exception while trying to send SYN.");
+            	logger.log(Level.SEVERE, e.getMessage(), e);
+            	return;
             }
         }
     }
@@ -100,9 +109,9 @@ public class MSTCPReceiverConnection extends Thread {
         
         MSTCPInformation msInfo = receiver.mstcpInformation;
         synPacket.setData(msInfo.bytes());
+        synPacket.setTime_req();
         
         byte[] synBytes = synPacket.bytes();
-        time_sent = System.currentTimeMillis();
         outSocket.send(new DatagramPacket(synBytes, synBytes.length, dstAddress, dstPort));
         setSYNTimer(true); // timeout if there's no reply
     }
@@ -117,13 +126,17 @@ public class MSTCPReceiverConnection extends Thread {
             sendSYN();
             while (!connectionEstablished) {
                 inSocket.receive(inPkt); // receive a packet
-                time_received = System.currentTimeMillis();
+                if (delay) delay();                
+                time_recv = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
 
                 TCPPacket tcpPacket = new TCPPacket(inData);
                 
                 if (tcpPacket.verifyChecksum() && tcpPacket.isSYN() && tcpPacket.isACK() && tcpPacket.getACK() == initialSeqNum) {
-                    logger.info(connectionID + ": Received SYN + ACK");
-                    rtt_avg = time_received - time_sent;
+                    int time_ack = time_recv - tcpPacket.getTime_ack();
+                    time_ack = time_ack < 0 ? (Integer.MAX_VALUE - tcpPacket.getTime_ack()) + time_recv : time_ack;
+                    long rtt = time_ack + tcpPacket.getTime_req();
+                    logger.info(connectionID + ": Received SYN + ACK. RTT: " + rtt);
+                    rtt_avg = rtt; 
                     rtts_measured++;
                     if (ms_join)
                         receiver.computeAlpha();
@@ -139,7 +152,7 @@ public class MSTCPReceiverConnection extends Thread {
             return true;
         } catch (Exception e) {
         	logger.warning(connectionID + ": Exception Received while Establishing Connection");
-            logger.warning(e.toString());
+        	logger.log(Level.SEVERE, e.getMessage(), e);
             return false;
         }
     }
@@ -151,6 +164,8 @@ public class MSTCPReceiverConnection extends Thread {
         sem_seqNum.acquire();
         nextSeqNum = base; // do the go-back-n
         sem_seqNum.release();
+        
+        sent_fin = false;
         
         receiver.computeAlpha();
         rtt_seqNum = -1;
@@ -171,7 +186,7 @@ public class MSTCPReceiverConnection extends Thread {
                 goBackN();
             } catch (Exception e) {
             	logger.warning(connectionID + ": Timeout: Exception while trying to send SYN");
-            	logger.warning(e.toString());
+            	logger.log(Level.SEVERE, e.getMessage(), e);
             }
         }
     }
@@ -196,9 +211,10 @@ public class MSTCPReceiverConnection extends Thread {
                 byte[] inData = new byte[MSTCPReceiver.pktSize];
                 DatagramPacket data = new DatagramPacket(inData, inData.length);
                 
-                while (!receiver.transferComplete) {
+                for (;;) {
                     inSocket.receive(data);
-                    time_received = System.currentTimeMillis();
+                    if (delay) delay();
+                    time_recv = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
                     TCPPacket tcpPacket = new TCPPacket(inData);
                     
                     if (tcpPacket.verifyChecksum()) { // if packet is corrupted there is not much we can do
@@ -210,12 +226,22 @@ public class MSTCPReceiverConnection extends Thread {
                                 nextSeqNum = base;
                                 sem_seqNum.release();
                             } else { // normal ACK and Data
+                                if (sent_fin && tcpPacket.isFIN()) {
+                                    logger.info(connectionID + ": Got FIN + ACK");
+                                    got_fin = true;
+                                    setDataTimer(false);
+                                    return;
+                                }
+                                
                                 // processing ACK
                                 if (tcpPacket.getACK() == rtt_seqNum) { // packet used to measure RTT
                                     rtt_seqNum = -1;
                                     rtts_measured++;
-                                    rtt_avg = rtt_avg + ((1/((float)rtts_measured)) * ((time_received-time_sent) - rtt_avg));
-                                    logger.info("Avg RTT of connection " + connectionID + ": " + rtt_avg);
+                                    int time_ack = time_recv - tcpPacket.getTime_ack();
+                                    time_ack = time_ack < 0 ? (Integer.MAX_VALUE - tcpPacket.getTime_ack()) + time_recv : time_ack;
+                                    long rtt = time_ack + tcpPacket.getTime_req();
+                                    rtt_avg = rtt_avg + ((1.0/(rtts_measured)) * ((rtt) - rtt_avg));
+                                    logger.info(connectionID + ": Avg RTT of connection " + connectionID + ": " + rtt_avg);
                                     receiver.computeAlpha();
                                 }
                                 sem_seqNum.acquire();
@@ -226,30 +252,14 @@ public class MSTCPReceiverConnection extends Thread {
                                 
                                 receiver.sem_cwnd.acquire();
                                 int bytes_acked = tcpPacket.getData().length;
-                                logger.info(connectionID + ": *** BEFORE ***");
-                                logger.info(connectionID + ": receiver.alpha: " + receiver.alpha);
-                                logger.info(connectionID + ": cwnd_bytes: " + cwnd_bytes);
-                                logger.info(connectionID + ": receiver.cwnd_bytes_total: " + receiver.cwnd_bytes_total);
-//                                logger.info(connectionID + ": bytes_acked: " + bytes_acked);
-//                                logger.info(connectionID + ": mss: " + mss);
-//                                logger.info(connectionID + ": receiver.alpha_scale: " + receiver.alpha_scale);
-                                int global = (receiver.alpha / receiver.alpha_scale) * ((bytes_acked * mss) / receiver.cwnd_bytes_total);
-                                int local = (bytes_acked * mss) / cwnd_bytes;
-                                logger.info(connectionID + ": global: " + global + " local: " + local);
-                                logger.info(connectionID + ": *** AFTER ***");
-                                logger.info(connectionID + ": receiver.alpha: " + receiver.alpha);
-                                logger.info(connectionID + ": cwnd_bytes: " + cwnd_bytes);
-                                logger.info(connectionID + ": receiver.cwnd_bytes_total: " + receiver.cwnd_bytes_total);
-                                receiver.cwnd_bytes_total += Math.min(global, local);
+                                double global = (receiver.alpha * bytes_acked * mss) / receiver.cwnd_bytes_total;
+                                double local = ((double) (bytes_acked * mss)) / cwnd_bytes;
                                 cwnd_bytes += Math.min(global, local);
                                 cwnd = cwnd_bytes /= MSTCPReceiver.pktSize;
                                 if (cwnd < 1)
                                     cwnd = 1;
                                 receiver.sem_cwnd.release();
                                 
-                                receiver.transferComplete = tcpPacket.isFIN();
-                                if (receiver.transferComplete)
-                                    logger.info(connectionID + ": InThread: Received FIN. We done here.");
 
                                 logger.info(connectionID + ": InThread: Received block from " + dstAddress + ", port " + dstPort);
                                 // pass data to receiver
@@ -260,11 +270,10 @@ public class MSTCPReceiverConnection extends Thread {
                         logger.info(connectionID + ": InThread: Data was corrupted");
                     }
                 }
-                
-                setDataTimer(false);
             } catch (Exception e) {
-            	logger.warning(connectionID + ": InThread: Exception Encountered while Receiving Data. Attempting to Carry On");
-            	logger.warning(e.toString());
+            	logger.warning(connectionID + ": InThread: Exception Encountered while Receiving Data.");
+            	logger.log(Level.SEVERE, e.getMessage(), e);
+            	return;
             } finally {
                 inSocket.close();
             }
@@ -282,6 +291,7 @@ public class MSTCPReceiverConnection extends Thread {
             tcpPacket.setACK(initialSeqNum);
         if (fin)
             tcpPacket.setFIN();
+        tcpPacket.setTime_req();
         return tcpPacket.bytes();
     }
     
@@ -291,7 +301,7 @@ public class MSTCPReceiverConnection extends Thread {
         public void run() {
             try {
                 byte[] request = new byte[MSTCPReceiver.requestSize];
-                while (!receiver.transferComplete) {
+                for (;;) {
                     if (nextSeqNum < base + cwnd) { // if the window is not yet full then send more packets
                         sem_seqNum.acquire();
                         
@@ -302,34 +312,40 @@ public class MSTCPReceiverConnection extends Thread {
                         if (nextSeqNum - initialSeqNum < sentRequests.size()) { // request has been constructed before (there has been a go-back-n)
                             request = sentRequests.get(nextSeqNum - initialSeqNum);
                         } else {
-                            int blockToRequest = receiver.blockToRequest(connectionID);
-                            if (blockToRequest == -1) // either uninitialised or all requests sent
+                            if (sent_fin && !got_fin) { // FIN has been sent, just waiting for timeout or transfer to complete
+                                sleep(2000);
                                 continue;
+                            } else if (sent_fin && got_fin) {
+                                logger.info(connectionID + ": ACKing Fin and closing connection.");
+                                request = generateTCPPacket(nextSeqNum, null, true, false);
+                                outSocket.send(new DatagramPacket(request, request.length, dstAddress, dstPort));
+                                return;
+                            }
+                            
+                            int blockToRequest = receiver.blockToRequest(connectionID);
+                            sent_fin  = (blockToRequest == -1);
+                            
                             ByteBuffer bb = ByteBuffer.allocate(4);
                             bb.putInt(blockToRequest);
-                            request = generateTCPPacket(nextSeqNum, bb.array(), (nextSeqNum == initialSeqNum), false); // if first packet then set ACK to complete connection set up
+                            logger.info(connectionID + " Requesting Block " + blockToRequest);
+                            request = generateTCPPacket(nextSeqNum, bb.array(), (nextSeqNum == initialSeqNum), sent_fin); // If first packet then set ACK. If final request then set FIN.
                             sentRequests.add(request);
                         }
                         logger.info(connectionID + ": Sending Request to " + dstAddress + ", port " + dstPort);
                         if (rtt_seqNum == -1) {
                             rtt_seqNum = nextSeqNum;
-                            time_sent = System.currentTimeMillis();
                         }
                         outSocket.send(new DatagramPacket(request, request.length, dstAddress, dstPort));
                         nextSeqNum++;
                         sem_seqNum.release();
                     }
-                    
-                    sleep(5);                    
+                                       
                 }
                 
-                request = generateTCPPacket(nextSeqNum, null, false, true);
-                for (int i=0; i<20; i++)
-                    outSocket.send(new DatagramPacket(request, request.length, dstAddress, dstPort));
-                
             } catch (Exception e) {
-                logger.warning(connectionID + ": InThread: Exception Encountered while Receiving Data. Attempting to Carry On");
-                e.printStackTrace();
+                logger.warning(connectionID + ": InThread: Exception Encountered while Receiving Data.");
+                logger.log(Level.SEVERE, e.getMessage(), e);
+                return;
             } finally {
                 outSocket.close();
             }
@@ -369,7 +385,7 @@ public class MSTCPReceiverConnection extends Thread {
         
         logger = Logger.getLogger( MSTCPSender.class.getName() + this.connectionID );
         try {
-            FileHandler handler = new FileHandler("./logs/MSTCPReceiverConnection_" + this.connectionID +".log", 8096, 1, true);
+            FileHandler handler = new FileHandler("./logs/MSTCPReceiverConnection_" + this.connectionID +".log", 8096, 1, false);
             handler.setFormatter(new SimpleFormatter());
             logger.setUseParentHandlers(false);
             logger.addHandler(handler);

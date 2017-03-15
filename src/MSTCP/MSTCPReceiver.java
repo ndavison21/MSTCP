@@ -14,9 +14,9 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 public class MSTCPReceiver {
-    static final int headerSize  = 20;  // TCP Header (with no options): 20 bytes
-    static final int requestSize = 24;  // TCP Header: 20 , Request (block to send): 4 bytes
-    static final int blockSize   = 980;  // Send blocks of 980 bytes
+    static final int headerSize  = 28;  // TCP Header (with no options): 20 bytes
+    static final int requestSize = 32;  // TCP Header: 20 , Request (block to send): 4 bytes
+    static final int blockSize   = 972;  // Send blocks of 980 bytes
     static final int pktSize     = 1000; // TCP Header: 20, blocks <= 980, so 1000 Bytes total
     static final int synLimit    = 50;   // number if times to try SYN before giving up
     static final int noOfSources = 2;    // number of sources to connect to
@@ -35,8 +35,7 @@ public class MSTCPReceiver {
     MSTCPInformation mstcpInformation;           // information about the MSTCP connection
     int nextBlock = 0;                           // next block to request
     
-    int alpha;
-    int alpha_scale = 512; // optimise calculation of alpha
+    double alpha;
     int bytes_acked;
     Semaphore sem_cwnd;
     int cwnd_bytes_total;
@@ -45,7 +44,7 @@ public class MSTCPReceiver {
     public MSTCPReceiver(String addr, int recvPort, int dstPort, String path, String filename) throws InterruptedException, SocketException, UnknownHostException {
         logger = Logger.getLogger( MSTCPSender.class.getName());
         try {
-            FileHandler handler = new FileHandler("./logs/MSTCPReceiver.log", 8096, 1, true);
+            FileHandler handler = new FileHandler("./logs/MSTCPReceiver.log", 8096, 1, false);
             handler.setFormatter(new SimpleFormatter());
             logger.setUseParentHandlers(false);
             logger.addHandler(handler);
@@ -101,25 +100,25 @@ public class MSTCPReceiver {
                 tcpPacket = connections.get(map.connection).receivedData.take();
                 fos.write(tcpPacket.getData());
                 receivingComplete = map.block >= mstcpInformation.fileSize / MSTCPReceiver.blockSize;
-                // TODO: Coupled windowing
             }
             
             fos.close();
             
         } catch (Exception e) {
             logger.warning("Exception Received while Establishing Connection");
-            logger.warning(e.toString());
+            logger.log(Level.SEVERE, e.getMessage(), e);
         }
 
     }
     
     // computing alpha for coupled congestion control, calculated once per RTT or on packet drop
     public synchronized void computeAlpha() {
-        int max = 0, sum = 0, a;
+        double max = 0, a;
+        int sum = 0;
         for (MSTCPReceiverConnection c: connections) {
             if (c.rtt_avg <= 0)
                 continue;
-            a = (int) (c.cwnd_bytes / (c.rtt_avg * c.rtt_avg));
+            a = c.cwnd_bytes / (c.rtt_avg * c.rtt_avg);
             if (a > max)
                 max = a;
             sum += c.cwnd_bytes / c.rtt_avg;
@@ -128,9 +127,9 @@ public class MSTCPReceiver {
             logger.warning("Unable to compute alpha: sum is zero");
             return;
         }
-        // System.out.println("cwnd_bytes_total: " + cwnd_bytes_total + " alpha_scale: " + alpha_scale + " max: " + max + " sum^2: " + sum*sum);
-        alpha = ((cwnd_bytes_total * alpha_scale) / (sum*sum)) * max;
-        // logger.info("Recomputed Alpha: " + alpha);
+        
+        alpha = (cwnd_bytes_total / (sum*sum)) * max;
+        logger.info("Recomputed Alpha: " + alpha);
     }
     
     // Generate requests, mapping block requested to connection sent on
