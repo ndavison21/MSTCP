@@ -212,6 +212,7 @@ public class MSTCPReceiverConnection extends Thread {
                 DatagramPacket data = new DatagramPacket(inData, inData.length);
                 
                 for (;;) {
+                    logger.info(connectionID + " Waiting for next ACK.");
                     inSocket.receive(data);
                     if (delay) delay();
                     time_recv = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
@@ -316,7 +317,7 @@ public class MSTCPReceiverConnection extends Thread {
                                 sleep(2000);
                                 continue;
                             } else if (sent_fin && got_fin) {
-                                logger.info(connectionID + ": ACKing Fin and closing connection.");
+                                logger.info(connectionID + ": ACKing FIN and closing connection.");
                                 request = generateTCPPacket(nextSeqNum, null, true, false);
                                 outSocket.send(new DatagramPacket(request, request.length, dstAddress, dstPort));
                                 return;
@@ -338,6 +339,8 @@ public class MSTCPReceiverConnection extends Thread {
                         outSocket.send(new DatagramPacket(request, request.length, dstAddress, dstPort));
                         nextSeqNum++;
                         sem_seqNum.release();
+                    } else {
+                        sleep(5);
                     }
                                        
                 }
@@ -385,7 +388,7 @@ public class MSTCPReceiverConnection extends Thread {
         
         logger = Logger.getLogger( MSTCPSender.class.getName() + this.connectionID );
         try {
-            FileHandler handler = new FileHandler("./logs/MSTCPReceiverConnection_" + this.connectionID +".log", 8096, 1, false);
+            FileHandler handler = new FileHandler("./logs/MSTCPReceiverConnection_" + this.connectionID +".log", 1048576, 1, false);
             handler.setFormatter(new SimpleFormatter());
             logger.setUseParentHandlers(false);
             logger.addHandler(handler);
@@ -401,5 +404,7 @@ public class MSTCPReceiverConnection extends Thread {
             this.run(); // if first connection then we must wait for connection to be established before continuing
         else
             this.start(); // for subsequent ones we don't want to have to wait
+        
+        logger.info(connectionID + ": Started up.");
     }
 }

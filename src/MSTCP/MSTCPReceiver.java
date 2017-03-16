@@ -44,7 +44,7 @@ public class MSTCPReceiver {
     public MSTCPReceiver(String addr, int recvPort, int dstPort, String path, String filename) throws InterruptedException, SocketException, UnknownHostException {
         logger = Logger.getLogger( MSTCPSender.class.getName());
         try {
-            FileHandler handler = new FileHandler("./logs/MSTCPReceiver.log", 8096, 1, false);
+            FileHandler handler = new FileHandler("./logs/MSTCPReceiver.log", 1048576, 1, false);
             handler.setFormatter(new SimpleFormatter());
             logger.setUseParentHandlers(false);
             logger.addHandler(handler);
@@ -113,8 +113,7 @@ public class MSTCPReceiver {
     
     // computing alpha for coupled congestion control, calculated once per RTT or on packet drop
     public synchronized void computeAlpha() {
-        double max = 0, a;
-        int sum = 0;
+        double max = 0, a, sum = 0;
         for (MSTCPReceiverConnection c: connections) {
             if (c.rtt_avg <= 0)
                 continue;
@@ -129,7 +128,7 @@ public class MSTCPReceiver {
         }
         
         alpha = (cwnd_bytes_total / (sum*sum)) * max;
-        logger.info("Recomputed Alpha: " + alpha);
+        logger.info("Recomputed Alpha: " + alpha + " (cwnd_bytes_total: " + cwnd_bytes_total + ", sum: " + sum + " max: " + max + ")");
     }
     
     // Generate requests, mapping block requested to connection sent on

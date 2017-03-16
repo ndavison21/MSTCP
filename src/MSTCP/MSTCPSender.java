@@ -61,7 +61,7 @@ public class MSTCPSender {
     public MSTCPSender(int recvPort, String path, Vector<SourceInformation> sources) {
         logger = Logger.getLogger( MSTCPSender.class.getName() + recvPort );
         try {
-            FileHandler handler = new FileHandler("./logs/MSTCPSender_" + recvPort +".log", 8096, 1, false);
+            FileHandler handler = new FileHandler("./logs/MSTCPSender_" + recvPort +".log", 1048576, 1, false);
             handler.setFormatter(new SimpleFormatter());
             logger.setUseParentHandlers(false);
             logger.addHandler(handler);
@@ -139,7 +139,7 @@ public class MSTCPSender {
                 for (int i=0; i < dataBytes.length; i++)
                     dataBytes[i] = 0; // zero out, stop leftovers from previous iteration
                 
-                
+                logger.info(recvPort + ": Waiting for next Request.");
                 inSocket.receive(req);
                 logger.info(recvPort + ": Packet Received.");
                 if (delay) delay();
