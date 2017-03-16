@@ -212,6 +212,8 @@ public class MSTCPReceiverConnection extends Thread {
                 DatagramPacket data = new DatagramPacket(inData, inData.length);
                 
                 for (;;) {
+                    if (sent_fin)
+                        sent_fin = sent_fin;
                     logger.info(connectionID + " Waiting for next ACK.");
                     inSocket.receive(data);
                     if (delay) delay();
@@ -314,6 +316,7 @@ public class MSTCPReceiverConnection extends Thread {
                             request = sentRequests.get(nextSeqNum - initialSeqNum);
                         } else {
                             if (sent_fin && !got_fin) { // FIN has been sent, just waiting for timeout or transfer to complete
+                                sem_seqNum.release();
                                 sleep(2000);
                                 continue;
                             } else if (sent_fin && got_fin) {
@@ -324,6 +327,8 @@ public class MSTCPReceiverConnection extends Thread {
                             }
                             
                             int blockToRequest = receiver.blockToRequest(connectionID);
+                            if (blockToRequest == -1)
+                                sent_fin = true;
                             sent_fin  = (blockToRequest == -1);
                             
                             ByteBuffer bb = ByteBuffer.allocate(4);
