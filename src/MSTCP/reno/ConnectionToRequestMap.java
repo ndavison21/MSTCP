@@ -1,4 +1,4 @@
-package MSTCP;
+package MSTCP.reno;
 
 public class ConnectionToRequestMap {
     public int connection;

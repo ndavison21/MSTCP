@@ -1,4 +1,4 @@
-package MSTCP;
+package MSTCP.reno;
 
 import java.io.File;
 import java.io.FileOutputStream;
