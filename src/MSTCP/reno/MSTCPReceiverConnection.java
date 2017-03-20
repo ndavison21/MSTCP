@@ -40,7 +40,7 @@ public class MSTCPReceiverConnection extends Thread {
     final int connectionID; // identifies this connection between the receiver and a source
     
     final DatagramSocket inSocket, outSocket;  // sockets to receive data and send ACKs
-    final int recvPort, dstPort;               // ports to receive data and semd ACKs
+    final int recvPort, dstPort;               // ports to receive data and send ACKs
     final InetAddress dstAddress;              // address of data source
     final int initialSeqNum;                   // random first sequence number
     int base;                            // sequence number of previous, in-order, packet received
