@@ -52,9 +52,13 @@ public class MSTCPInformation {
         if (fileSize == -1)
             fileSize = mstcpInformation.fileSize;
         
-        for (SourceInformation s: mstcpInformation.sources) {
-            if (!sources.contains(s))
-                sources.add(s);
+        if (this.sources == null)
+            this.sources = mstcpInformation.sources;
+        else {
+            for (SourceInformation s: mstcpInformation.sources) {
+                if (!this.sources.contains(s))
+                    this.sources.add(s);
+            }
         }
     }
     

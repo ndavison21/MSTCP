@@ -2,7 +2,6 @@ package MSTCP.vegas;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -22,8 +21,9 @@ public class MSTCPRequesterConnection extends Thread {
     final int dstPort;
     MSTCPRequester requester;
     
-    final MSTCPSocket inSocket;
-    final MSTCPSocket outSocket;
+    final MSTCPSocket socket;
+    final InThread inThread;
+    final OutThread outThread;
     
     LinkedList<TCPPacket> sentRequests;
     LinkedBlockingQueue<TCPPacket> receivedData;
@@ -72,18 +72,85 @@ public class MSTCPRequesterConnection extends Thread {
             timer.cancel(); // stop the current timer
     }
     
-    private void setTimer(boolean syn) {
+    /**
+     * 0: Data
+     * 1: SYN
+     * 2: FIN
+     */
+    private void setTimer(int type) {
         stopTimer();
         timer = new Timer(); // start a new one if necessary
-        if (syn)
-            timer.schedule(new SYNTimeout(),  Utils.synTimeout);
-        else
-            timer.schedule(new DataTimeout(), Utils.dataTimeout);
+        if (type == Utils.DATA_ENUM)
+            timer.schedule(new DataTimeout(),  Utils.dataTimeout);
+        else if (type == Utils.SYN_ENUM)
+            timer.schedule(new SYNTimeout(), Utils.synTimeout);
+        else if (type == Utils.FIN_ENUM)
+            timer.schedule(new FINTimeout(), Utils.finTimeout);
     }
     
     /**
-     *  Establishing Connection
+     *  Connection Establishment / Teardown
      */
+    
+    private class FINTimeout extends TimerTask {
+        public void run() {
+            sendFIN(false);
+        }
+    }
+    
+    public void sendFIN(boolean ack) {
+        int rpt = 1;
+        TCPPacket fin = new TCPPacket(recvPort, dstPort, nextSeqNum, cwnd);
+        fin.setFIN();
+        if (ack) {
+            rpt = 3; // send it a few times to make sure it gets there
+            fin.setACK(nextSeqNum);
+            logger.info("Received FIN + ACK. Sending ACK to (" + dstAddr + ", " + dstPort + ")");
+        } else {
+            logger.info("Sending FIN to (" + dstAddr + ", " + dstPort + ")");
+            setTimer(Utils.FIN_ENUM);
+        }
+        byte[] finBytes = fin.bytes();
+        
+        try {
+            for(int i=0; i<rpt; i++)
+                socket.send(new DatagramPacket(finBytes, finBytes.length, dstAddr, dstPort));
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+            System.exit(1);
+        }
+    }
+    
+    public void close() {
+        logger.info("Closing Connection to (" + dstAddr + ", " + dstPort + ")");
+        
+        inThread.interrupt();
+        outThread.interrupt();
+        
+        new Thread() {
+            public void run() {
+                TCPPacket in;
+                DatagramPacket inPkt;
+                
+                sendFIN(false);
+                
+                for (;;) {
+                    inPkt = socket.receive();
+                    in = new TCPPacket(inPkt.getData());
+                    
+                    if (in.verifyChecksum() && in.isACK() && in.getSeqNum() == nextSeqNum)
+                        break;
+                }
+                
+                stopTimer();
+                sendFIN(true);
+                
+                socket.close();
+                logger.info("We Done Here.");
+            }
+        }.start();
+
+    }  
     
     private class SYNTimeout extends TimerTask {
         public void run() {
@@ -105,35 +172,26 @@ public class MSTCPRequesterConnection extends Thread {
         
         byte[] synBytes = synPacket.bytes();
         try {
-            outSocket.send(new DatagramPacket(synBytes, synBytes.length, dstAddr, dstPort));
+            socket.send(new DatagramPacket(synBytes, synBytes.length, dstAddr, dstPort));
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
             return false;
         }
         synAttempts++;
-        setTimer(true);
+        setTimer(Utils.SYN_ENUM);
         return true;
         
     }
     
     private boolean establishConnection() {
-        byte[] inData = new byte[Utils.pktSize];
-        DatagramPacket inPkt = new DatagramPacket(inData, inData.length);
+        DatagramPacket inPkt;
         
         if (sendSYN()) {
             for (;;) {
-                try {
-                    inSocket.receive(inPkt);
-                } catch (IOException e) {
-                    logger.log(Level.SEVERE, e.getMessage(), e);
-                    System.exit(1);
-                }
-                
-                if (Utils.delayAndDrop(logger))
-                    continue;
+                inPkt = socket.receive();
                 
                 time_recv = (int) System.currentTimeMillis() % Integer.MAX_VALUE;
-                TCPPacket tcpPacket = new TCPPacket(inData);
+                TCPPacket tcpPacket = new TCPPacket(inPkt.getData());
                 if (tcpPacket.verifyChecksum() && tcpPacket.isSYN() && tcpPacket.isACK() && tcpPacket.getACK() == initialSeqNum) {
                     stopTimer();
                     time_ack = time_recv - tcpPacket.getTime_ack();
@@ -156,9 +214,10 @@ public class MSTCPRequesterConnection extends Thread {
      */
     
     private void retransmit() throws InterruptedException {
-        if (toRetransmit.contains(sentRequests.getFirst()))
+        if (toRetransmit.contains(sentRequests.peek()))
             return;
         
+        logger.info("Retransmitting packet " + sentRequests.peek().getSeqNum());
         synchronized (equilibrium_rate) {
             equilibrium_rate = 0.0;
             queue_delay = 0;
@@ -168,7 +227,7 @@ public class MSTCPRequesterConnection extends Thread {
         rttSeqNum = nextSeqNum;
         sampled_num = 0;
         sampled_rtt = 0;
-        toRetransmit.put(sentRequests.getFirst());
+        toRetransmit.put(sentRequests.peek());
         initialSeqNum.notifyAll();
     }
     
@@ -185,21 +244,20 @@ public class MSTCPRequesterConnection extends Thread {
     
     public class InThread extends Thread {
         public void run() {
-            byte[] inData = new byte[Utils.pktSize];
-            DatagramPacket data = new DatagramPacket(inData, inData.length);
+            DatagramPacket data;
             
             try {
                 for (;;) {
                     logger.info("Waiting for next ACK + Data");
-                    inSocket.receive(data);
-                    if (Utils.delayAndDrop(logger))
-                        continue;
+                    data = socket.receive();
+                    if (this.isInterrupted())
+                        return;
                     time_recv = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
                     
                     if (requester.transfer_complete)
                         break;
                     
-                    TCPPacket tcpPacket = new TCPPacket(inData);
+                    TCPPacket tcpPacket = new TCPPacket(data.getData());
                     
                     if (tcpPacket.verifyChecksum() && tcpPacket.isACK() && base <= tcpPacket.getSeqNum()) { // if packet is corrupted there's not much we can do...
     
@@ -267,7 +325,7 @@ public class MSTCPRequesterConnection extends Thread {
                             
                             cwnd = (int) cwnd_true;
                             
-                            logger.info("Done Congestion Control. Congestion Window is now: " + cwnd);
+                            logger.info("Congestion Window is now " + cwnd + " (" + cwnd_true + ")");
                             
                             // prepare for next round
                             rttSeqNum = nextSeqNum;
@@ -280,17 +338,17 @@ public class MSTCPRequesterConnection extends Thread {
                             if (base == nextSeqNum)
                                 stopTimer(); // no outstanding requests so stop timer
                             else
-                                setTimer(false); // otherwise start waiting for next response
+                                setTimer(Utils.DATA_ENUM); // otherwise start waiting for next response
                             initialSeqNum.notifyAll();
                         }
                         
-                        logger.info("InThread: Received Block from (" + dstAddr + ", " + dstPort + ")");
+                        logger.info("Received Block from (" + dstAddr + ", " + dstPort + ")");
                         // pass data to receiver
                         receivedData.put(tcpPacket);
                     } else
-                        logger.info("InThread: Received Corrputed Packet");
+                        logger.info("Received Corrputed Packet");
                 }
-            } catch (IOException | InterruptedException e) {
+            } catch (InterruptedException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
                 System.exit(1);
             }
@@ -321,46 +379,41 @@ public class MSTCPRequesterConnection extends Thread {
                         }
                         
                         int blockToRequest = requester.blockToRequest(recvPort);
+                        if (blockToRequest == -1) {
+                            this.interrupt();
+                            return;
+                        }
                         ByteBuffer bb = ByteBuffer.allocate(4); // space for an Integer
                         bb.putInt(blockToRequest);
-                        logger.info("Requesting Block " + blockToRequest);
                         tcpRequest = new TCPPacket(recvPort, dstPort, nextSeqNum, cwnd, bb.array());
                         if (nextSeqNum == initialSeqNum)
                             tcpRequest.setACK(initialSeqNum);
                         tcpRequest.setTime_req();
                         sentRequests.add(tcpRequest);
                         
-                        logger.info("Sending request to (" + dstAddr + ", " + dstPort + ")");
+                        logger.info("Sending request for block " + blockToRequest + " to (" + dstAddr + ", " + dstPort + ")");
                         request = tcpRequest.bytes();
                         synchronized(initialSeqNum) {
                             nextSeqNum++;
                         }
                     }
-                    outSocket.send(new DatagramPacket(request, request.length, dstAddr, dstPort));
+                    socket.send(new DatagramPacket(request, request.length, dstAddr, dstPort));
                 }
-            } catch(IOException | InterruptedException e) {
+            } catch(IOException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
                 System.exit(1);
+            } catch (InterruptedException e) {
+                logger.log(Level.WARNING, "OutThread Interrupted. " + e.getMessage(), e);
+                return;
             }
         }
     }
     
     
     /**
-     * Thread Operation
+     * Main Methods
      */
-    
-    public void close() {
-        logger.info("Closing Connection.");
-        // TODO: FIN, FIN+ACK, ACK routine
-        inSocket.close();
-        outSocket.close();
-    }
-    
     public void run() {
-        InThread inThread = new InThread();
-        OutThread outThread = new OutThread();
-        
         if (establishConnection()) {
             inThread.start();
             outThread.start();
@@ -376,12 +429,14 @@ public class MSTCPRequesterConnection extends Thread {
         this.recvPort = recvPort;
         this.dstPort = dstPort;
         this.requester = requester;
-        this.inSocket = new MSTCPSocket(new DatagramSocket(recvPort));
-        this.outSocket = new MSTCPSocket(new DatagramSocket());
+        this.socket = new MSTCPSocket(logger, recvPort);
         
         this.sentRequests = new LinkedList<TCPPacket>();
         this.receivedData = new LinkedBlockingQueue<TCPPacket>();
         this.toRetransmit = new LinkedBlockingQueue<TCPPacket>();
+        
+        this.inThread = new InThread();
+        this.outThread = new OutThread();
         
         if (!ms_join)
             this.run();

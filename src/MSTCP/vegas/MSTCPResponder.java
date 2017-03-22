@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,8 +30,37 @@ public class MSTCPResponder {
     MSTCPInformation mstcpInfo;
     Vector<SourceInformation> sources;
     boolean connected = false;
+    boolean sentFINACK = false;
+    Timer timer;
     
-    DatagramSocket inSocket, outSocket;
+    MSTCPSocket socket;
+    
+    private void stopTimer() {
+        if (timer != null)
+            timer.cancel();
+    }
+    
+    private void setTimer() {
+        stopTimer();
+        timer = new Timer();
+        timer.schedule(new FINACKTimeout(), Utils.finTimeout);
+    }
+    
+    private class FINACKTimeout extends TimerTask {
+        public void run() {
+            logger.info("Timeout after sending FIN + ACK. Closing Connection to (" + dstAddress + ", " + dstPort + ")");
+            TCPPacket fin = new TCPPacket(recvPort, dstPort, nextSeqNum, cwnd);
+            fin.setFIN();
+            fin.setACK(nextSeqNum);
+            byte[] finBytes = fin.bytes();
+            try {
+                socket.send(new DatagramPacket(finBytes, finBytes.length, InetAddress.getByName(srcInfo.address), srcInfo.port));
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, e.getMessage(), e);
+                System.exit(1);
+            }
+        }
+    }
     
     public byte[] generateTCPPacket(int seqNum, byte[] dataBytes, boolean syn, boolean fin, int time_req) {
         TCPPacket tcpPacket = new TCPPacket(recvPort, dstPort, seqNum, cwnd, dataBytes);
@@ -51,26 +82,28 @@ public class MSTCPResponder {
         this.srcInfo = new SourceInformation(Utils.getIPAddress(logger), recvPort);
         this.sources = sources;
 
-        logger.info("Starting MSTCPResponder on (" + srcInfo.address + ", " + recvPort + ")");
+        try {
+            logger.info("Starting MSTCPResponder on (" + InetAddress.getByName(srcInfo.address) + ", " + recvPort + ")");
+        } catch (UnknownHostException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+            System.exit(1);
+        }
         
         try {
-            inSocket = new DatagramSocket(recvPort);
-            outSocket = new DatagramSocket();
+            socket = new MSTCPSocket(logger, recvPort);
     
             RandomAccessFile raf = null;
             
-            byte[] inBytes = new byte[Utils.requestSize], outBytes;
-            DatagramPacket udpPkt = new DatagramPacket(inBytes, inBytes.length);
+            byte[] outBytes;
+            DatagramPacket udpPkt;
             TCPPacket inPacket;
             int time_recv, time_req;
         
             for (;;) {
-                inSocket.receive(udpPkt);
-                if (Utils.delayAndDrop(logger))
-                    continue;
+                udpPkt = socket.receive();
                 
                 time_recv = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
-                inPacket = new TCPPacket(inBytes);
+                inPacket = new TCPPacket(udpPkt.getData());
                 
                 if (inPacket.verifyChecksum()) {
                     if (inPacket.isACK() && inPacket.getSeqNum() == initialSeqNum)
@@ -99,9 +132,12 @@ public class MSTCPResponder {
                         
                         mstcpInfo.fileSize = file.length();
                         
-                        outBytes = generateTCPPacket(initialSeqNum, null, true, false, time_req);
-                        outSocket.send(new DatagramPacket(outBytes, outBytes.length, dstAddress, dstPort));
+                        logger.info("Sending SYN + ACK to (" + dstAddress + ", " + dstPort + ")");
+                        outBytes = generateTCPPacket(initialSeqNum, mstcpInfo.bytes(), true, false, time_req);
+                        socket.send(new DatagramPacket(outBytes, outBytes.length, dstAddress, dstPort));
                     }
+                } else {
+                    logger.info("Received Corrupted Packet");
                 }
             }
             
@@ -110,38 +146,54 @@ public class MSTCPResponder {
             for (;;) {
                 dataBytes = new byte[Utils.blockSize];
                 if (connected) {
-                    for (int i=0; i<inBytes.length; i++)
-                        inBytes[i] = 0;
-                    inSocket.receive(udpPkt);
-                    if (Utils.delayAndDrop(logger))
-                        continue;
+                    udpPkt = socket.receive();
                     time_recv = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
-                    inPacket = new TCPPacket(inBytes);
+                    inPacket = new TCPPacket(udpPkt.getData());
                 } else
                     connected = true;
                 
                 if (inPacket.verifyChecksum()) {
-                    if (inPacket.getSeqNum() == nextSeqNum)
-                        nextSeqNum++;
-                    else if (inPacket.getSeqNum() > nextSeqNum){
-                        toAck.add(inPacket.getSeqNum());
-                        nextSeqNum = inPacket.getSeqNum() + 1;
-                    }
-                    
                     time_req = time_recv - inPacket.getTime_req();
                     if (time_req < 0)
                         time_req = (Integer.MAX_VALUE - inPacket.getTime_req()) + time_recv;
-                        
                     
-                    int block = ByteBuffer.wrap(inPacket.getData()).getInt();
-                    logger.info("Received packet " + inPacket.getSeqNum() + " requesting block " + block);
-                    raf.seek(block * Utils.blockSize);
-                    raf.read(dataBytes);
-                    outBytes = generateTCPPacket(inPacket.getSeqNum(), dataBytes, false, false, time_req);
+                    if (inPacket.isFIN() && !sentFINACK) {
+                        logger.info("Received FIN packet " + inPacket.getSeqNum() + ". Sending FIN + ACK to (" + dstAddress + ", " + dstPort + ")");
+                        outBytes = generateTCPPacket(inPacket.getSeqNum(), null, false, true, time_req);
+                        sentFINACK = true;
+                        setTimer();
+                    } else if (inPacket.isACK() && sentFINACK) {
+                        logger.info("Received ACK after sending FIN + ACK. Closing Connection to (" + dstAddress + ", " + dstPort + ")");
+                        stopTimer();
+                        break;
+                    } else {
+                        if (inPacket.getSeqNum() == nextSeqNum)
+                            nextSeqNum++;
+                        else if (inPacket.getSeqNum() > nextSeqNum){
+                            toAck.add(inPacket.getSeqNum());
+                            nextSeqNum = inPacket.getSeqNum() + 1;
+                        }
+                        
+                        int block = ByteBuffer.wrap(inPacket.getData()).getInt();
+                        logger.info("Received packet " + inPacket.getSeqNum() + " requesting block " + block);
+                        raf.seek(block * Utils.blockSize);
+                        raf.read(dataBytes);
+                        outBytes = generateTCPPacket(inPacket.getSeqNum(), dataBytes, false, false, time_req);
+                        logger.info("Sending ACK + Block to (" + dstAddress + ", " + dstPort + ")");
+                    }
+                    
+                    socket.send(new DatagramPacket(outBytes, outBytes.length, dstAddress, dstPort));
+                } else {
+                    logger.info("Received Corrupted Packet");
                 }
                 
 
             }
+            
+            socket.close();
+            raf.close();
+            
+            logger.info("We Done Here.");
         
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);

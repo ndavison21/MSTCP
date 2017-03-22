@@ -12,8 +12,8 @@ public class Test {
         System.out.println("Starting Test.");
         
         final Vector<SourceInformation> sources = new Vector<SourceInformation>();
-        sources.add(new SourceInformation("127.0.0.1", 15000));
-        sources.add(new SourceInformation("127.0.0.1", 15001));
+        sources.add(new SourceInformation(Utils.getIPAddress(null), 15000));
+        sources.add(new SourceInformation(Utils.getIPAddress(null), 15001));
         
         (new Thread() {
             public void run() {
@@ -29,9 +29,10 @@ public class Test {
         
         TimeUnit.SECONDS.sleep(2);
         
-        //new MSTCPReceiver(Utils.getIPAddress(null), 14000, 15000, "./", "hello_repeat.txt"); // recvPort, dstPort
-        new MSTCPRequester(Utils.getIPAddress(null), 14000, 15000, "./", "hello_repeat_repeat.txt"); // recvPort, dstPort
-        //new MSTCPReceiver(Utils.getIPAddress(null), 14000, 15000, "./", "me.jpg"); // recvPort, dstPort
+        // new MSTCPRequester(Utils.getIPAddress(null), 14000, 15000, "./", "hello.txt");
+        // new MSTCPRequester(Utils.getIPAddress(null), 14000, 15000, "./", "hello_repeat.txt");
+        // new MSTCPRequester(Utils.getIPAddress(null), 14000, 15000, "./", "hello_repeat_repeat.txt");
+        new MSTCPRequester(Utils.getIPAddress(null), 14000, 15000, "./", "me.jpg");
     
         System.out.println("Test Complete.");
     }
