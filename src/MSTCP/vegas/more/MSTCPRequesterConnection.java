@@ -5,8 +5,6 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -25,8 +23,7 @@ public class MSTCPRequesterConnection extends Thread {
     final InThread inThread;
     final OutThread outThread;
     
-    LinkedList<TCPPacket> sentRequests;
-    LinkedBlockingQueue<TCPPacket> receivedData;
+    LinkedBlockingQueue<TCPPacket> sentRequests;
     
     Timer timer;
     int synAttempts = 0;
@@ -54,7 +51,7 @@ public class MSTCPRequesterConnection extends Thread {
     Double equilibrium_rate = 0.0;
     
     // fast retransmit
-    LinkedBlockingQueue<TCPPacket> toRetransmit;
+    LinkedBlockingQueue<Integer> toRetransmit; // sequence number of packets to retransmit
     
     
     final Integer initialSeqNum = Utils.rand.nextInt(1000);
@@ -214,31 +211,47 @@ public class MSTCPRequesterConnection extends Thread {
      */
     
     private void retransmit() throws InterruptedException {
-        if (toRetransmit.contains(sentRequests.peek()))
-            return;
+        TCPPacket req = null;
+        synchronized (sentRequests) {
+            req = sentRequests.take();
+            if (toRetransmit.contains(req.getSeqNum()) || req == null)
+                return;
+            else
+                toRetransmit.put(req.getSeqNum());
+        }
         
-        logger.info("Retransmitting packet " + sentRequests.peek().getSeqNum());
+        logger.info("Retransmitting packet " + req.getSeqNum());
+        synchronized (equilibrium_rate) {
+            equilibrium_rate = 0.0;
+            queue_delay = 0;
+        }
+        initialSeqNum.notifyAll();
+    }
+    
+    private void goBackN() {
+        logger.info("Data Timed Out. Resending all packets.");
+
         synchronized (equilibrium_rate) {
             equilibrium_rate = 0.0;
             queue_delay = 0;
         }
         
-        // prepare for next round
-        rttSeqNum = nextSeqNum;
-        sampled_num = 0;
-        sampled_rtt = 0;
-        toRetransmit.put(sentRequests.peek());
+        toRetransmit.clear();
+        sentRequests.clear();   
+        
+        synchronized(initialSeqNum) {
+            rttSeqNum = nextSeqNum + cwnd;
+            sampled_num = 0;
+            sampled_rtt = 0;
+            
+            nextSeqNum = base;
+        }
         initialSeqNum.notifyAll();
     }
     
     private class DataTimeout extends TimerTask {
         public void run() {
-            try {
-                retransmit();
-            } catch (InterruptedException e) {
-                logger.log(Level.SEVERE, e.getMessage(), e);
-                System.exit(1);
-            }
+            goBackN();
         }
     }   
     
@@ -262,9 +275,9 @@ public class MSTCPRequesterConnection extends Thread {
                     if (tcpPacket.verifyChecksum() && tcpPacket.isACK() && base <= tcpPacket.getSeqNum()) { // if packet is corrupted there's not much we can do...
     
                         if (tcpPacket.getACK() < tcpPacket.getSeqNum()) { // duplicate ACK, may need to retransmit
-                            int timeout = sentRequests.getFirst().getTime_req() + Utils.dataTimeout;
+                            int timeout = sentRequests.peek().getTime_req() + Utils.dataTimeout;
                             if (timeout < 0)
-                                timeout = Utils.dataTimeout - (Integer.MAX_VALUE - sentRequests.getFirst().getTime_req());
+                                timeout = Utils.dataTimeout - (Integer.MAX_VALUE - sentRequests.peek().getTime_req());
                             if ((System.currentTimeMillis() % Integer.MAX_VALUE) > timeout)
                                 retransmit();
                         }
@@ -275,65 +288,67 @@ public class MSTCPRequesterConnection extends Thread {
                         if (time_ack < 0)
                             time_ack = time_recv + Integer.MAX_VALUE - tcpPacket.getTime_ack();
                         long pkt_rtt = time_ack + tcpPacket.getTime_req();
-                        if (pkt_rtt < base_rtt)
-                            base_rtt = pkt_rtt;
-                        sampled_num++;
-                        sampled_rtt += pkt_rtt;
-                        
-                        if (tcpPacket.getSeqNum() == rttSeqNum) { // end of a round: do congestion control
-                            // average RTT on the last round
-                            rtt = ((double) sampled_rtt) / sampled_num;
-                            diff = cwnd_true * ( ( rtt - base_rtt ) / rtt );
-                            
-                            // tweak weights and alphas
-                            if (diff >= alpha) {
-                                synchronized (requester.total_rate) {
-                                    requester.total_rate -= equilibrium_rate;
-                                    synchronized (equilibrium_rate) {
-                                        equilibrium_rate = cwnd_true / rtt;
-                                    }
-                                    requester.total_rate += equilibrium_rate;
-                                }
-                                
-                                requester.adjust_weights();
-                                alpha = weight * requester.total_alpha;
-                                if (alpha < 2) // lower bound
-                                    alpha = 2;
-                            }
-                            
-                            // window adjustment
-                            if (diff < alpha)
-                                cwnd_true++;
-                            else
-                                cwnd_true--;
-                            
-                            // try to drain queues if needed
-                            q = rtt - base_rtt;
-                            synchronized (equilibrium_rate) {
-                                if (queue_delay == 0 || queue_delay > q)
-                                    queue_delay = q;
-                                
-                                if (q > 2 * queue_delay) {
-                                    backoff_factor = 0.5 * (base_rtt / rtt);
-                                    cwnd_true = cwnd_true * backoff_factor;
-                                    queue_delay = 0;
-                                }
-                            }
-                            
-                            if (cwnd_true < 2)
-                                cwnd_true = 2;
-                            
-                            cwnd = (int) cwnd_true;
-                            
-                            logger.info("Congestion Window is now " + cwnd + " (" + cwnd_true + ")");
-                            
-                            // prepare for next round
-                            rttSeqNum = nextSeqNum;
-                            sampled_num = 0;
-                            sampled_rtt = 0;
-                        }
                         
                         synchronized (initialSeqNum) {
+                            if (pkt_rtt < base_rtt)
+                                base_rtt = pkt_rtt;
+                            
+                            sampled_num++;
+                            sampled_rtt += pkt_rtt;
+                        
+                            if (tcpPacket.getSeqNum() == rttSeqNum) { // end of a round: do congestion control
+                                // average RTT on the last round
+                                rtt = ((double) sampled_rtt) / sampled_num;
+                                diff = cwnd_true * ( ( rtt - base_rtt ) / rtt );
+                                
+                                // tweak weights and alphas
+                                if (diff >= alpha) {
+                                    synchronized (requester.total_rate) {
+                                        requester.total_rate -= equilibrium_rate;
+                                        synchronized (equilibrium_rate) {
+                                            equilibrium_rate = cwnd_true / rtt;
+                                        }
+                                        requester.total_rate += equilibrium_rate;
+                                    }
+                                    
+                                    requester.adjust_weights();
+                                    alpha = weight * requester.total_alpha;
+                                    if (alpha < 2) // lower bound
+                                        alpha = 2;
+                                }
+                                
+                                // window adjustment
+                                if (diff < alpha)
+                                    cwnd_true++;
+                                else
+                                    cwnd_true--;
+                                
+                                // try to drain queues if needed
+                                q = rtt - base_rtt;
+                                synchronized (equilibrium_rate) {
+                                    if (queue_delay == 0 || queue_delay > q)
+                                        queue_delay = q;
+                                    
+                                    if (q > 2 * queue_delay) {
+                                        backoff_factor = 0.5 * (base_rtt / rtt);
+                                        cwnd_true = cwnd_true * backoff_factor;
+                                        queue_delay = 0;
+                                    }
+                                }
+                                
+                                if (cwnd_true < 2)
+                                    cwnd_true = 2;
+                                
+                                cwnd = (int) cwnd_true;
+                                
+                                logger.info("Congestion Window is now " + cwnd + " (" + cwnd_true + ")");
+                                
+                                // prepare for next round
+                                rttSeqNum = nextSeqNum + cwnd;
+                                sampled_num = 0;
+                                sampled_rtt = 0;
+                            }
+                        
                             base = tcpPacket.getACK();
                             if (base == nextSeqNum)
                                 stopTimer(); // no outstanding requests so stop timer
@@ -344,9 +359,14 @@ public class MSTCPRequesterConnection extends Thread {
                         
                         logger.info("Received Block from (" + dstAddr + ", " + dstPort + ")");
                         // pass data to receiver
-                        receivedData.put(tcpPacket);
-                    } else
-                        logger.info("Received Corrputed Packet");
+                        requester.receivedPackets.put(tcpPacket.getMorePacket());
+                    } else {
+                        if (base <= tcpPacket.getSeqNum()) {
+                            logger.info("Received Packet Out of Order (seqNum " + tcpPacket.getSeqNum() + ", base " + base + ". Passing to Requester anyway.");
+                            requester.receivedPackets.put(tcpPacket.getMorePacket());
+                        } else
+                            logger.info("Received Corrputed Packet");
+                    }
                 }
             } catch (InterruptedException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
@@ -366,36 +386,35 @@ public class MSTCPRequesterConnection extends Thread {
             
             try {
                 while (!requester.transfer_complete) {
-                    if (toRetransmit.size() > 0) {
-                        tcpRequest = toRetransmit.remove();
-                        tcpRequest.setTime_req();
-                        request = tcpRequest.bytes();
-                    } else {
+                    if (toRetransmit.isEmpty()) {
                         synchronized(initialSeqNum) {
                             if (nextSeqNum >= base + cwnd) {
                                 initialSeqNum.wait();
-                                continue;
                             }
                         }
+                    }
                         
-                        int blockToRequest = requester.blockToRequest(recvPort);
-                        if (blockToRequest == -1) {
-                            this.interrupt();
-                            return;
-                        }
-                        ByteBuffer bb = ByteBuffer.allocate(4); // space for an Integer
-                        bb.putInt(blockToRequest);
-                        tcpRequest = new TCPPacket(recvPort, dstPort, nextSeqNum, cwnd, bb.array());
-                        if (nextSeqNum == initialSeqNum)
-                            tcpRequest.setACK(initialSeqNum);
-                        tcpRequest.setTime_req();
-                        sentRequests.add(tcpRequest);
-                        
-                        logger.info("Sending request for block " + blockToRequest + " to (" + dstAddr + ", " + dstPort + ")");
-                        request = tcpRequest.bytes();
-                        synchronized(initialSeqNum) {
-                            nextSeqNum++;
-                        }
+                    int blockToRequest = requester.blockToRequest(recvPort);
+                    if (blockToRequest == -1) {
+                        this.interrupt();
+                        return;
+                    }
+                    
+                    MOREPacket more = new MOREPacket(blockToRequest);
+                    
+                    int seqNum = (toRetransmit.isEmpty() ? nextSeqNum : toRetransmit.take());
+                    
+                    tcpRequest = new TCPPacket(recvPort, dstPort, seqNum, cwnd);
+                    tcpRequest.setMorePacket(more);
+                    if (nextSeqNum == initialSeqNum)
+                        tcpRequest.setACK(initialSeqNum);
+                    tcpRequest.setTime_req();
+                    sentRequests.add(tcpRequest);
+                    
+                    logger.info("Sending request for block " + blockToRequest + " to (" + dstAddr + ", " + dstPort + ")");
+                    request = tcpRequest.bytes();
+                    synchronized(initialSeqNum) {
+                        nextSeqNum++;
                     }
                     socket.send(new DatagramPacket(request, request.length, dstAddr, dstPort));
                 }
@@ -431,9 +450,8 @@ public class MSTCPRequesterConnection extends Thread {
         this.requester = requester;
         this.socket = new MSTCPSocket(logger, recvPort);
         
-        this.sentRequests = new LinkedList<TCPPacket>();
-        this.receivedData = new LinkedBlockingQueue<TCPPacket>();
-        this.toRetransmit = new LinkedBlockingQueue<TCPPacket>();
+        this.sentRequests = new LinkedBlockingQueue<TCPPacket>();
+        this.toRetransmit = new LinkedBlockingQueue<Integer>();
         
         this.inThread = new InThread();
         this.outThread = new OutThread();

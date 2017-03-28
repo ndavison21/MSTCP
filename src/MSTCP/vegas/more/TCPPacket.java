@@ -6,6 +6,7 @@ import java.util.Arrays;
 public class TCPPacket {
     static int BASE_SIZE = 224; // base size of the TCP packet in bytes (7 32-bit words)
     
+    /** Fields from TCP Header **/
     private int srcPort    = 0;    // 16 bits, port at sender
     private int dstPort    = 0;    // 16 bits, port at receiver
     private int seqNum     = 0;    // 32 bits, if SYN flag set then the initial sequence number, otherwise the accumulated sequence number
@@ -18,11 +19,18 @@ public class TCPPacket {
     private byte[] options = null; // 0-320 bits divisible by 32, final byte includes any padding
     private byte[] data = null;    // (0-840 bytes) data the TCP is a header of
     
+    private int paddingLength = 0;
+    
+    /** fields added for MORE **/
+    // TODO: Implement these for the packet
     private int time_req = -1; // 32 bits, in a request records the time the packet was sent. In an ack records the latency of the request.
     private int time_ack = -1; // 32 bits, in a request is empty. In an ack Records the time the packet was sent.
     
-    
-    private int paddingLength = 0;
+    private int packetType = -1; // 1 bit, either forward or response packet
+    private int flowID     = -1;     // 32 bits, flow identifier, hopefully unique
+    private byte[] srcIP   = null;
+    private byte[] dstIP   = null;
+    private MOREPacket morePacket = null; // variable length. Code Vector and     
     
     
     public TCPPacket(int srcPort, int dstPort, int seqNum, int ackNum, int flags, int windowSize,
@@ -59,19 +67,23 @@ public class TCPPacket {
         this(srcPort, dstPort, seqNum, windowSize);
         this.data = data;
     }
-    
-    // WARNING: this should only be used for checking if a packet is in a collection
-    // public TCPPacket(int seqNum) {
-    //     this.seqNum = seqNum;
-    // }
-    
+        
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TCPPacket))
+        if (o == null)
             return false;
         
-        TCPPacket tcpPkt = (TCPPacket) o;
-        return this.seqNum == tcpPkt.seqNum;
+        if (o instanceof Integer){
+            Integer i = (Integer) o;
+            return this.seqNum == i;
+        }
+        
+        if (o instanceof TCPPacket) {
+            TCPPacket tcpPkt = (TCPPacket) o;
+            return this.seqNum == tcpPkt.seqNum;
+        }
+        
+        return false;
     }
 
     public int getSrcPort() {
@@ -202,8 +214,17 @@ public class TCPPacket {
     public byte[] getData() {
         return this.data;
     }
-    
-    
+        
+    public MOREPacket getMorePacket() {
+        return morePacket;
+    }
+
+
+    public void setMorePacket(MOREPacket morePacket) {
+        this.morePacket = morePacket;
+    }
+
+
     public TCPPacket(byte[] packetBytes) {
         this.srcPort = ByteBuffer.wrap(packetBytes, 0, 2).getShort();
         this.dstPort = ByteBuffer.wrap(packetBytes, 2, 2).getShort();

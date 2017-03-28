@@ -6,17 +6,16 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MSTCPRequester {
     final Logger logger;
     
-    Vector<MSTCPRequesterConnection> connections; // active connections (TODO: Replace failed connections)
-    LinkedBlockingQueue<ConnectionToRequestMap> connectionToBlockQueue; // records which blocks requested on each connection
-    MSTCPInformation mstcpInformation; // informations about the MSTCP connections
-    final int baseRecvPort; // first port used for indexing Vector. TODO: find a better solution?
-    int nextRecvPort;       // next port on which we receive ACKs + Data
+    Vector<MSTCPRequesterConnection> connections;    // active connections (TODO: Replace failed connections)
+    LinkedBlockingQueue<MOREPacket> receivedPackets; // connections add their received packets to this
+    MSTCPInformation mstcpInformation;               // information about the MSTCP connections
+    final int baseRecvPort;                          // first port used for indexing Vector. TODO: find a better solution?
+    int nextRecvPort;                                // next port on which we receive ACKs + Data
     
     int nextBlock = 0; // next block to request
     
@@ -33,7 +32,7 @@ public class MSTCPRequester {
         this.nextRecvPort = baseRecvPort;
         this.mstcpInformation = new MSTCPInformation(recvPort, filename);
         this.connections = new Vector<MSTCPRequesterConnection>(Utils.noOfSources);
-        this.connectionToBlockQueue = new LinkedBlockingQueue<ConnectionToRequestMap>();
+        this.receivedPackets = new LinkedBlockingQueue<MOREPacket>();
         
         // Starting first connections
         logger.info("Starting first connection (" + InetAddress.getByName(addr) + ", " + dstPort + ")");
@@ -56,13 +55,15 @@ public class MSTCPRequester {
         File file = new File(path + "received_" + filename);
         FileOutputStream fos = new FileOutputStream(file);
         
-        ConnectionToRequestMap map;
-        TCPPacket tcpPacket;
+        MOREPacket more;
         for(;;) {
-            map = connectionToBlockQueue.take();
-            tcpPacket = connections.get(map.connection - baseRecvPort).receivedData.take();
-            fos.write(tcpPacket.getData());
-            if (map.block == (mstcpInformation.fileSize / Utils.blockSize) + 1)
+            more = receivedPackets.take();
+            if (more.getBlock() < nextBlock)
+                continue;
+            
+            nextBlock++;
+            fos.write(more.getData());
+            if (more.getBlock() == (mstcpInformation.fileSize / Utils.blockSize) + 1)
                 break;
         }
         
@@ -79,13 +80,7 @@ public class MSTCPRequester {
         if (nextBlock > (mstcpInformation.fileSize / Utils.blockSize) + 1)
             return -1;
         logger.info("Requesting block " + nextBlock + " on connection " + recvPort);
-        try {
-            connectionToBlockQueue.put(new ConnectionToRequestMap(recvPort, nextBlock));
-        } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
-            System.exit(1);
-        }
-        return nextBlock++;
+        return nextBlock;
     }
 
     public synchronized void adjust_weights() {
