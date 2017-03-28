@@ -1,12 +1,13 @@
-package TCPoverUDP;
+package MSTCP.vegas.more;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class TCPPacket {
+    static int BASE_SIZE = 224; // base size of the TCP packet in bytes (7 32-bit words)
     
     private int srcPort    = 0;    // 16 bits, port at sender
-    private int destPort   = 0;    // 16 bits, port at receiver
+    private int dstPort    = 0;    // 16 bits, port at receiver
     private int seqNum     = 0;    // 32 bits, if SYN flag set then the initial sequence number, otherwise the accumulated sequence number
     private int ackNum     = 0;    // 32 bits, if ACK flag set then next expected sequence number, otherwise empty
     private int dataOffset = 0;    //  4 bits, size of header in 32-bit words
@@ -15,36 +16,62 @@ public class TCPPacket {
     private int checksum   = 0;    // 16 bits, 16-bit checksum
     private int urgentPointer = 0; // 16 bits, if URG flag set then offset to last urgent data byte
     private byte[] options = null; // 0-320 bits divisible by 32, final byte includes any padding
+    private byte[] data = null;    // (0-840 bytes) data the TCP is a header of
+    
+    private int time_req = -1; // 32 bits, in a request records the time the packet was sent. In an ack records the latency of the request.
+    private int time_ack = -1; // 32 bits, in a request is empty. In an ack Records the time the packet was sent.
+    
     
     private int paddingLength = 0;
     
     
-    public TCPPacket(int srcPort, int destPort, int seqNum, int ackNum, int flags, int windowSize,
+    public TCPPacket(int srcPort, int dstPort, int seqNum, int ackNum, int flags, int windowSize,
             int urgentPointer, byte[] options) {
-        this.srcPort = srcPort;
-        this.destPort = destPort;
-        this.seqNum = seqNum;
+        this (srcPort, dstPort, seqNum, windowSize);
         this.ackNum = ackNum;
         this.flags = flags;
-        this.windowSize = windowSize;
         this.urgentPointer = urgentPointer;
         this.options = options;
         
         int optionsLength = (options == null ? 0 : options.length) * 8;
 
-        paddingLength = (160 + optionsLength) % 32;
-        dataOffset = (160 + optionsLength + paddingLength) / 32;
+        paddingLength = (BASE_SIZE + optionsLength) % 32;
+        dataOffset = (BASE_SIZE + optionsLength + paddingLength) / 32;
     }
     
    
-    public TCPPacket(int srcPort, int destPort, int seqNum, int windowSize) {
-        super();
+    public TCPPacket(int srcPort, int dstPort, int seqNum, int windowSize) {
         this.srcPort = srcPort;
-        this.destPort = destPort;
+        this.dstPort = dstPort;
         this.seqNum = seqNum;
         this.windowSize = windowSize;
-        paddingLength = 160 % 32;
-        dataOffset = (160 + paddingLength) / 32;
+        paddingLength = BASE_SIZE % 32;
+        dataOffset = (BASE_SIZE + paddingLength) / 32;
+    }
+    
+    public TCPPacket(int srcPort, int dstPort, int seqNum, int ackNum, int flags, int windowSize,
+            int urgentPointer, byte[] options, byte[] data) {
+        this(srcPort, dstPort, seqNum, ackNum, flags, windowSize, urgentPointer, options);
+        this.data = data;
+    }
+    
+    public TCPPacket(int srcPort, int dstPort, int seqNum, int windowSize, byte[] data) {
+        this(srcPort, dstPort, seqNum, windowSize);
+        this.data = data;
+    }
+    
+    // WARNING: this should only be used for checking if a packet is in a collection
+    // public TCPPacket(int seqNum) {
+    //     this.seqNum = seqNum;
+    // }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof TCPPacket))
+            return false;
+        
+        TCPPacket tcpPkt = (TCPPacket) o;
+        return this.seqNum == tcpPkt.seqNum;
     }
 
     public int getSrcPort() {
@@ -56,11 +83,11 @@ public class TCPPacket {
     }
 
     public int getDestPort() {
-        return destPort;
+        return dstPort;
     }
 
-    public void setDestPort(int destPort) {
-        this.destPort = destPort;
+    public void setDestPort(int dstPort) {
+        this.dstPort = dstPort;
     }
 
     public int getSeqNum() {
@@ -115,6 +142,26 @@ public class TCPPacket {
     public void setFlags(int flags) {
         this.flags = flags;
     }
+    
+    public int getTime_req() {
+        return this.time_req;
+    }
+    
+    public void setTime_req() {
+        this.time_req = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
+    }
+    
+    public void setTime_req(int time_req) {
+        this.time_req = time_req;
+    }
+    
+    public int getTime_ack() {
+        return this.time_ack;
+    }
+    
+    public void setTime_ack() {
+        this.time_ack = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
+    }
 
     public int getWindowSize() {
         return windowSize;
@@ -139,7 +186,7 @@ public class TCPPacket {
                 this.options = options;
             }
             
-            this.dataOffset = 5 + (this.options.length / 4);
+            this.dataOffset = (BASE_SIZE / 32) + (this.options.length / 4);
                 
         }
     }
@@ -148,9 +195,18 @@ public class TCPPacket {
         return dataOffset;
     }
     
+    public void setData(byte[] data) {
+        this.data = data;
+    }
+    
+    public byte[] getData() {
+        return this.data;
+    }
+    
+    
     public TCPPacket(byte[] packetBytes) {
         this.srcPort = ByteBuffer.wrap(packetBytes, 0, 2).getShort();
-        this.destPort = ByteBuffer.wrap(packetBytes, 2, 2).getShort();
+        this.dstPort = ByteBuffer.wrap(packetBytes, 2, 2).getShort();
         this.seqNum = ByteBuffer.wrap(packetBytes, 4, 4).getInt();
         this.ackNum = ByteBuffer.wrap(packetBytes, 8, 4).getInt();
         
@@ -160,15 +216,23 @@ public class TCPPacket {
         this.checksum = ByteBuffer.wrap(packetBytes, 16, 2).getShort();
         this.urgentPointer = ByteBuffer.wrap(packetBytes, 18, 2).getShort();
         
-        if (dataOffset > 5) this.options = Arrays.copyOfRange(packetBytes, 20, packetBytes.length);
+        this.time_req = ByteBuffer.wrap(packetBytes, 20, 4).getInt();
+        this.time_ack = ByteBuffer.wrap(packetBytes, 24, 4).getInt();
+        
+        if (dataOffset > (BASE_SIZE / 32))
+            this.options = Arrays.copyOfRange(packetBytes, 20, packetBytes.length);
+        if (dataOffset * 4 < packetBytes.length)
+            this.data = Arrays.copyOfRange(packetBytes, dataOffset * 4, packetBytes.length);
                 
     }
     
+    
+    
     private ByteBuffer constructByteBuffer() {
-        ByteBuffer bb = ByteBuffer.allocate(dataOffset * 4);
+        ByteBuffer bb = ByteBuffer.allocate( (dataOffset * 4) + (data == null ? 0 : data.length));
         
         bb.putShort((short) srcPort);
-        bb.putShort((short) destPort);
+        bb.putShort((short) dstPort);
         bb.putInt(seqNum);
         bb.putInt(ackNum);
         
@@ -179,7 +243,14 @@ public class TCPPacket {
         bb.putShort((short) windowSize);
         bb.putShort((short) 0); // checksum done below
         bb.putShort((short) urgentPointer);
-        if (options != null && options.length > 0) bb.put(options);
+        
+        bb.putInt(time_req);
+        bb.putInt(time_ack);
+        
+        if (options != null && options.length > 0) 
+            bb.put(options);
+        if (data != null)
+            bb.put(data);
         
         return bb;
     }
@@ -187,21 +258,23 @@ public class TCPPacket {
     public byte[] bytes() {
         byte[] packetBytes = constructByteBuffer().array();
 
-        short sum = calculateChecksum();
+        short sum = calculateChecksum(packetBytes);
         packetBytes[16] = (byte) (sum >> 8);
         packetBytes[17] = (byte) (sum);
+        
 
         return packetBytes;
     }
     
     public short calculateChecksum() {
-        byte[] packetBytes = constructByteBuffer().array();
-        
+        return calculateChecksum(constructByteBuffer().array());
+    }
+    
+    public short calculateChecksum(byte[] packetBytes) {        
         short sum = 0;
         for (int i=0; i<packetBytes.length; i++) {
             sum += packetBytes[i];
         }
-        
         return sum;
     }
    
@@ -209,14 +282,15 @@ public class TCPPacket {
         return this.checksum == calculateChecksum();
     }
     
-    
     public static void main(String[] args) {
-        TCPPacket pkt1 = new TCPPacket(0, 0, 0, 0, 0, 0, 0, null);
-        TCPPacket pkt2 = new TCPPacket(pkt1.bytes());
-        
-        byte[] pkt1bytes = pkt1.bytes();
-        byte[] pkt2bytes = pkt2.bytes();
-        System.out.println(Arrays.equals(pkt1bytes, pkt2bytes));
+        byte[] data = {0, 1, 2, 3, -1, -2, -3, -4};
+        TCPPacket pkt1 = new TCPPacket(14000, 15000, 50, 10, data);
+        pkt1.setACK(54);
+        pkt1.setTime_ack();
+        pkt1.setTime_req();
+        byte[] pkt1Bytes = pkt1.bytes();
+        TCPPacket pkt2 = new TCPPacket(pkt1Bytes);
+        boolean result = pkt2.verifyChecksum();
+        System.out.println(result);
     }
-    
 }
