@@ -18,22 +18,22 @@ public class Test {
             
             (new Thread() {
                 public void run() {
-                    new MSTCPResponder(15000, "./", sources);
+                    new MSTCPResponder(Utils.getIPAddress(null), 15000, "./", sources);
                 }
             }).start();
             
             (new Thread() {
                 public void run() {
-                    new MSTCPResponder(15001, "./", sources);
+                    new MSTCPResponder(Utils.getIPAddress(null), 15001, "./", sources);
                 }
             }).start();
             
             TimeUnit.SECONDS.sleep(2);
             
-            // new MSTCPRequester(Utils.getIPAddress(null), 14000, 15000, "./", "hello.txt");
-            new MSTCPRequester(Utils.getIPAddress(null), 14000, 15000, "./", "hello_repeat.txt");
-            // new MSTCPRequester(Utils.getIPAddress(null), 14000, 15000, "./", "hello_repeat_repeat.txt");
-            // new MSTCPRequester(Utils.getIPAddress(null), 14000, 15000, "./", "me.jpg");
+            // new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null),  14000, 15000, "./", "hello.txt");
+            new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null), 14000, 15000, "./", "hello_repeat.txt");
+            // new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null),  14000, 15000, "./", "hello_repeat_repeat.txt");
+            // new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null),  14000, 15000, "./", "me.jpg");
         
             System.out.println("Test Complete.");
         } catch (Exception e) {

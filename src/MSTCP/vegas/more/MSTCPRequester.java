@@ -26,19 +26,19 @@ public class MSTCPRequester {
     
     boolean transfer_complete = false;
     
-    public MSTCPRequester(String addr, int recvPort, int dstPort, String path, String filename) throws InterruptedException, IOException {
+    public MSTCPRequester(String recvAddr, String dstAddr, int recvPort, int dstPort, String path, String filename) throws InterruptedException, IOException {
         logger = Utils.getLogger(this.getClass().getName());
         logger.info("Starting up MSTCP-Vegas Connection. File: " + filename);
         
-        this.recvAddr = InetAddress.getByName(Utils.getIPAddress(logger));
+        this.recvAddr = InetAddress.getByName(recvAddr);
         this.nextRecvPort = recvPort;
-        this.mstcpInformation = new MSTCPInformation(recvAddr.getAddress(), recvPort, filename, (new Random()).nextInt());
+        this.mstcpInformation = new MSTCPInformation(this.recvAddr.getAddress(), recvPort, filename, (new Random()).nextInt());
         this.connections = new Vector<MSTCPRequesterConnection>(Utils.noOfSources);
         this.receivedPackets = new LinkedBlockingQueue<MOREPacket>();
         
         // Starting first connections
-        logger.info("Starting first connection (" + InetAddress.getByName(addr) + ", " + dstPort + ")");
-        MSTCPRequesterConnection conn = new MSTCPRequesterConnection(addr, nextRecvPort++, dstPort, this, false);
+        logger.info("Starting first connection (" + InetAddress.getByName(dstAddr) + ", " + dstPort + ")");
+        MSTCPRequesterConnection conn = new MSTCPRequesterConnection(dstAddr, nextRecvPort++, dstPort, this, false);
         connections.addElement(conn);
         
         // Start connections with other sources
@@ -93,5 +93,13 @@ public class MSTCPRequester {
         for (MSTCPRequesterConnection c: this.connections)
             if (c.equilibrium_rate != 0)
                 c.weight = c.equilibrium_rate / total_rate;
+    }
+    
+    
+    public static void main(String[] args) throws InterruptedException, IOException {
+        // new MSTCPRequester("192.168.1.1", "192.168.2.1", 14000, 15000, "./", "hello.txt");
+        new MSTCPRequester("192.168.1.1", "192.168.2.1", 14000, 15000, "./", "hello_repeat.txt");
+        // new MSTCPRequester("192.168.1.1", "192.168.2.1", 14000, 15000, "./", "hello_repeat_repeat.txt");
+        // new MSTCPRequester("192.168.1.1", "192.168.2.1", 14000, 15000, "./", "me.jpg");
     }
 }

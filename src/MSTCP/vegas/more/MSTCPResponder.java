@@ -73,12 +73,12 @@ public class MSTCPResponder {
         return tcpPacket.bytes();
     }
     
-    public MSTCPResponder(int recvPort, String path, Vector<SourceInformation> sources) {
+    public MSTCPResponder(String recvAddr, int recvPort, String path, Vector<SourceInformation> sources) {
         this.logger = Utils.getLogger(this.getClass().getName() + "_" + recvPort);
         
         this.recvPort = recvPort;
         this.path = path;
-        this.srcInfo = new SourceInformation(Utils.getIPAddress(logger), recvPort);
+        this.srcInfo = new SourceInformation(recvAddr, recvPort);
         this.sources = sources;
 
         try {
@@ -202,5 +202,25 @@ public class MSTCPResponder {
             System.exit(1);
         }
         
+    }
+    
+    public static void main(String[] args) {
+        final Vector<SourceInformation> sources = new Vector<SourceInformation>();
+        sources.add(new SourceInformation("192.168.2.1", 15000));
+        sources.add(new SourceInformation("192.168.2.1", 15001));
+        sources.add(new SourceInformation("192.168.3.1", 15000));
+        sources.add(new SourceInformation("192.168.3.1", 15001));
+        
+        (new Thread() {
+            public void run() {
+                new MSTCPResponder("192.168.2.1", 15000, "./", sources);
+            }
+        }).start();
+        
+        (new Thread() {
+            public void run() {
+                new MSTCPResponder("192.168.2.1", 15001, "./", sources);
+            }
+        }).start();
     }
 }

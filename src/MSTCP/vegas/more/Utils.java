@@ -24,7 +24,7 @@ public final class Utils {
     public static final int latency_variance = 1000;
     public static final double p_drop        = 0.05;
 
-    public static final int noOfSources = 2;
+    public static final int noOfSources = 4;
     public static final int pktSize     = 1000; // 1000 Bytes total (Header 28 bytes, Block 972 bytes)
     public static final int tcpSize     = 28;   // TCP Header + timestams + no options
     public static final int moreSize    = 8;    // MORE Header with no code vector or data
