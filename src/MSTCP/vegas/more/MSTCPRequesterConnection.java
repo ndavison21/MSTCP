@@ -164,6 +164,7 @@ public class MSTCPRequesterConnection extends Thread {
         synPacket.setSYN();
         
         MSTCPInformation msInfo = requester.mstcpInformation;
+        msInfo.recvPort = this.recvPort;
         synPacket.setData(msInfo.bytes());
         synPacket.setTime_req();
         
@@ -359,11 +360,11 @@ public class MSTCPRequesterConnection extends Thread {
                         
                         logger.info("Received Block from (" + dstAddr + ", " + dstPort + ")");
                         // pass data to receiver
-                        requester.receivedPackets.put(tcpPacket.getMorePacket());
+                        requester.receivedPackets.put(new MOREPacket(tcpPacket.getData()));
                     } else {
                         if (base <= tcpPacket.getSeqNum()) {
                             logger.info("Received Packet Out of Order (seqNum " + tcpPacket.getSeqNum() + ", base " + base + ". Passing to Requester anyway.");
-                            requester.receivedPackets.put(tcpPacket.getMorePacket());
+                            requester.receivedPackets.put(new MOREPacket(tcpPacket.getData()));
                         } else
                             logger.info("Received Corrputed Packet");
                     }
@@ -394,24 +395,24 @@ public class MSTCPRequesterConnection extends Thread {
                         }
                     }
                         
-                    int blockToRequest = requester.blockToRequest(recvPort);
-                    if (blockToRequest == -1) {
+                    short[] codeVector = requester.codeVector(recvPort);
+                    if (codeVector == null) {
                         this.interrupt();
                         return;
                     }
                     
-                    MOREPacket more = new MOREPacket(blockToRequest);
+                    MOREPacket more = new MOREPacket(requester.mstcpInformation.flowID, codeVector);;
                     
                     int seqNum = (toRetransmit.isEmpty() ? nextSeqNum : toRetransmit.take());
                     
                     tcpRequest = new TCPPacket(recvPort, dstPort, seqNum, cwnd);
-                    tcpRequest.setMorePacket(more);
+                    tcpRequest.setData(more.bytes());
                     if (nextSeqNum == initialSeqNum)
                         tcpRequest.setACK(initialSeqNum);
                     tcpRequest.setTime_req();
                     sentRequests.add(tcpRequest);
                     
-                    logger.info("Sending request for block " + blockToRequest + " to (" + dstAddr + ", " + dstPort + ")");
+                    logger.info("Sending request for block " + codeVector[0] + " to (" + dstAddr + ", " + dstPort + ")");
                     request = tcpRequest.bytes();
                     synchronized(initialSeqNum) {
                         nextSeqNum++;

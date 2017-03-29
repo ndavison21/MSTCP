@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Random;
 import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
@@ -14,10 +15,11 @@ public class MSTCPRequester {
     Vector<MSTCPRequesterConnection> connections;    // active connections (TODO: Replace failed connections)
     LinkedBlockingQueue<MOREPacket> receivedPackets; // connections add their received packets to this
     MSTCPInformation mstcpInformation;               // information about the MSTCP connections
-    final int baseRecvPort;                          // first port used for indexing Vector. TODO: find a better solution?
+
+    final InetAddress recvAddr;
     int nextRecvPort;                                // next port on which we receive ACKs + Data
     
-    int nextBlock = 0; // next block to request
+    short nextBlock = 0; // next block to request
     
     final int total_alpha = Utils.total_alpha;
     Double total_rate = 0.0;
@@ -28,9 +30,9 @@ public class MSTCPRequester {
         logger = Utils.getLogger(this.getClass().getName());
         logger.info("Starting up MSTCP-Vegas Connection. File: " + filename);
         
-        this.baseRecvPort = recvPort;
-        this.nextRecvPort = baseRecvPort;
-        this.mstcpInformation = new MSTCPInformation(recvPort, filename);
+        this.recvAddr = InetAddress.getByName(Utils.getIPAddress(logger));
+        this.nextRecvPort = recvPort;
+        this.mstcpInformation = new MSTCPInformation(recvAddr.getAddress(), recvPort, filename, (new Random()).nextInt());
         this.connections = new Vector<MSTCPRequesterConnection>(Utils.noOfSources);
         this.receivedPackets = new LinkedBlockingQueue<MOREPacket>();
         
@@ -57,13 +59,16 @@ public class MSTCPRequester {
         
         MOREPacket more;
         for(;;) {
+            // TODO: coded data not just block numbers
             more = receivedPackets.take();
-            if (more.getBlock() < nextBlock)
+            if (more.getCodeVector()[0] < nextBlock)
                 continue;
             
+            logger.info("Received block " + nextBlock); 
             nextBlock++;
-            fos.write(more.getData());
-            if (more.getBlock() == (mstcpInformation.fileSize / Utils.blockSize) + 1)
+            
+            fos.write(more.getEncodedData());
+            if (more.getCodeVector()[0] == (mstcpInformation.fileSize / Utils.blockSize) + 1)
                 break;
         }
         
@@ -76,11 +81,12 @@ public class MSTCPRequester {
     }
     
     // called by connections, returns next needed block and records which connection it'll come on
-    public synchronized int blockToRequest(int recvPort) {
+    public synchronized short[] codeVector(int recvPort) {
         if (nextBlock > (mstcpInformation.fileSize / Utils.blockSize) + 1)
-            return -1;
+            return null;
         logger.info("Requesting block " + nextBlock + " on connection " + recvPort);
-        return nextBlock;
+        
+        return (new short[]{nextBlock});
     }
 
     public synchronized void adjust_weights() {

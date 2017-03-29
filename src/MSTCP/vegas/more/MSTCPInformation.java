@@ -5,21 +5,24 @@ import java.util.Vector;
 
 public class MSTCPInformation {
 
+    byte[] recvAddr;
     int recvPort;    // can uniquely identify the connection by the port it receives on
     String filename;
-    long fileSize = -1;    
+    long fileSize = -1;
+    int flowID;
     Vector<SourceInformation> sources;
 
     
     // For sending with SYN
-    public MSTCPInformation(int recvPort, String filename) {
-        this.recvPort = recvPort;
-        this.filename = filename;
+    public MSTCPInformation(byte[] recvAddr, int recvPort, String filename, int flowID) {
+        this(null, recvAddr, recvPort, filename, -1, flowID);
     }
     
     // For sending with SYN + ACK
-    public MSTCPInformation(Vector<SourceInformation> sources, int recvPort, String filename, long filesize) {
+    public MSTCPInformation(Vector<SourceInformation> sources, byte[] recvAddr, int recvPort, String filename, long filesize, int flowID) {
+        super();
         this.sources = sources;
+        this.recvAddr = recvAddr;
         this.recvPort = recvPort;
         this.filename = filename;
         this.fileSize = filesize;
@@ -27,6 +30,8 @@ public class MSTCPInformation {
     
     public MSTCPInformation(byte[] bytes) {
         ByteBuffer bb = ByteBuffer.wrap(bytes);
+        this.recvAddr = new byte[4];
+        bb.get(recvAddr);
         this.recvPort = bb.getInt();
         int filenameLength = bb.getInt();
         byte[] filenameBytes = new byte[filenameLength];
@@ -64,6 +69,7 @@ public class MSTCPInformation {
     
     public byte[] bytes() {
         int size = 0;
+        size += 4; // for address (InetAddress)
         size += 4; // for receiver port (int) 
         size += 4; // for length of filename (int)
         size += filename.getBytes().length; // for filename (String -> bytes)
@@ -85,6 +91,7 @@ public class MSTCPInformation {
         
         
         ByteBuffer bb = ByteBuffer.allocate(size);
+        bb.put(recvAddr);
         bb.putInt(recvPort);
         bb.putInt(filename.getBytes().length);
         bb.put(filename.getBytes());

@@ -6,7 +6,6 @@ import java.io.RandomAccessFile;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -115,11 +114,11 @@ public class MSTCPResponder {
                         logger.info("SYN Received. Initial Sequence Number " + inPacket.getSeqNum() + ". Request Latency " + time_req);
                         initialSeqNum = inPacket.getSeqNum();
                         nextSeqNum = initialSeqNum;
-                        dstAddress = udpPkt.getAddress(); // when moving to lower level we'll need to get this from IP
-                        dstPort = inPacket.getSrcPort();
                         
                         mstcpInfo = new MSTCPInformation(inPacket.getData());
                         mstcpInfo.sources = this.sources;
+                        dstAddress = InetAddress.getByAddress(mstcpInfo.recvAddr); // when moving to lower level we'll need to get this from IP
+                        dstPort = mstcpInfo.recvPort;
                         for (SourceInformation s: mstcpInfo.sources) { // set this sender to connected
                             if (s.address == srcInfo.address && s.port == srcInfo.port) {
                                 s.connected = true;
@@ -174,11 +173,14 @@ public class MSTCPResponder {
                             nextSeqNum = inPacket.getSeqNum() + 1;
                         }
                         
-                        int block = ByteBuffer.wrap(inPacket.getData()).getInt();
+                        MOREPacket more = new MOREPacket(inPacket.getData());
+                        short block = more.getCodeVector()[0];
                         logger.info("Received packet " + inPacket.getSeqNum() + " requesting block " + block);
                         raf.seek(block * Utils.blockSize);
                         raf.read(dataBytes);
-                        outBytes = generateTCPPacket(inPacket.getSeqNum(), dataBytes, false, false, time_req);
+                        more.setPacketType((short) 1); 
+                        more.setEncodedData(dataBytes);
+                        outBytes = generateTCPPacket(inPacket.getSeqNum(), more.bytes(), false, false, time_req);
                         logger.info("Sending ACK + Block to (" + dstAddress + ", " + dstPort + ")");
                     }
                     

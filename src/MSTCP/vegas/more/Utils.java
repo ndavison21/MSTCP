@@ -26,9 +26,11 @@ public final class Utils {
 
     public static final int noOfSources = 2;
     public static final int pktSize     = 1000; // 1000 Bytes total (Header 28 bytes, Block 972 bytes)
-    public static final int headerSize  = 28; // TCP Header (with no options): 20 bytes. 8 bytes for timestamps
-    public static final int blockSize   = pktSize - headerSize; // Send blocks of 980 bytes
-    public static final int requestSize = headerSize + 4; // header + block requested
+    public static final int tcpSize     = 28;   // TCP Header + timestams + no options
+    public static final int moreSize    = 8;    // MORE Header with no code vector or data
+    public static final int blockSize   = 800;  // size of data blocks
+    public static final int maxVectorSize = pktSize - (tcpSize + moreSize + blockSize); // maximum size of code vector in bytes
+    
 
     public static final int synAttempts  = Integer.MAX_VALUE;
     public static final int synTimeout   = Integer.MAX_VALUE;

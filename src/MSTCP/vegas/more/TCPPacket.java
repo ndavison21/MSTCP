@@ -4,33 +4,26 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class TCPPacket {
-    static int BASE_SIZE = 224; // base size of the TCP packet in bytes (7 32-bit words)
+    static int BASE_SIZE = Utils.tcpSize * 8; // base size of the TCP packet in bits (5 32-bit words)
     
-    /** Fields from TCP Header **/
     private int srcPort    = 0;    // 16 bits, port at sender
     private int dstPort    = 0;    // 16 bits, port at receiver
     private int seqNum     = 0;    // 32 bits, if SYN flag set then the initial sequence number, otherwise the accumulated sequence number
     private int ackNum     = 0;    // 32 bits, if ACK flag set then next expected sequence number, otherwise empty
     private int dataOffset = 0;    //  4 bits, size of header in 32-bit words
+    private int reserved   = 0;    //  3 bits, reserved
     private int flags      = 0;    //  9 bits, contains 9 1-bit flags (see reference)
     private int windowSize = 0;    // 16 bits, size of the receive window
     private int checksum   = 0;    // 16 bits, 16-bit checksum
     private int urgentPointer = 0; // 16 bits, if URG flag set then offset to last urgent data byte
+    
+    private int time_req = -1;   // 32 bits, in a request records the time the packet was sent. In an ack records the latency of the request.
+    private int time_ack = -1;   // 32 bits, in a request is empty. In an ack Records the time the packet was sent.
+    
     private byte[] options = null; // 0-320 bits divisible by 32, final byte includes any padding
-    private byte[] data = null;    // (0-840 bytes) data the TCP is a header of
+    private byte[] data = null;    // data the TCP is a header of
     
     private int paddingLength = 0;
-    
-    /** fields added for MORE **/
-    // TODO: Implement these for the packet
-    private int time_req = -1; // 32 bits, in a request records the time the packet was sent. In an ack records the latency of the request.
-    private int time_ack = -1; // 32 bits, in a request is empty. In an ack Records the time the packet was sent.
-    
-    private int packetType = -1; // 1 bit, either forward or response packet
-    private int flowID     = -1;     // 32 bits, flow identifier, hopefully unique
-    private byte[] srcIP   = null;
-    private byte[] dstIP   = null;
-    private MOREPacket morePacket = null; // variable length. Code Vector and     
     
     
     public TCPPacket(int srcPort, int dstPort, int seqNum, int ackNum, int flags, int windowSize,
@@ -154,26 +147,6 @@ public class TCPPacket {
     public void setFlags(int flags) {
         this.flags = flags;
     }
-    
-    public int getTime_req() {
-        return this.time_req;
-    }
-    
-    public void setTime_req() {
-        this.time_req = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
-    }
-    
-    public void setTime_req(int time_req) {
-        this.time_req = time_req;
-    }
-    
-    public int getTime_ack() {
-        return this.time_ack;
-    }
-    
-    public void setTime_ack() {
-        this.time_ack = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
-    }
 
     public int getWindowSize() {
         return windowSize;
@@ -181,6 +154,26 @@ public class TCPPacket {
 
     public void setWindowSize(int windowSize) {
         this.windowSize = windowSize;
+    }
+    
+    public int getTime_req() {
+        return time_req;
+    }
+
+    public void setTime_req() {
+        this.time_req = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
+    }
+    
+    public void setTime_req(int time_req) {
+        this.time_req = time_req;
+    }
+
+    public int getTime_ack() {
+        return this.time_ack;
+    }
+    
+    public void setTime_ack() {
+        this.time_ack = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
     }
 
     public byte[] getOptions() {
@@ -214,15 +207,6 @@ public class TCPPacket {
     public byte[] getData() {
         return this.data;
     }
-        
-    public MOREPacket getMorePacket() {
-        return morePacket;
-    }
-
-
-    public void setMorePacket(MOREPacket morePacket) {
-        this.morePacket = morePacket;
-    }
 
 
     public TCPPacket(byte[] packetBytes) {
@@ -236,7 +220,6 @@ public class TCPPacket {
         this.windowSize = ByteBuffer.wrap(packetBytes, 14, 2).getShort();
         this.checksum = ByteBuffer.wrap(packetBytes, 16, 2).getShort();
         this.urgentPointer = ByteBuffer.wrap(packetBytes, 18, 2).getShort();
-        
         this.time_req = ByteBuffer.wrap(packetBytes, 20, 4).getInt();
         this.time_ack = ByteBuffer.wrap(packetBytes, 24, 4).getInt();
         
@@ -257,14 +240,13 @@ public class TCPPacket {
         bb.putInt(seqNum);
         bb.putInt(ackNum);
         
-        int temp = (dataOffset << 4) + (flags >> 8);
+        int temp = (dataOffset << 4) + (reserved << 1) + (flags >> 8);
         bb.put((byte) temp);
         bb.put((byte) flags);
         
         bb.putShort((short) windowSize);
         bb.putShort((short) 0); // checksum done below
         bb.putShort((short) urgentPointer);
-        
         bb.putInt(time_req);
         bb.putInt(time_ack);
         
@@ -307,8 +289,8 @@ public class TCPPacket {
         byte[] data = {0, 1, 2, 3, -1, -2, -3, -4};
         TCPPacket pkt1 = new TCPPacket(14000, 15000, 50, 10, data);
         pkt1.setACK(54);
-        pkt1.setTime_ack();
         pkt1.setTime_req();
+        pkt1.setTime_ack();
         byte[] pkt1Bytes = pkt1.bytes();
         TCPPacket pkt2 = new TCPPacket(pkt1Bytes);
         boolean result = pkt2.verifyChecksum();
