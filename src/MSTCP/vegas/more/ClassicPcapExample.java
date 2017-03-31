@@ -35,10 +35,13 @@ public class ClassicPcapExample {
             String description =  
                 (device.getDescription() != null) ? device.getDescription()  
                     : "No description available";  
-            System.out.printf("#%d: %s [%s]\n", i++, device.getName(), description);  
+            System.out.printf("#%d: %s [%s]\n", i++, device.getName(), description);
+            for (PcapAddr address: device.getAddresses()) {
+            	System.out.printf("\t%s\n", address.getAddr().toString());
+            }
         }  
   
-        PcapIf device = alldevs.get(0); // We know we have atleast 1 device  
+        PcapIf device = alldevs.get(8); // We know we have atleast 1 device  
         System.out  
             .printf("\nChoosing '%s' on your behalf:\n",  
                 (device.getDescription() != null) ? device.getDescription()  
@@ -63,11 +66,10 @@ public class ClassicPcapExample {
          * Third we create a packet handler which will receive packets from the 
          * libpcap loop. 
          **************************************************************************/  
-        PcapPacketHandler<String> jpacketHandler = new PcapPacketHandler<String>() {  
+        PcapPacketHandler<Integer> jpacketHandler = new PcapPacketHandler<Integer>() {  
   
-            public void nextPacket(PcapPacket packet, String user) {  
-  
-                System.out.printf("Received packet at %s caplen=%-4d len=%-4d %s\n",  
+            public void nextPacket(PcapPacket packet, Integer user) {
+                System.out.printf("Received packet at %s caplen=%-4d len=%-4d %d\n",  
                     new Date(packet.getCaptureHeader().timestampInMillis()),   
                     packet.getCaptureHeader().caplen(),  // Length actually captured  
                     packet.getCaptureHeader().wirelen(), // Original length   
@@ -84,11 +86,12 @@ public class ClassicPcapExample {
          * the loop method exists that allows the programmer to sepecify exactly 
          * which protocol ID to use as the data link type for this pcap interface. 
          **************************************************************************/  
-        pcap.loop(10, jpacketHandler, "jNetPcap rocks!");  
+        i=0;
+        for(;;)
+        	pcap.loop(1, jpacketHandler, i++);  
   
         /*************************************************************************** 
          * Last thing to do is close the pcap handle 
-         **************************************************************************/  
-        pcap.close();  
+         **************************************************************************/   
     }
 }
