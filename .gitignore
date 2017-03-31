@@ -1,5 +1,6 @@
 logs/*
 received_*
+bin/MSTCP
 bin/logs/*
 bin/received_*
 .classpath
