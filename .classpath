@@ -2,9 +2,5 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/Users/Nathanael/Downloads/MPTCP/jpcap-0.01.16-win32/jars/net.sourceforge.jpcap-0.01.16.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Nathanael/Downloads/MPTCP/jpcap-0.01.16-win32/jars/dev-classes_net.ultrametrics-0.03.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Nathanael/Downloads/MPTCP/jpcap-0.01.16-win32/jars/fooware_CommandLine-1.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Nathanael/Downloads/MPTCP/jpcap-0.01.16-win32/jars/javadoc_net.sourceforge.jpcap-0.01.16.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
