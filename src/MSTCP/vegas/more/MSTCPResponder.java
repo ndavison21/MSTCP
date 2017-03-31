@@ -205,22 +205,26 @@ public class MSTCPResponder {
     }
     
     public static void main(String[] args) {
+        System.out.println("Note: Setup is for Triangle Network with PC-1 requesting from PC-2 and PC-3");
+        System.out.println("Args: either 192.168.2.1 or 192.168.3.1");
+        
         final Vector<SourceInformation> sources = new Vector<SourceInformation>();
         sources.add(new SourceInformation("192.168.2.1", 15000));
         sources.add(new SourceInformation("192.168.2.1", 15001));
         sources.add(new SourceInformation("192.168.3.1", 15000));
         sources.add(new SourceInformation("192.168.3.1", 15001));
         
-        (new Thread() {
-            public void run() {
-                new MSTCPResponder("192.168.2.1", 15000, "./", sources);
-            }
-        }).start();
+        final String localIP = args[0];
         
-        (new Thread() {
-            public void run() {
-                new MSTCPResponder("192.168.2.1", 15001, "./", sources);
+        for (SourceInformation s: sources) {
+            if (s.address.equals(localIP)) {
+                final int localPort = s.port;
+                (new Thread() {
+                    public void run() {
+                        new MSTCPResponder(localIP, localPort, "./", sources);
+                    }
+                }).start();
             }
-        }).start();
+        }
     }
 }

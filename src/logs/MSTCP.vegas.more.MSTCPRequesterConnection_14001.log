@@ -1,0 +1,66 @@
+2017-03-29 15:17:26 INFO MSTCP.vegas.more.MSTCPRequesterConnection <init> Started up connection on port 14001
+2017-03-29 15:17:26 INFO MSTCP.vegas.more.MSTCPRequesterConnection sendSYN Sending SYN 0 to (/127.0.0.1, 15001)
+2017-03-29 15:17:26 INFO MSTCP.vegas.more.MSTCPSocket$Sender run outBuffer size is 1
+2017-03-29 15:17:29 INFO MSTCP.vegas.more.MSTCPRequesterConnection establishConnection Received SYN + ACK. RTT: 2704
+2017-03-29 15:17:29 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Waiting for next ACK + Data
+2017-03-29 15:17:29 INFO MSTCP.vegas.more.MSTCPRequesterConnection$OutThread run Sending request for block 0 to (/127.0.0.1, 15001)
+2017-03-29 15:17:29 INFO MSTCP.vegas.more.MSTCPSocket$Sender run outBuffer size is 1
+2017-03-29 15:17:29 INFO MSTCP.vegas.more.MSTCPRequesterConnection$OutThread run Sending request for block 0 to (/127.0.0.1, 15001)
+2017-03-29 15:17:30 INFO MSTCP.vegas.more.MSTCPSocket$Sender run outBuffer size is 1
+2017-03-29 15:17:31 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Congestion Window is now 3 (3.0)
+2017-03-29 15:17:31 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Received Block from (/127.0.0.1, 15001)
+2017-03-29 15:17:31 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Waiting for next ACK + Data
+2017-03-29 15:17:31 INFO MSTCP.vegas.more.MSTCPRequesterConnection$OutThread run Sending request for block 1 to (/127.0.0.1, 15001)
+2017-03-29 15:17:31 INFO MSTCP.vegas.more.MSTCPSocket$Sender run outBuffer size is 1
+2017-03-29 15:17:32 INFO MSTCP.vegas.more.MSTCPRequesterConnection$OutThread run Sending request for block 1 to (/127.0.0.1, 15001)
+2017-03-29 15:17:33 INFO MSTCP.vegas.more.MSTCPSocket$Sender run outBuffer size is 1
+2017-03-29 15:17:33 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Received Block from (/127.0.0.1, 15001)
+2017-03-29 15:17:33 INFO MSTCP.vegas.more.MSTCPRequesterConnection$OutThread run Sending request for block 1 to (/127.0.0.1, 15001)
+2017-03-29 15:17:33 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Waiting for next ACK + Data
+2017-03-29 15:17:34 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Received Block from (/127.0.0.1, 15001)
+2017-03-29 15:17:34 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Waiting for next ACK + Data
+2017-03-29 15:17:34 INFO MSTCP.vegas.more.MSTCPRequesterConnection$OutThread run Sending request for block 1 to (/127.0.0.1, 15001)
+2017-03-29 15:17:35 INFO MSTCP.vegas.more.MSTCPSocket$Sender run outBuffer size is 2
+2017-03-29 15:17:36 INFO MSTCP.vegas.more.MSTCPSocket$Sender run outBuffer size is 1
+2017-03-29 15:17:36 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Received Block from (/127.0.0.1, 15001)
+2017-03-29 15:17:36 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Waiting for next ACK + Data
+2017-03-29 15:17:36 INFO MSTCP.vegas.more.MSTCPRequesterConnection$OutThread run Sending request for block 2 to (/127.0.0.1, 15001)
+2017-03-29 15:17:38 INFO MSTCP.vegas.more.MSTCPSocket$Sender run outBuffer size is 1
+2017-03-29 15:17:38 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Received Block from (/127.0.0.1, 15001)
+2017-03-29 15:17:38 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Waiting for next ACK + Data
+2017-03-29 15:17:38 INFO MSTCP.vegas.more.MSTCPRequesterConnection$OutThread run Sending request for block 2 to (/127.0.0.1, 15001)
+2017-03-29 15:17:39 INFO MSTCP.vegas.more.MSTCPSocket$Sender run outBuffer size is 1
+2017-03-29 15:17:39 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Congestion Window is now 4 (4.0)
+2017-03-29 15:17:39 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Received Block from (/127.0.0.1, 15001)
+2017-03-29 15:17:39 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Waiting for next ACK + Data
+2017-03-29 15:17:39 INFO MSTCP.vegas.more.MSTCPRequesterConnection$OutThread run Sending request for block 3 to (/127.0.0.1, 15001)
+2017-03-29 15:17:39 INFO MSTCP.vegas.more.MSTCPRequesterConnection$OutThread run Sending request for block 3 to (/127.0.0.1, 15001)
+2017-03-29 15:17:41 INFO MSTCP.vegas.more.MSTCPSocket$Sender run outBuffer size is 2
+2017-03-29 15:17:41 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Received Block from (/127.0.0.1, 15001)
+2017-03-29 15:17:41 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Waiting for next ACK + Data
+2017-03-29 15:17:41 INFO MSTCP.vegas.more.MSTCPRequesterConnection$OutThread run Sending request for block 3 to (/127.0.0.1, 15001)
+2017-03-29 15:17:42 INFO MSTCP.vegas.more.MSTCPSocket$Sender run outBuffer size is 2
+2017-03-29 15:17:42 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Received Block from (/127.0.0.1, 15001)
+2017-03-29 15:17:42 INFO MSTCP.vegas.more.MSTCPRequesterConnection$OutThread run Sending request for block 3 to (/127.0.0.1, 15001)
+2017-03-29 15:17:42 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Waiting for next ACK + Data
+2017-03-29 15:17:43 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Received Block from (/127.0.0.1, 15001)
+2017-03-29 15:17:43 INFO MSTCP.vegas.more.MSTCPRequesterConnection$OutThread run Sending request for block 3 to (/127.0.0.1, 15001)
+2017-03-29 15:17:43 INFO MSTCP.vegas.more.MSTCPRequesterConnection$InThread run Waiting for next ACK + Data
+2017-03-29 15:17:43 INFO MSTCP.vegas.more.MSTCPRequesterConnection close Closing Connection to (/127.0.0.1, 15001)
+2017-03-29 15:17:43 WARNING MSTCP.vegas.more.MSTCPSocket receive Socket Interrupted
+2017-03-29 15:17:43 WARNING MSTCP.vegas.more.MSTCPRequesterConnection$OutThread run OutThread Interrupted. null
+java.lang.InterruptedException
+	at java.lang.Object.wait(Native Method)
+	at java.lang.Object.wait(Object.java:503)
+	at MSTCP.vegas.more.MSTCPRequesterConnection$OutThread.run(MSTCPRequesterConnection.java:393)
+
+2017-03-29 15:17:43 INFO MSTCP.vegas.more.MSTCPRequesterConnection sendFIN Sending FIN to (/127.0.0.1, 15001)
+2017-03-29 15:17:44 INFO MSTCP.vegas.more.MSTCPSocket$Sender run outBuffer size is 4
+2017-03-29 15:17:45 INFO MSTCP.vegas.more.MSTCPSocket$Sender run outBuffer size is 3
+2017-03-29 15:17:47 INFO MSTCP.vegas.more.MSTCPSocket$Sender run outBuffer size is 2
+2017-03-29 15:17:49 INFO MSTCP.vegas.more.MSTCPSocket$Sender run outBuffer size is 1
+2017-03-29 15:17:51 INFO MSTCP.vegas.more.MSTCPRequesterConnection sendFIN Received FIN + ACK. Sending ACK to (/127.0.0.1, 15001)
+2017-03-29 15:17:51 INFO MSTCP.vegas.more.MSTCPSocket$Sender run outBuffer size is 4
+2017-03-29 15:17:53 INFO MSTCP.vegas.more.MSTCPSocket$Sender run outBuffer size is 3
+2017-03-29 15:17:55 INFO MSTCP.vegas.more.MSTCPSocket$Sender run outBuffer size is 2
+2017-03-29 15:17:57 INFO MSTCP.vegas.more.MSTCPRequesterConnection$1 run We Done Here.
