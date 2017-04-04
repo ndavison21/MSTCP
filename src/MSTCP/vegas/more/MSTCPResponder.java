@@ -3,9 +3,11 @@ package MSTCP.vegas.more;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -140,10 +142,10 @@ public class MSTCPResponder {
                 }
             }
             
-            byte[] dataBytes;
+            byte[] dataBytes = new byte[Utils.blockSize];
+            BigInteger data;
             
             for (;;) {
-                dataBytes = new byte[Utils.blockSize];
                 if (connected) {
                     udpPkt = socket.receive();
                     time_recv = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
@@ -173,15 +175,30 @@ public class MSTCPResponder {
                             nextSeqNum = inPacket.getSeqNum() + 1;
                         }
                         
+                        logger.info("Received packet " + inPacket.getSeqNum());
+                        
                         MOREPacket more = new MOREPacket(inPacket.getData());
-                        short block = more.getCodeVector()[0];
-                        logger.info("Received packet " + inPacket.getSeqNum() + " requesting block " + block);
-                        raf.seek(block * Utils.blockSize);
-                        raf.read(dataBytes);
+                        CodeVectorElement[] codeVector = more.getCodeVector();
+                        BigInteger encodedData = null;
+                        for (CodeVectorElement c: codeVector) {
+                        	if (c.getBlock() == -1)
+                        		continue;
+                        	logger.info("\tBlock " + c.getBlock() + " with coefficient " + c.getCoefficeint());
+                        	raf.seek(c.getBlock() * Utils.blockSize);
+                        	raf.read(dataBytes);
+                        	data = new BigInteger(dataBytes); // TODO: better variable names
+                        	data = data.multiply(BigInteger.valueOf(c.getCoefficeint()));
+                        	if (encodedData == null)
+                        		encodedData = data;
+                        	else
+                        		encodedData = encodedData.add(data);
+                        }
+                        
                         more.setPacketType((short) 1); 
-                        more.setEncodedData(dataBytes);
+                        more.setEncodedData(encodedData);
                         outBytes = generateTCPPacket(inPacket.getSeqNum(), more.bytes(), false, false, time_req);
-                        logger.info("Sending ACK + Block to (" + dstAddress + ", " + dstPort + ")");
+                        logger.info("Sending ACK + Encoded Data to (" + dstAddress + ", " + dstPort + ")");
+                        Arrays.fill(dataBytes, (byte) 0);
                     }
                     
                     socket.send(new DatagramPacket(outBytes, outBytes.length, dstAddress, dstPort));
