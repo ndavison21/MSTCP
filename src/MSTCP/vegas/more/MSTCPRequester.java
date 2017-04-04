@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -19,7 +20,7 @@ public class MSTCPRequester {
     final InetAddress recvAddr;
     int nextRecvPort;                                // next port on which we receive ACKs + Data
     
-    short nextBlock = 0; // next block to request
+    NetworkCoder networkCoder;
     
     final int total_alpha = Utils.total_alpha;
     Double total_rate = 0.0;
@@ -57,18 +58,21 @@ public class MSTCPRequester {
         File file = new File(path + "received_" + filename);
         FileOutputStream fos = new FileOutputStream(file);
         
+        
         MOREPacket more;
         for(;;) {
-            // TODO: coded data not just block numbers
             more = receivedPackets.take();
-            if (more.getCodeVector()[0] < nextBlock)
-                continue;
             
-            logger.info("Received block " + nextBlock); 
-            nextBlock++;
+            if (networkCoder.isInnovative(more)) {
+            	if (networkCoder.canDecode()) {
+            		Vector<byte[]> data = networkCoder.decode();
+            		for (byte[] d: data) {
+            			fos.write(d, 0, Math.min(d.length, Utils.blockSize));
+            		}
+            	}
+            }
             
-            fos.write(more.getEncodedData());
-            if (more.getCodeVector()[0] == (mstcpInformation.fileSize / Utils.blockSize) + 1)
+            if (networkCoder.nextBatch > (mstcpInformation.fileSize / (Utils.blockSize * Utils.batchSize)) + 1)
                 break;
         }
         
@@ -81,13 +85,17 @@ public class MSTCPRequester {
     }
     
     // called by connections, returns next needed block and records which connection it'll come on
-    public synchronized short[] codeVector(int recvPort) {
-        if (nextBlock > (mstcpInformation.fileSize / Utils.blockSize) + 1)
-            return null;
-        logger.info("Requesting block " + nextBlock + " on connection " + recvPort);
+    public void codeVector(int recvPort, CodeVectorElement[] codeVector) {
+        if (networkCoder.nextBatch > (mstcpInformation.fileSize / (Utils.blockSize * Utils.batchSize)) + 1) {
+        	Arrays.fill(codeVector, new CodeVectorElement((short) -1, (short) -1));
+            return;
+        }
+        for (short i=0; i < Utils.batchSize; i++)
+        	codeVector[i] = new CodeVectorElement((short) (networkCoder.baseBlock + i), networkCoder.random());
         
-        return (new short[]{nextBlock});
+        logger.info("Request for batch " + networkCoder.nextBatch + " on connection " + recvPort);
     }
+
 
     public synchronized void adjust_weights() {
         for (MSTCPRequesterConnection c: this.connections)

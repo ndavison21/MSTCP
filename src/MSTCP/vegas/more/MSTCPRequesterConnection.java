@@ -198,6 +198,8 @@ public class MSTCPRequesterConnection extends Thread {
                     base_rtt = time_ack + tcpPacket.getTime_req();
                     logger.info("Received SYN + ACK. RTT: " + base_rtt);
                     requester.mstcpInformation.update(new MSTCPInformation(tcpPacket.getData()));
+                    if (requester.networkCoder == null)
+                    	requester.networkCoder = new NetworkCoder(requester.logger, requester.mstcpInformation.fileSize);
                     return true;
                 }
                 
@@ -384,6 +386,7 @@ public class MSTCPRequesterConnection extends Thread {
         public void run() {
             TCPPacket tcpRequest;
             byte[] request;
+            CodeVectorElement[] codeVector = new CodeVectorElement[Utils.batchSize];
             
             try {
                 while (!requester.transfer_complete) {
@@ -395,8 +398,8 @@ public class MSTCPRequesterConnection extends Thread {
                         }
                     }
                         
-                    short[] codeVector = requester.codeVector(recvPort);
-                    if (codeVector == null) {
+                    requester.codeVector(recvPort, codeVector);
+                    if (codeVector[0].getBlock() == -1) {
                         this.interrupt();
                         return;
                     }

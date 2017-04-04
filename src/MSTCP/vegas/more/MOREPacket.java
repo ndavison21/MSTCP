@@ -1,5 +1,6 @@
 package MSTCP.vegas.more;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
 public class MOREPacket {
@@ -9,11 +10,11 @@ public class MOREPacket {
     private int   flowID     = -1;  // 32 bits, flow identifier, hopefully unique
     private short packetType = -1;  // 16 bits, (0 means forward packet, 1 means response packet)
 
-    private short vectorLength;    // 16 bits, number of elements in the codeVector
-    private short[] codeVector;    // array of 16 bit shorts, blocks and coefficients of encoded data.
-    private byte[] encodedData;    // ? bits, combined packets
+    private short vectorLength;      // 16 bits, number of elements in the codeVector
+    private CodeVectorElement[] codeVector;    // array of 16 bit shorts, blocks and coefficients of encoded data.
+    private BigInteger encodedData;    // ? bits, combined packets
     
-    public MOREPacket(int flowID, short packetType, short[] codeVector, byte[] encodedData) {
+    public MOREPacket(int flowID, short packetType, CodeVectorElement[] codeVector, BigInteger encodedData) {
         super();
         this.flowID = flowID;
         this.packetType = packetType;
@@ -22,8 +23,12 @@ public class MOREPacket {
         this.encodedData = encodedData;
     }
     
-    public MOREPacket(int flowID, short[] codeVector) {
-        this(flowID, (short) 0, codeVector, null);
+    public MOREPacket(int flowID, short packetType, CodeVectorElement[] codeVector, byte[] encodedData) {
+        this(flowID, packetType, codeVector, new BigInteger(encodedData));
+    }
+    
+    public MOREPacket(int flowID, CodeVectorElement[] codeVector) {
+        this(flowID, (short) 0, codeVector, (BigInteger) null);
     }
 
     public int getFlowID() {
@@ -46,20 +51,24 @@ public class MOREPacket {
         return vectorLength;
     }
 
-    public short[] getCodeVector() {
+    public CodeVectorElement[] getCodeVector() {
         return codeVector;
     }
 
-    public void setCodeVector(short[] codeVector) {
+    public void setCodeVector(CodeVectorElement[] codeVector) {
         this.vectorLength = (short) (codeVector == null ? 0 : codeVector.length);
         this.codeVector = codeVector;
     }
 
-    public byte[] getEncodedData() {
+    public BigInteger getEncodedData() {
         return encodedData;
     }
 
     public void setEncodedData(byte[] encodedData) {
+        this.encodedData = new BigInteger(encodedData);
+    }
+    
+    public void setEncodedData(BigInteger encodedData) {
         this.encodedData = encodedData;
     }
     
@@ -69,26 +78,28 @@ public class MOREPacket {
         this.flowID       = bb.getInt();
         this.packetType   = bb.getShort();
         this.vectorLength = bb.getShort();
-        this.codeVector = new short[this.vectorLength];
+        this.codeVector = new CodeVectorElement[this.vectorLength];
         for (short i=0; i<this.vectorLength; i++)
-            this.codeVector[i] = bb.getShort();
+            this.codeVector[i] = new CodeVectorElement(bb.getShort(), bb.getShort());
         if (packetType == 1) {
-            this.encodedData = new byte[Utils.blockSize];
-            bb.get(this.encodedData);
+            byte[] encodedDataBytes = new byte[bb.remaining()];
+            bb.get(encodedDataBytes);
+            this.encodedData = new BigInteger(encodedDataBytes);
         } else
             this.encodedData = null;
     }
     
     public byte[] bytes() {
-        ByteBuffer bb = ByteBuffer.allocate(BASE_SIZE + 2*vectorLength + (encodedData == null ? 0 : encodedData.length));
+    	byte[] encodedDataBytes = (encodedData == null ? new byte[0] : encodedData.toByteArray());
+        ByteBuffer bb = ByteBuffer.allocate(BASE_SIZE + 2*vectorLength + encodedDataBytes.length);
 
         bb.putInt(flowID);
         bb.putShort(packetType);
         bb.putShort(vectorLength);
         for (short i=0; i<vectorLength; i++)
-            bb.putShort(codeVector[i]);
+            bb.put(codeVector[i].bytes());
         if (encodedData != null)
-            bb.put(encodedData);
+            bb.put(encodedData.toByteArray());
         
         return bb.array();
     }
