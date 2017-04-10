@@ -1,6 +1,8 @@
 package MSTCP.vegas.more;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
@@ -30,11 +32,31 @@ public class Test {
             
             TimeUnit.SECONDS.sleep(2);
             
-            // new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null),  14000, 15000, "./", "hello.txt");
-            new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null), 14000, 15000, "./", "hello_repeat.txt");
-            // new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null),  14000, 15000, "./", "hello_repeat_repeat.txt");
-            // new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null),  14000, 15000, "./", "me.jpg");
+            // String file = "hello.txt";
+            // String file = "hello_800.txt";
+            // String file = "hello_repeat.txt";
+            // String file = "hello_repeat_repeat.txt";
+            String file = "me.jpg";
+            
+            new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null), 14000, 15000, "./", file);
         
+            File original = new File("./" + file);
+            File received = new File("./received_" + file);
+            
+            byte[] o = Files.readAllBytes(original.toPath());
+            byte[] r = Files.readAllBytes(received.toPath());
+            
+            for (int i=0; i<o.length; i++) {
+                if (o[i] != r[i]) {
+                    System.out.println("Difference at byte " + i + ". Original is " + o[i] + ", Received is " + r[i]);
+                }
+            }
+            
+            if (o.length > r.length)
+                System.out.println("Original file contains more bytes.");
+            else if (r.length > o.length)
+                System.out.println("Received file contains more bytes.");
+            
             System.out.println("Test Complete.");
         } catch (Exception e) {
             e.printStackTrace();

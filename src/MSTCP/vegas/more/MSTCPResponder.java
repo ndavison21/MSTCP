@@ -142,6 +142,7 @@ public class MSTCPResponder {
                 }
             }
             
+            long remaining = -1;
             byte[] dataBytes = new byte[Utils.blockSize];
             BigInteger data;
             
@@ -179,19 +180,23 @@ public class MSTCPResponder {
                         
                         MOREPacket more = new MOREPacket(inPacket.getData());
                         CodeVectorElement[] codeVector = more.getCodeVector();
-                        BigInteger encodedData = null;
+                        BigInteger encodedData = BigInteger.ZERO;
                         for (CodeVectorElement c: codeVector) {
                         	if (c.getBlock() == -1)
                         		continue;
-                        	logger.info("\tBlock " + c.getBlock() + " with coefficient " + c.getCoefficeint());
+                        	logger.info("Block " + c.getBlock() + " with coefficient " + c.getCoefficient());
                         	raf.seek(c.getBlock() * Utils.blockSize);
+                        	remaining = (raf.length() - c.getBlock() * Utils.blockSize) +1;
+                        	if (remaining < 0) // case for when the file is less than 1 block in size
+                        	    remaining = raf.length();
+                        	if (remaining < Utils.blockSize)
+                        	    dataBytes = new byte[(int) remaining];
+                        	else if (dataBytes.length < Utils.blockSize)
+                        	    dataBytes = new byte[Utils.blockSize];
                         	raf.read(dataBytes);
                         	data = new BigInteger(dataBytes); // TODO: better variable names
-                        	data = data.multiply(BigInteger.valueOf(c.getCoefficeint()));
-                        	if (encodedData == null)
-                        		encodedData = data;
-                        	else
-                        		encodedData = encodedData.add(data);
+                        	data = data.multiply(BigInteger.valueOf(c.getCoefficient()));
+                        	encodedData = encodedData.add(data);
                         }
                         
                         more.setPacketType((short) 1); 

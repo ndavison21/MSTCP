@@ -11,6 +11,7 @@ public class MOREPacket {
     private short packetType = -1;  // 16 bits, (0 means forward packet, 1 means response packet)
 
     private short vectorLength;      // 16 bits, number of elements in the codeVector
+    private short dataLength;        // 16 bits, number of bytes in the encodedData
     private CodeVectorElement[] codeVector;    // array of 16 bit shorts, blocks and coefficients of encoded data.
     private BigInteger encodedData;    // ? bits, combined packets
     
@@ -19,6 +20,7 @@ public class MOREPacket {
         this.flowID = flowID;
         this.packetType = packetType;
         this.vectorLength = (short) (codeVector == null ? 0 : codeVector.length);
+        this.dataLength = (short) (encodedData == null ? 0 : encodedData.toByteArray().length);
         this.codeVector = codeVector;
         this.encodedData = encodedData;
     }
@@ -59,16 +61,22 @@ public class MOREPacket {
         this.vectorLength = (short) (codeVector == null ? 0 : codeVector.length);
         this.codeVector = codeVector;
     }
+    
+    public short getDataLength() {
+        return dataLength;
+    }
 
     public BigInteger getEncodedData() {
         return encodedData;
     }
 
     public void setEncodedData(byte[] encodedData) {
+        this.dataLength = (short) (encodedData == null ? 0 : encodedData.length);
         this.encodedData = new BigInteger(encodedData);
     }
     
     public void setEncodedData(BigInteger encodedData) {
+        this.dataLength = (short) (encodedData == null ? 0 : encodedData.toByteArray().length);
         this.encodedData = encodedData;
     }
     
@@ -78,11 +86,12 @@ public class MOREPacket {
         this.flowID       = bb.getInt();
         this.packetType   = bb.getShort();
         this.vectorLength = bb.getShort();
+        this.dataLength   = bb.getShort();
         this.codeVector = new CodeVectorElement[this.vectorLength];
         for (short i=0; i<this.vectorLength; i++)
             this.codeVector[i] = new CodeVectorElement(bb.getShort(), bb.getShort());
         if (packetType == 1) {
-            byte[] encodedDataBytes = new byte[bb.remaining()];
+            byte[] encodedDataBytes = new byte[dataLength];
             bb.get(encodedDataBytes);
             this.encodedData = new BigInteger(encodedDataBytes);
         } else
@@ -96,6 +105,7 @@ public class MOREPacket {
         bb.putInt(flowID);
         bb.putShort(packetType);
         bb.putShort(vectorLength);
+        bb.putShort(dataLength);
         for (short i=0; i<vectorLength; i++)
             bb.put(codeVector[i].bytes());
         if (encodedData != null)

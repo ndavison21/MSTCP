@@ -50,6 +50,9 @@ public class MSTCPRequesterConnection extends Thread {
     double backoff_factor  = -1;
     Double equilibrium_rate = 0.0;
     
+    // calculating redundancy to send
+    double p_drop = (Utils.drop ? Utils.p_drop : 0);
+    
     // fast retransmit
     LinkedBlockingQueue<Integer> toRetransmit; // sequence number of packets to retransmit
     
@@ -198,8 +201,12 @@ public class MSTCPRequesterConnection extends Thread {
                     base_rtt = time_ack + tcpPacket.getTime_req();
                     logger.info("Received SYN + ACK. RTT: " + base_rtt);
                     requester.mstcpInformation.update(new MSTCPInformation(tcpPacket.getData()));
-                    if (requester.networkCoder == null)
-                    	requester.networkCoder = new NetworkCoder(requester.logger, requester.mstcpInformation.fileSize);
+                    if (requester.networkCoder == null) {
+                    	requester.networkCoder = new NetworkCoder(requester.logger, requester.mstcpInformation.fileSize, true);
+                    	requester.networkCoder.start();
+                    	
+                    	requester.nextBatchReqs = Math.min(Utils.batchSize, requester.networkCoder.fileBlocks);
+                    }
                     return true;
                 }
                 
@@ -277,13 +284,19 @@ public class MSTCPRequesterConnection extends Thread {
                     
                     if (tcpPacket.verifyChecksum() && tcpPacket.isACK() && base <= tcpPacket.getSeqNum()) { // if packet is corrupted there's not much we can do...
     
+                        double mult = 1.0;
                         if (tcpPacket.getACK() < tcpPacket.getSeqNum()) { // duplicate ACK, may need to retransmit
                             int timeout = sentRequests.peek().getTime_req() + Utils.dataTimeout;
                             if (timeout < 0)
                                 timeout = Utils.dataTimeout - (Integer.MAX_VALUE - sentRequests.peek().getTime_req());
-                            if ((System.currentTimeMillis() % Integer.MAX_VALUE) > timeout)
+                            if ((System.currentTimeMillis() % Integer.MAX_VALUE) > timeout) {
+                                int losses = tcpPacket.getSeqNum() - tcpPacket.getACK();
+                                mult = Math.pow(1.0 - Utils.p_smooth, losses);
                                 retransmit();
+                            }
                         }
+
+                        p_drop = ( p_drop * mult * (1 - Utils.p_smooth) ) + (1 - mult);
                         
                         sentRequests.remove(tcpPacket);
                         
@@ -362,11 +375,11 @@ public class MSTCPRequesterConnection extends Thread {
                         
                         logger.info("Received Block from (" + dstAddr + ", " + dstPort + ")");
                         // pass data to receiver
-                        requester.receivedPackets.put(new MOREPacket(tcpPacket.getData()));
+                        requester.networkCoder.receivedPackets.put(new MOREPacket(tcpPacket.getData()));
                     } else {
                         if (base <= tcpPacket.getSeqNum()) {
                             logger.info("Received Packet Out of Order (seqNum " + tcpPacket.getSeqNum() + ", base " + base + ". Passing to Requester anyway.");
-                            requester.receivedPackets.put(new MOREPacket(tcpPacket.getData()));
+                            requester.networkCoder.receivedPackets.put(new MOREPacket(tcpPacket.getData()));
                         } else
                             logger.info("Received Corrputed Packet");
                     }
@@ -386,7 +399,7 @@ public class MSTCPRequesterConnection extends Thread {
         public void run() {
             TCPPacket tcpRequest;
             byte[] request;
-            CodeVectorElement[] codeVector = new CodeVectorElement[Utils.batchSize];
+            CodeVectorElement[] codeVector;
             
             try {
                 while (!requester.transfer_complete) {
@@ -398,8 +411,8 @@ public class MSTCPRequesterConnection extends Thread {
                         }
                     }
                         
-                    requester.codeVector(recvPort, codeVector);
-                    if (codeVector[0].getBlock() == -1) {
+                    codeVector = requester.codeVector(recvPort, p_drop);
+                    if (codeVector == null) {
                         this.interrupt();
                         return;
                     }
@@ -415,7 +428,7 @@ public class MSTCPRequesterConnection extends Thread {
                     tcpRequest.setTime_req();
                     sentRequests.add(tcpRequest);
                     
-                    logger.info("Sending request for block " + codeVector[0] + " to (" + dstAddr + ", " + dstPort + ")");
+                    logger.info("Sending request for batch " + codeVector[0].getBlock() / Utils.batchSize + " to (" + dstAddr + ", " + dstPort + ")");
                     request = tcpRequest.bytes();
                     synchronized(initialSeqNum) {
                         nextSeqNum++;

@@ -4,3 +4,4 @@ bin/MSTCP
 bin/logs/*
 bin/received_*
 .classpath
+*.bin

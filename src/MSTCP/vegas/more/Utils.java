@@ -16,21 +16,24 @@ public final class Utils {
     public static final int FIN_ENUM  = 2;
 
     public static final boolean localhost    = true;
-    public static final boolean delay        = true;
+    public static final boolean delay        = false;
     public static final boolean drop         = false;
     public static final Random rand          = new Random();
     public static final int bufferSize       = 3;
     public static final int latency          = 1500;
     public static final int latency_variance = 1000;
     public static final double p_drop        = 0.05;
+    
+    public static final double p_smooth      = 0.2; // smoothing factor for monitoring drop rate
 
-    public static final int noOfSources = 1;
-    public static final int batchSize   = 1;   // to keep matrix sizes small we send blocks in groups of 15
-    public static final int pktSize     = 1000; // 1000 Bytes total (Header 28 bytes, Block 972 bytes)
-    public static final int tcpSize     = 28;   // TCP Header + timestams + no options
-    public static final int moreSize    = 8;    // MORE Header with no code vector or data
-    public static final int blockSize   = 800;  // size of data blocks
+    public static final int noOfSources   = 2;
+    public static final int batchSize     = 3;   // to keep matrix sizes small we send blocks in smaller groups
+    public static final int pktSize       = 1000; // 1000 Bytes total (Header 28 bytes, Block 972 bytes)
+    public static final int tcpSize       = 28;   // TCP Header + timestams + no options
+    public static final int moreSize      = 10;    // MORE Header with no code vector or data
+    public static final int blockSize     = 800;  // size of data blocks
     public static final int maxVectorSize = pktSize - (tcpSize + moreSize + blockSize); // maximum size of code vector in bytes
+    public static final int precision     = 2000; // number decimal places to calculate to  (must be greater than log10(2 ^ blockSize) )
     
 
     public static final int synAttempts  = Integer.MAX_VALUE;
