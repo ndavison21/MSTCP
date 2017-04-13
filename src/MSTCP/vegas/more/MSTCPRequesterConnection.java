@@ -202,8 +202,7 @@ public class MSTCPRequesterConnection extends Thread {
                     logger.info("Received SYN + ACK. RTT: " + base_rtt);
                     requester.mstcpInformation.update(new MSTCPInformation(tcpPacket.getData()));
                     if (requester.networkCoder == null) {
-                    	requester.networkCoder = new NetworkCoder(requester.logger, requester.mstcpInformation.fileSize, true);
-                    	requester.networkCoder.start();
+                    	requester.networkCoder = new NetworkCoder(requester.logger, requester.mstcpInformation.fileSize, requester.mstcpInformation.flowID, true);
                     	
                     	requester.nextBatchReqs = Math.min(Utils.batchSize, requester.networkCoder.fileBlocks);
                     }
@@ -410,14 +409,15 @@ public class MSTCPRequesterConnection extends Thread {
                             }
                         }
                     }
-                        
+                    
+                    short batch = (short) requester.nextReqBatch;
                     codeVector = requester.codeVector(recvPort, p_drop);
                     if (codeVector == null) {
                         this.interrupt();
                         return;
                     }
                     
-                    MOREPacket more = new MOREPacket(requester.mstcpInformation.flowID, codeVector);;
+                    MOREPacket more = new MOREPacket(requester.mstcpInformation.flowID, batch, codeVector);;
                     
                     int seqNum = (toRetransmit.isEmpty() ? nextSeqNum : toRetransmit.take());
                     

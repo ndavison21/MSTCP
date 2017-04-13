@@ -62,12 +62,10 @@ public class MSTCPRequester {
         // get decoded packets and write to file
         byte[] data;
         long remainingBytes = mstcpInformation.fileSize;
-        int toWrite = 0;
         while (remainingBytes > 0) {
             data = networkCoder.decodedPackets.take();
-            toWrite = (int) Math.min( Math.min(data.length, Utils.blockSize), remainingBytes);
-            fos.write(data, 0, Math.min(data.length, Utils.blockSize));
-            remainingBytes -= toWrite;
+            fos.write(data, 1, data.length - 1);
+            remainingBytes -= (data.length - 1);
         }
         
         logger.info("Closing Connections.");

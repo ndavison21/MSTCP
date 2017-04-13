@@ -10,27 +10,30 @@ public class MOREPacket {
     private int   flowID     = -1;  // 32 bits, flow identifier, hopefully unique
     private short packetType = -1;  // 16 bits, (0 means forward packet, 1 means response packet)
 
-    private short vectorLength;      // 16 bits, number of elements in the codeVector
-    private short dataLength;        // 16 bits, number of bytes in the encodedData
+    
+    private short batch;        // 16 bits, batches of the file being sent    
+    private short vectorLength; // 16 bits, number of elements in the codeVector
+    private short dataLength;   // 16 bits, number of bytes in the encodedData
     private CodeVectorElement[] codeVector;    // array of 16 bit shorts, blocks and coefficients of encoded data.
     private BigInteger encodedData;    // ? bits, combined packets
     
-    public MOREPacket(int flowID, short packetType, CodeVectorElement[] codeVector, BigInteger encodedData) {
+    public MOREPacket(int flowID, short packetType, short batch, CodeVectorElement[] codeVector, BigInteger encodedData) {
         super();
         this.flowID = flowID;
         this.packetType = packetType;
+        this.batch = batch;
         this.vectorLength = (short) (codeVector == null ? 0 : codeVector.length);
         this.dataLength = (short) (encodedData == null ? 0 : encodedData.toByteArray().length);
         this.codeVector = codeVector;
         this.encodedData = encodedData;
     }
     
-    public MOREPacket(int flowID, short packetType, CodeVectorElement[] codeVector, byte[] encodedData) {
-        this(flowID, packetType, codeVector, new BigInteger(encodedData));
+    public MOREPacket(int flowID, short packetType, short batch, CodeVectorElement[] codeVector, byte[] encodedData) {
+        this(flowID, packetType, batch, codeVector, new BigInteger(encodedData));
     }
     
-    public MOREPacket(int flowID, CodeVectorElement[] codeVector) {
-        this(flowID, (short) 0, codeVector, (BigInteger) null);
+    public MOREPacket(int flowID, short batch, CodeVectorElement[] codeVector) {
+        this(flowID, (short) 0, batch, codeVector, (BigInteger) null);
     }
 
     public int getFlowID() {
@@ -47,6 +50,14 @@ public class MOREPacket {
 
     public void setPacketType(short packetType) {
         this.packetType = packetType;
+    }
+    
+    public short getBatch() {
+        return batch;
+    }
+
+    public void setBatch(short batch) {
+        this.batch = batch;
     }
     
     public short getVectorLength() {
@@ -85,6 +96,7 @@ public class MOREPacket {
         ByteBuffer bb = ByteBuffer.wrap(packetBytes);
         this.flowID       = bb.getInt();
         this.packetType   = bb.getShort();
+        this.batch        = bb.getShort();
         this.vectorLength = bb.getShort();
         this.dataLength   = bb.getShort();
         this.codeVector = new CodeVectorElement[this.vectorLength];
@@ -104,6 +116,7 @@ public class MOREPacket {
 
         bb.putInt(flowID);
         bb.putShort(packetType);
+        bb.putShort(batch);
         bb.putShort(vectorLength);
         bb.putShort(dataLength);
         for (short i=0; i<vectorLength; i++)
@@ -114,13 +127,14 @@ public class MOREPacket {
         return bb.array();
     }
     
-    public static int getFlowID(byte[] bytes) {
-        return ByteBuffer.wrap(bytes, 16, 4).getInt();
+    public static int getFlowID(byte[] moreBytes) {
+        return ByteBuffer.wrap(moreBytes, 16, 4).getInt();
     }
     
-    public static short getPacketType(byte[] bytes) {
-        return ByteBuffer.wrap(bytes, 20, 2).getShort();
+    public static short getPacketType(byte[] moreBytes) {
+        return ByteBuffer.wrap(moreBytes, 20, 2).getShort();
     }
+    
 
     
 }
