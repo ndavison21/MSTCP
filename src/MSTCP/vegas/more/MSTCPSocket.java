@@ -76,11 +76,13 @@ public class MSTCPSocket {
         }
     }
     
-    
+    public MSTCPSocket(Logger logger) throws SocketException { // connect to any free port
+        this(logger, -1);
+    }
 
     public MSTCPSocket(Logger logger, int port) throws SocketException {
         this.logger    = logger;
-        this.inSocket  = new DatagramSocket(port);
+        this.inSocket  = port == -1 ? new DatagramSocket() : new DatagramSocket(port);
         this.outSocket = new DatagramSocket();
         this.receiver  = new Receiver();
         this.sender    = new Sender();
