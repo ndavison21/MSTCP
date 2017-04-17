@@ -49,7 +49,7 @@ public class MSTCPForwarder {
                     if (tcpPacket.isSYN()) {
                         if (tcpPacket.isACK()) { // if SYN+ACK
                             // initialise buffer for innovative packets
-                            MSTCPInformation mstcpInfo = new MSTCPInformation(data.getData());
+                            MSTCPInformation mstcpInfo = new MSTCPInformation(tcpPacket.getData());
                             if (!flowBuffer.containsKey(mstcpInfo.flowID)) {
                                 flowBuffer.put(mstcpInfo.flowID, new FlowData(mstcpInfo.flowID, mstcpInfo.fileSize, data.getAddress()));
                             }

@@ -114,7 +114,7 @@ public class MSTCPRequesterConnection extends Thread {
         
         try {
             for(int i=0; i<rpt; i++)
-                socket.send(new DatagramPacket(finBytes, finBytes.length, dstAddr, dstPort));
+                socket.send(new DatagramPacket(finBytes, finBytes.length, dstAddr, Utils.router ? Utils.router_port : dstPort));
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
             System.exit(1);
@@ -173,7 +173,7 @@ public class MSTCPRequesterConnection extends Thread {
         
         byte[] synBytes = synPacket.bytes();
         try {
-            socket.send(new DatagramPacket(synBytes, synBytes.length, dstAddr, dstPort));
+            socket.send(new DatagramPacket(synBytes, synBytes.length, dstAddr, Utils.router ? Utils.router_port : dstPort));
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
             return false;
@@ -433,7 +433,7 @@ public class MSTCPRequesterConnection extends Thread {
                     synchronized(initialSeqNum) {
                         nextSeqNum++;
                     }
-                    socket.send(new DatagramPacket(request, request.length, dstAddr, dstPort));
+                    socket.send(new DatagramPacket(request, request.length, dstAddr, Utils.router ? Utils.router_port : dstPort));
                 }
             } catch(IOException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);

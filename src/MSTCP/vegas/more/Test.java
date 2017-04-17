@@ -2,6 +2,7 @@ package MSTCP.vegas.more;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.SocketException;
 import java.nio.file.Files;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
@@ -15,18 +16,29 @@ public class Test {
             System.out.println("Starting Test.");
             
             final Vector<SourceInformation> sources = new Vector<SourceInformation>();
-            sources.add(new SourceInformation(Utils.getIPAddress(null), 15000));
-            sources.add(new SourceInformation(Utils.getIPAddress(null), 15001));
+            sources.add(new SourceInformation(Utils.getIPAddress(null), 16000));
+            sources.add(new SourceInformation(Utils.getIPAddress(null), 16001));
             
             (new Thread() {
                 public void run() {
-                    new MSTCPResponder(Utils.getIPAddress(null), 15000, "./", sources);
+                    new MSTCPResponder(Utils.getIPAddress(null), 16000, "./", sources);
                 }
             }).start();
             
             (new Thread() {
                 public void run() {
-                    new MSTCPResponder(Utils.getIPAddress(null), 15001, "./", sources);
+                    new MSTCPResponder(Utils.getIPAddress(null), 16001, "./", sources);
+                }
+            }).start();
+            
+            (new Thread() {
+                public void run() {
+                    try {
+                        new MSTCPForwarder(Utils.router_port);
+                    } catch (SocketException e) {
+                        e.printStackTrace();
+                        System.exit(1);
+                    }   
                 }
             }).start();
             
@@ -34,11 +46,11 @@ public class Test {
             
             // String file = "hello.txt";
             // String file = "hello_800.txt";
-            // String file = "hello_repeat.txt";
+            String file = "hello_repeat.txt";
             // String file = "hello_repeat_repeat.txt";
-            String file = "me.jpg";
+            // String file = "me.jpg";
             
-            new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null), 14000, 15000, "./", file);
+            new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null), 14000, 16000, "./", file);
         
             File original = new File("./" + file);
             File received = new File("./received_" + file);

@@ -68,7 +68,7 @@ public class NetworkCoder extends Thread {
             prevPacket = preEncodedPackets.remove(batch); // get pre-encoded packet
         }
         
-        new Thread() {
+        (new Thread() {
             public void run() {
                 synchronized(preEncodedPackets) { // pre-encode new packet
                     if (packetBuffer.containsKey(batch)) {
@@ -76,7 +76,7 @@ public class NetworkCoder extends Thread {
                     }
                 }
             }
-        }.start();
+        }).start();
         
         return prevPacket;
     }

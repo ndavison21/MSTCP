@@ -55,7 +55,7 @@ public class MSTCPResponder {
             fin.setACK(nextSeqNum);
             byte[] finBytes = fin.bytes();
             try {
-                socket.send(new DatagramPacket(finBytes, finBytes.length, InetAddress.getByName(srcInfo.address), srcInfo.port));
+                socket.send(new DatagramPacket(finBytes, finBytes.length, InetAddress.getByName(srcInfo.address), Utils.router ? Utils.router_port : srcInfo.port));
             } catch (IOException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
                 System.exit(1);
@@ -135,7 +135,7 @@ public class MSTCPResponder {
                         
                         logger.info("Sending SYN + ACK to (" + dstAddress + ", " + dstPort + ")");
                         outBytes = generateTCPPacket(initialSeqNum, mstcpInfo.bytes(), true, false, time_req);
-                        socket.send(new DatagramPacket(outBytes, outBytes.length, dstAddress, dstPort));
+                        socket.send(new DatagramPacket(outBytes, outBytes.length, dstAddress, Utils.router ? Utils.router_port : dstPort));
                     }
                 } else {
                     logger.info("Received Corrupted Packet");
@@ -207,7 +207,7 @@ public class MSTCPResponder {
                         Arrays.fill(dataBytes, (byte) 0);
                     }
                     
-                    socket.send(new DatagramPacket(outBytes, outBytes.length, dstAddress, dstPort));
+                    socket.send(new DatagramPacket(outBytes, outBytes.length, dstAddress, Utils.router ? Utils.router_port : dstPort));
                 } else {
                     logger.info("Received Corrupted Packet");
                 }
