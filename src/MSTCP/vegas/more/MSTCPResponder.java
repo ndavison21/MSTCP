@@ -232,10 +232,10 @@ public class MSTCPResponder {
         System.out.println("Args: either 192.168.2.1 or 192.168.3.1");
         
         final Vector<SourceInformation> sources = new Vector<SourceInformation>();
-        sources.add(new SourceInformation("192.168.2.1", 15000));
-        sources.add(new SourceInformation("192.168.2.1", 15001));
-        sources.add(new SourceInformation("192.168.3.1", 15000));
-        sources.add(new SourceInformation("192.168.3.1", 15001));
+        sources.add(new SourceInformation("192.168.2.1", 16000));
+        sources.add(new SourceInformation("192.168.2.1", 16001));
+        sources.add(new SourceInformation("192.168.3.1", 16000));
+        sources.add(new SourceInformation("192.168.3.1", 16001));
         
         final String localIP = args[0];
         

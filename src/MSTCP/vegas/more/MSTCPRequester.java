@@ -137,6 +137,6 @@ public class MSTCPRequester {
     public static void main(String[] args) throws InterruptedException, IOException {
         System.out.println("Note: Setup is for Triangle Network with PC-1 requesting from PC-2 and PC-3");
         System.out.println("Args: <filename>");
-        new MSTCPRequester("192.168.1.1", "192.168.2.1", 14000, 15000, "./", args[0]);
+        new MSTCPRequester("192.168.1.1", "192.168.2.1", 14000, 16000, "./", args[0]);
     }
 }
