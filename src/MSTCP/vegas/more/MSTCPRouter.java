@@ -42,7 +42,7 @@ public class MSTCPRouter {
     }
 
     public MSTCPRouter(int interfaceIndex) throws SocketException {
-        this.logger = Utils.getLogger("MSTCPRouter.log");
+        this.logger = Utils.getLogger(this.getClass().getName());
         this.socket = new MSTCPSocket(logger);
         StringBuilder errbuf = new StringBuilder();
 
@@ -84,16 +84,19 @@ public class MSTCPRouter {
                                     if (tcpPacket.isACK()) { // if SYN+ACK
                                         // initialise buffer for innovative packets
                                         MSTCPInformation mstcpInfo = new MSTCPInformation(tcpPacket.getData());
+                                        logger.info("Received SYN+ACK for flow " + mstcpInfo.flowID);
                                         if (!flowBuffer.containsKey(mstcpInfo.flowID)) {
                                             flowBuffer.put(mstcpInfo.flowID, new FlowData(mstcpInfo.flowID, mstcpInfo.fileSize, addr));
                                         }
-                                    }
+                                    } else 
+                                        logger.info("Received MSTCP SYN. Waiting for SYN+ACK");
                                 } else if (tcpPacket.isACK()) { // if ACK+Data
                                     MOREPacket more = new MOREPacket(tcpPacket.getData());
                                     FlowData flow = flowBuffer.get(more.getFlowID());
                                     if (flow == null) { // didn't see SYN+ACK, don't have file length so not much we can do
-                                        logger.warning("Received packet for unitialised flow " + more.getFlowID() + ". Forwarding to next hop.");
+                                        logger.warning("Received ACK+Data for unitialised flow " + more.getFlowID() + ". Forwarding to next hop.");
                                     } else {
+                                        logger.info("Received ACK+Data for flow " + more.getFlowID());
                                         flow.networkCoder.isInnovative(more); // if innovative store packet and update pre-encoded packet
                                         more = flow.networkCoder.getPreEncodedPacket(more.getBatch()); // send pre-encoded packet and pre-encode new packet
                                         tcpPacket.setData(more.bytes());
@@ -101,9 +104,11 @@ public class MSTCPRouter {
                                     }
                                 } else if (tcpPacket.isFIN()) { // if FIN
                                     MOREPacket more = new MOREPacket(tcpPacket.getData());
+                                    logger.info("Received FIN for flow " + more.getFlowID());
                                     flowBuffer.remove(more.getFlowID()); // delete buffer
                                 }
-                            }
+                            } else
+                                logger.info("Received unknown packet.");
                             
                             
                             // pcap.sendPacket(packet); // not supported on unix
