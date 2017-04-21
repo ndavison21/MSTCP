@@ -78,7 +78,7 @@ public class MSTCPRouter {
                             byte[] payload = udp.getPayload();
                             TCPPacket tcpPacket = new TCPPacket(payload);
                             
-                            if (tcpPacket.verifyChecksum()) { // if false then either packet is not a TCPPacket or it is corrupted. Cannot distinguish.
+                            if (tcpPacket.getSeqNum() != -1 && tcpPacket.verifyChecksum()) { // if false then either packet is not a TCPPacket or it is corrupted. Cannot distinguish.
                                 port = tcpPacket.getDestPort();
                                 if (tcpPacket.isSYN()) {
                                     if (tcpPacket.isACK()) { // if SYN+ACK

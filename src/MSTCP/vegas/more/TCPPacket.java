@@ -6,10 +6,10 @@ import java.util.Arrays;
 public class TCPPacket {
     static int BASE_SIZE = Utils.tcpSize * 8; // base size of the TCP packet in bits (5 32-bit words)
     
-    private int srcPort    = 0;    // 16 bits, port at sender
-    private int dstPort    = 0;    // 16 bits, port at receiver
-    private int seqNum     = 0;    // 32 bits, if SYN flag set then the initial sequence number, otherwise the accumulated sequence number
-    private int ackNum     = 0;    // 32 bits, if ACK flag set then next expected sequence number, otherwise empty
+    private int srcPort    = -1;    // 16 bits, port at sender
+    private int dstPort    = -1;    // 16 bits, port at receiver
+    private int seqNum     = -1;    // 32 bits, if SYN flag set then the initial sequence number, otherwise the accumulated sequence number
+    private int ackNum     = -1;    // 32 bits, if ACK flag set then next expected sequence number, otherwise empty
     private int dataOffset = 0;    //  4 bits, size of header in 32-bit words
     private int reserved   = 0;    //  3 bits, reserved
     private int flags      = 0;    //  9 bits, contains 9 1-bit flags (see reference)
@@ -210,21 +210,29 @@ public class TCPPacket {
 
 
     public TCPPacket(byte[] packetBytes) {
-        this.srcPort = ByteBuffer.wrap(packetBytes, 0, 2).getShort();
-        this.dstPort = ByteBuffer.wrap(packetBytes, 2, 2).getShort();
-        this.seqNum = ByteBuffer.wrap(packetBytes, 4, 4).getInt();
-        this.ackNum = ByteBuffer.wrap(packetBytes, 8, 4).getInt();
+        if (packetBytes == null || packetBytes.length < Utils.tcpSize)
+            return;
+        
+        ByteBuffer bb = ByteBuffer.wrap(packetBytes);
+
+        this.srcPort = bb.getShort();
+        this.dstPort = bb.getShort();
+        this.seqNum = bb.getInt();
+        this.ackNum = bb.getInt();
         
         this.dataOffset = packetBytes[12] >> 4;
         this.flags = ((packetBytes[12] & 1) << 8) + packetBytes[13];
-        this.windowSize = ByteBuffer.wrap(packetBytes, 14, 2).getShort();
-        this.checksum = ByteBuffer.wrap(packetBytes, 16, 2).getShort();
-        this.urgentPointer = ByteBuffer.wrap(packetBytes, 18, 2).getShort();
-        this.time_req = ByteBuffer.wrap(packetBytes, 20, 4).getInt();
-        this.time_ack = ByteBuffer.wrap(packetBytes, 24, 4).getInt();
+
+        bb.getShort(); // advance by 2 bytes
+
+        this.windowSize = bb.getShort();
+        this.checksum = bb.getShort();
+        this.urgentPointer = bb.getShort();
+        this.time_req = bb.getInt();
+        this.time_ack = bb.getInt();
         
         if (dataOffset > (BASE_SIZE / 32))
-            this.options = Arrays.copyOfRange(packetBytes, 20, packetBytes.length);
+            this.options = Arrays.copyOfRange(packetBytes, Utils.tcpSize, packetBytes.length); // TODO: get base size from utils
         if (dataOffset * 4 < packetBytes.length)
             this.data = Arrays.copyOfRange(packetBytes, dataOffset * 4, packetBytes.length);
                 

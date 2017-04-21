@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
  * VM ARGUMENT: -Djava.util.logging.SimpleFormatter.format="%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n"
  */
 public class Test {
-    public static void main(String[] args) throws InterruptedException, IOException {
+    public static void triangle() throws InterruptedException, IOException {
         try {
             System.out.println("Starting Test.");
             
@@ -74,5 +74,16 @@ public class Test {
             e.printStackTrace();
             System.exit(1);
         }
+        
+    }
+    
+    public static void nullTcp() {
+        TCPPacket pkt1 = new TCPPacket(null);
+        TCPPacket pkt2 = new TCPPacket(new byte[0]);
+    }
+    
+    public static void main(String[] args) throws InterruptedException, IOException {
+        //triangle();
+        nullTcp();
     }
 }
