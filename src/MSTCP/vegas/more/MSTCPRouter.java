@@ -41,7 +41,7 @@ public class MSTCPRouter {
         }
     }
 
-    public MSTCPRouter() throws SocketException {
+    public MSTCPRouter(int interfaceIndex) throws SocketException {
         this.logger = Utils.getLogger("MSTCPRouter.log");
         this.socket = new MSTCPSocket(logger);
         StringBuilder errbuf = new StringBuilder();
@@ -53,7 +53,7 @@ public class MSTCPRouter {
             logger.severe(errbuf.toString());
             System.exit(1);;
         }
-        PcapIf netInterface = ifs.get(6);
+        PcapIf netInterface = ifs.get(interfaceIndex);
         logger.info("Connected to " + netInterface.getName() + " " + netInterface.getDescription());
         
         // open network interface
@@ -126,8 +126,9 @@ public class MSTCPRouter {
     }
     
     public static void main(String[] args) throws SocketException {
+        System.out.println("Args: index of the interface connecting to (check using DetectInterfaces.java)");
         System.out.println("Note: drop udp forward packets packets. E.g. \"iptables -A FORWARD -p udp -j DROP\" ");
-        new MSTCPRouter();
+        new MSTCPRouter(Integer.parseInt(args[0]));
     }
 
 }
