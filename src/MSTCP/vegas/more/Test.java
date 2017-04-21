@@ -83,7 +83,7 @@ public class Test {
     }
     
     public static void main(String[] args) throws InterruptedException, IOException {
-        //triangle();
-        nullTcp();
+        triangle();
+        // nullTcp();
     }
 }

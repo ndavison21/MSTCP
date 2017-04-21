@@ -213,6 +213,12 @@ public class TCPPacket {
         if (packetBytes == null || packetBytes.length < Utils.tcpSize)
             return;
         
+        this.dataOffset = packetBytes[12] >> 4;
+        this.flags = ((packetBytes[12] & 1) << 8) + packetBytes[13];
+        
+        if (dataOffset * 4 < Utils.tcpSize || dataOffset * 4 > packetBytes.length)
+            return;
+        
         ByteBuffer bb = ByteBuffer.wrap(packetBytes);
 
         this.srcPort = bb.getShort();
@@ -220,8 +226,8 @@ public class TCPPacket {
         this.seqNum = bb.getInt();
         this.ackNum = bb.getInt();
         
-        this.dataOffset = packetBytes[12] >> 4;
-        this.flags = ((packetBytes[12] & 1) << 8) + packetBytes[13];
+        // this.dataOffset = packetBytes[12] >> 4;
+        // this.flags = ((packetBytes[12] & 1) << 8) + packetBytes[13];
 
         bb.getShort(); // advance by 2 bytes
 
@@ -232,7 +238,7 @@ public class TCPPacket {
         this.time_ack = bb.getInt();
         
         if (dataOffset > (BASE_SIZE / 32))
-            this.options = Arrays.copyOfRange(packetBytes, Utils.tcpSize, packetBytes.length); // TODO: get base size from utils
+            this.options = Arrays.copyOfRange(packetBytes, Utils.tcpSize, packetBytes.length);
         if (dataOffset * 4 < packetBytes.length)
             this.data = Arrays.copyOfRange(packetBytes, dataOffset * 4, packetBytes.length);
                 
