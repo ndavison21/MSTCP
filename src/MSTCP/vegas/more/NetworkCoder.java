@@ -138,8 +138,9 @@ public class NetworkCoder extends Thread {
             
             // building coefficients array
             double[] coefficients = new double[batchSize];
-            for (CodeVectorElement c: codeVector)
+            for (CodeVectorElement c: codeVector) {
                 coefficients[c.getBlock() - baseBlock] = c.getInnovCoefficient();
+            }
             
             for (int i=0; i<batchSize; i++) {
                 if (coefficients[i] != 0) { // if u[i] != 0

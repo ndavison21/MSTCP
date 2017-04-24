@@ -44,11 +44,17 @@ public class MSTCPSocket {
             try {
                 for (;;) {
                     d = outBuffer.take();
-                    if (d.getData()[0] == -1 && d.getLength() == 0) // 'poison pill' shutdown
+                    if (d.getData()[0] == -1 && d.getLength() == 0) { // 'poison pill' shutdown
+                        synchronized(outBuffer) {
+                            outBuffer.clear();
+                            outBuffer.notifyAll();
+                        }
                         return;
-                    logger.info("outBuffer size is " + (outBuffer.size() + 1));
-                    if (Utils.drop())
+                    } 
+                    if (Utils.drop()) {
+                        System.out.println("Dropping packet ");
                         continue;
+                    }
                     Utils.delay(logger);
                     outSocket.send(d);
                 }
@@ -63,16 +69,16 @@ public class MSTCPSocket {
         
         @Override
         public void interrupt() {
-            outBuffer.add(new DatagramPacket(new byte[]{-1}, 0)); // 'poison pill' shutdown
-            while (!outBuffer.isEmpty()) {
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    logger.log(Level.SEVERE, e.getMessage(), e);
-                    System.exit(1);
+            try {
+                synchronized(outBuffer) {
+                    outBuffer.add(new DatagramPacket(new byte[]{-1}, 0)); // 'poison pill' shutdown
+                    outBuffer.wait();
                 }
+                super.interrupt();
+            } catch (InterruptedException e) {
+                logger.log(Level.SEVERE, e.getMessage(), e);
+                System.exit(1);
             }
-            super.interrupt();
         }
     }
     
@@ -110,10 +116,13 @@ public class MSTCPSocket {
     }
 
     public void close() {
-        receiver.interrupt();
-        sender.interrupt();
-        this.inSocket.close();
-        this.outSocket.close();
+        try {
+            receiver.interrupt();
+            sender.interrupt();
+        } finally {
+            inSocket.close();
+            outSocket.close();
+        }
     }
 
     // @Override

@@ -15,6 +15,9 @@ public class Test {
         try {
             System.out.println("Starting Test.");
             
+            String[] files = new String[]{"hello.txt", "hello_800.txt", "hello_repeat.txt", "hello_repeat_repeat.txt", "me.jpg"};
+            // String file = "hello_repeat_repeat.txt";
+            
             final Vector<SourceInformation> sources = new Vector<SourceInformation>();
             sources.add(new SourceInformation(Utils.getIPAddress(null), 16000));
             sources.add(new SourceInformation(Utils.getIPAddress(null), 16001));
@@ -44,46 +47,49 @@ public class Test {
             
             TimeUnit.SECONDS.sleep(2);
             
-            // String file = "hello.txt";
-            // String file = "hello_800.txt";
-            String file = "hello_repeat.txt";
-            // String file = "hello_repeat_repeat.txt";
-            // String file = "me.jpg";
+            // for(;;) {
+            for (String file: files) {
+                
+                System.out.println("Starting Transfer of " + file + ".");
+                
+                new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null), 14000, 16000, "./", file);
             
-            new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null), 14000, 16000, "./", file);
-        
-            File original = new File("./" + file);
-            File received = new File("./received_" + file);
-            
-            byte[] o = Files.readAllBytes(original.toPath());
-            byte[] r = Files.readAllBytes(received.toPath());
-            
-            for (int i=0; i<o.length; i++) {
-                if (o[i] != r[i]) {
-                    System.out.println("Difference at byte " + i + ". Original is " + o[i] + ", Received is " + r[i]);
+                File original = new File("./" + file);
+                File received = new File("./received_" + file);
+                
+                byte[] o = Files.readAllBytes(original.toPath());
+                byte[] r = Files.readAllBytes(received.toPath());
+                
+                for (int i=0; i<o.length; i++) {
+                    if (o[i] != r[i]) {
+                        System.out.println("Difference at byte " + i + ". Original is " + o[i] + ", Received is " + r[i]);
+                    }
                 }
+                
+                if (o.length > r.length)
+                    System.out.println("Original file contains more bytes.");
+                else if (r.length > o.length)
+                    System.out.println("Received file contains more bytes.");
+                
+                System.out.println("Transfer Complete.");
+                
+                Thread.sleep(2000);
+                
             }
-            
-            if (o.length > r.length)
-                System.out.println("Original file contains more bytes.");
-            else if (r.length > o.length)
-                System.out.println("Received file contains more bytes.");
             
             System.out.println("Test Complete.");
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
+        } finally {
+            System.exit(1);
         }
         
     }
     
-    public static void nullTcp() {
-        TCPPacket pkt1 = new TCPPacket(null);
-        TCPPacket pkt2 = new TCPPacket(new byte[0]);
-    }
+
     
     public static void main(String[] args) throws InterruptedException, IOException {
         triangle();
-        // nullTcp();
     }
 }

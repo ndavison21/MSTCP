@@ -66,7 +66,6 @@ public class MSTCPRouter {
 
             @Override
             public void nextPacket(PcapPacket packet, Object user) {
-                logger.info("Packet Received.");
                 packet.scan(id);
                 if (packet.hasHeader(ip)) {
                     if (packet.hasHeader(udp)) { // we send MSTCP over UDP

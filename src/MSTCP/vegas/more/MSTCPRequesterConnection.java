@@ -8,6 +8,7 @@ import java.net.UnknownHostException;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,12 +32,12 @@ public class MSTCPRequesterConnection extends Thread {
     // rtt measurements
     int time_recv    = -1;
     int time_ack     = -1;
-    long base_rtt    = -1;
-    int pkt_rtt      = -1;
-    long sampled_rtt = 0;
-    int sampled_num  = 0;
-    double rtt       = -1;
-    double diff      = -1;
+    long base_rtt    = -1; // lowest RTT measured (i.e. when no congestion)
+    int pkt_rtt      = -1; // instantaneous rtt
+    long sampled_rtt =  0; // sum of RTTs in the current round
+    int sampled_num  =  0; // number of RTTs in the current round
+    double rtt       = -1; // average RTT of the previous round
+    double diff      = -1; // difference of previous RTT to the base rtt (i.e. measure of congestion)
     
     // congestion control
     boolean slowstart = false; // TODO: Implement slow start
@@ -126,27 +127,33 @@ public class MSTCPRequesterConnection extends Thread {
         
         inThread.interrupt();
         outThread.interrupt();
+        stopTimer();
         
         new Thread() {
             public void run() {
-                TCPPacket in;
-                DatagramPacket inPkt;
-                
-                sendFIN(false);
-                
-                for (;;) {
-                    inPkt = socket.receive();
-                    in = new TCPPacket(inPkt.getData());
+                try {
+                    TCPPacket in;
+                    DatagramPacket inPkt;
                     
-                    if (in.verifyChecksum() && in.isACK() && in.getSeqNum() == nextSeqNum)
-                        break;
+                    sendFIN(false);
+                    
+                    for (;;) {
+                        inPkt = socket.receive();
+                        in = new TCPPacket(inPkt.getData());
+                        
+                        if (in.verifyChecksum() && in.isACK() && in.getSeqNum() == nextSeqNum)
+                            break;
+                    }
+                    
+                    stopTimer();
+                    sendFIN(true);
+                
+                } finally {
+                    socket.close();
+                    logger.info("We Done Here.");
+                    for (Handler handler: logger.getHandlers())
+                        handler.close();
                 }
-                
-                stopTimer();
-                sendFIN(true);
-                
-                socket.close();
-                logger.info("We Done Here.");
             }
         }.start();
 
@@ -254,8 +261,8 @@ public class MSTCPRequesterConnection extends Thread {
             sampled_rtt = 0;
             
             nextSeqNum = base;
+            initialSeqNum.notifyAll();
         }
-        initialSeqNum.notifyAll();
     }
     
     private class DataTimeout extends TimerTask {
@@ -285,9 +292,9 @@ public class MSTCPRequesterConnection extends Thread {
     
                         double mult = 1.0;
                         if (tcpPacket.getACK() < tcpPacket.getSeqNum()) { // duplicate ACK, may need to retransmit
-                            int timeout = sentRequests.peek().getTime_req() + Utils.dataTimeout;
+                            double timeout = sentRequests.peek().getTime_req() + (2 * rtt);
                             if (timeout < 0)
-                                timeout = Utils.dataTimeout - (Integer.MAX_VALUE - sentRequests.peek().getTime_req());
+                                timeout = (2 * rtt) - (Integer.MAX_VALUE - sentRequests.peek().getTime_req());
                             if ((System.currentTimeMillis() % Integer.MAX_VALUE) > timeout) {
                                 int losses = tcpPacket.getSeqNum() - tcpPacket.getACK();
                                 mult = Math.pow(1.0 - Utils.p_smooth, losses);
@@ -302,7 +309,7 @@ public class MSTCPRequesterConnection extends Thread {
                         time_ack = time_recv - tcpPacket.getTime_ack();
                         if (time_ack < 0)
                             time_ack = time_recv + Integer.MAX_VALUE - tcpPacket.getTime_ack();
-                        long pkt_rtt = time_ack + tcpPacket.getTime_req();
+                        pkt_rtt = time_ack + tcpPacket.getTime_req();
                         
                         synchronized (initialSeqNum) {
                             if (pkt_rtt < base_rtt)
@@ -410,12 +417,13 @@ public class MSTCPRequesterConnection extends Thread {
                         }
                     }
                     
-                    short batch = (short) requester.nextReqBatch;
                     codeVector = requester.codeVector(recvPort, p_drop);
                     if (codeVector == null) {
                         this.interrupt();
                         return;
                     }
+                    
+                    short batch = (short) (codeVector[0].getBlock() / Utils.batchSize);
                     
                     MOREPacket more = new MOREPacket(requester.mstcpInformation.flowID, batch, codeVector);;
                     
@@ -423,12 +431,14 @@ public class MSTCPRequesterConnection extends Thread {
                     
                     tcpRequest = new TCPPacket(recvPort, dstPort, seqNum, cwnd);
                     tcpRequest.setData(more.bytes());
-                    if (nextSeqNum == initialSeqNum)
+                    if (nextSeqNum == initialSeqNum) {
+                        setTimer(Utils.DATA_ENUM);
                         tcpRequest.setACK(initialSeqNum);
+                    }
                     tcpRequest.setTime_req();
                     sentRequests.add(tcpRequest);
                     
-                    logger.info("Sending request for batch " + codeVector[0].getBlock() / Utils.batchSize + " to (" + dstAddr + ", " + dstPort + ")");
+                    logger.info("Sending request for batch " + batch + " to (" + dstAddr + ", " + dstPort + ")");
                     request = tcpRequest.bytes();
                     synchronized(initialSeqNum) {
                         nextSeqNum++;

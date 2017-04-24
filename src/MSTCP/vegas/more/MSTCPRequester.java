@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Random;
 import java.util.Vector;
+import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 public class MSTCPRequester {
@@ -75,53 +76,61 @@ public class MSTCPRequester {
             c.close();
         }
         logger.info("We Done here.");
+        
+        for (Handler handler: logger.getHandlers())
+            handler.close();
     }
     
     // called by connections, returns next needed block and records which connection it'll come on
     public synchronized CodeVectorElement[] codeVector(int recvPort, double p_drop) {
         int batch = nextReqBatch;
         int batchSize = Math.min(Utils.batchSize, networkCoder.fileBlocks - (nextReqBatch * Utils.batchSize));
-        if (batchSize < 0)
+        if (batchSize <= 0)
             batchSize = networkCoder.fileBlocks;
         
         if (batch >= networkCoder.fileBatches) { // have we made requests for all batches
             
-            for (int i=0; i<networkCoder.fileBatches; i++) { // find any batches we need to repeat requests for
-                if (networkCoder.packetBuffer.containsKey(i)) {
-                    batchSize = Math.min(Utils.batchSize, networkCoder.fileBlocks - nextReqBatch * Utils.batchSize);
-                    if (batchSize < 0)
-                        batchSize = networkCoder.fileBlocks;
-                    if (networkCoder.packetBuffer.get(i).size() < batchSize) {
-                        batch = i;
+            for (batch=0; batch < networkCoder.fileBatches; batch++) { // find any batches for which we need to repeat requests
+                batchSize = Math.min(Utils.batchSize, networkCoder.fileBlocks - nextReqBatch * Utils.batchSize);
+                if (batchSize < 0)
+                    batchSize = networkCoder.fileBlocks;
+                
+                if (networkCoder.packetBuffer.containsKey(batch)) {
+                    if (networkCoder.packetBuffer.get(batch).size() < batchSize) {
                         break;
                     }
-                }
+                } else
+                    break;
             }
             
             if (batch >= networkCoder.fileBatches) { // got all data, just need to decode.
-                logger.info("Made all requests, closing connections.");
+                logger.info("Got all data, waiting for decocde.");
                 return null;
             }
         }
             
-        logger.info("Request for batch " + nextReqBatch + " on connection " + recvPort);
+        logger.info("Request for batch " + batch + " on connection " + recvPort);
+        int baseBlock = (batch == nextReqBatch ? nextReqBlock : batch * Utils.batchSize);
         
         
         CodeVectorElement[] codeVector = new CodeVectorElement[batchSize];
         
+        System.out.println("batch " + batch + " batchSize " + batchSize);
         for (int i=0; i<batchSize; i++)
-            codeVector[i] = new CodeVectorElement((short) (nextReqBlock + i), networkCoder.nextCoefficient());
+            codeVector[i] = new CodeVectorElement((short) (baseBlock + i), networkCoder.nextCoefficient());
         
-        nextBatchReqs += p_drop; // redundancy
-        nextBatchReqs -= 1; // packet sent
-        
-        if (nextBatchReqs < 0.5) {
-            nextReqBatch++;
-            nextReqBlock+= batchSize;
-            batchSize = Math.min(Utils.batchSize, networkCoder.fileBlocks - nextReqBatch * Utils.batchSize);
-            if (batchSize < 0)
-                batchSize = networkCoder.fileBlocks;
-            nextBatchReqs = batchSize;
+        if (batch == nextReqBatch) {
+            nextBatchReqs += p_drop; // redundancy
+            nextBatchReqs -= 1; // packet sent
+            
+            if (nextBatchReqs < 0.5) {
+                nextReqBatch++;
+                nextReqBlock+= batchSize;
+                batchSize = Math.min(Utils.batchSize, networkCoder.fileBlocks - nextReqBatch * Utils.batchSize);
+                if (batchSize < 0)
+                    batchSize = networkCoder.fileBlocks;
+                nextBatchReqs = nextBatchReqs < 0 ? batchSize : nextBatchReqs + batchSize; // preserve redundancy built up
+            }
         }
         return codeVector;
     }
