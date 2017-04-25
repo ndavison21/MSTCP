@@ -3,6 +3,7 @@ package MSTCP.vegas.more;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
@@ -72,6 +73,26 @@ public class NetworkCoder extends Thread {
             public void run() {
                 synchronized(preEncodedPackets) { // pre-encode new packet
                     if (packetBuffer.containsKey(batch)) {
+                        preEncodedPackets.remove(batch);
+                        Vector<MOREPacket> batchBuffer = packetBuffer.get(batch);
+
+                        if (batchBuffer.size() <= 3)
+                            for (MOREPacket more: batchBuffer)
+                                updatePreEncodedPacket(more);
+                        else {
+                            // choose 3 packets
+                            ArrayList<Integer> pkts = new ArrayList<Integer>(3);
+                            int pkt = random.nextInt(batchBuffer.size());
+                            for (int i=0; i<3; i++) {
+                                pkt = random.nextInt(batchBuffer.size());
+                                while (pkts.contains(pkt)) {
+                                    pkt = random.nextInt(batchBuffer.size());
+                                }
+                                updatePreEncodedPacket(batchBuffer.get(pkt));
+                                
+                            }
+                        }
+                            
                         preEncodedPackets.put(batch, packetBuffer.get(batch).lastElement()); // TODO: combine packets in buffer
                     } else {
                         logger.info("No pre-encoded packet for batch " + batch + ".");
@@ -248,6 +269,7 @@ public class NetworkCoder extends Thread {
                     logger.log(Level.SEVERE, e.getMessage(), e);
                     System.exit(1);
                 }
+                logger.info("Decoded Batch " + nextDecBatch);
                 
                 innovChecker.remove(nextDecBatch);
                 packetBuffer.remove(nextDecBatch);
@@ -336,7 +358,8 @@ public class NetworkCoder extends Thread {
         }
     }
     
-    public short nextCoefficient() {
-        return (short) ( random.nextInt( (2 * Byte.MAX_VALUE) + 1) - Byte.MAX_VALUE );
+    public short nextCoefficient(int batchSize) {
+        double prob = batchSize < 8 ? 1 : (5.0 / batchSize); // probability any given block is included TODO: find best parameters
+        return (short) ( random.nextDouble() < prob ? random.nextInt( (2 * Byte.MAX_VALUE) + 1) - Byte.MAX_VALUE : 0);
     }
 }

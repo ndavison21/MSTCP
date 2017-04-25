@@ -47,7 +47,7 @@ public class Test {
             
             TimeUnit.SECONDS.sleep(2);
             
-            for(int k=0; k<1; k++) {
+            for(int k=0; k<10; k++) {
             //for (String file: files) {
                 
                 System.out.println("Starting Transfer of " + file + ".");
@@ -74,6 +74,7 @@ public class Test {
                 System.out.println("Transfer Complete.");
                 
                 Thread.sleep(2000);
+                System.gc();
                 
             }
             

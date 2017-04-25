@@ -134,7 +134,7 @@ public class MSTCPResponderConnection {
                             outBytes = generateTCPPacket(inPacket.getSeqNum(), more.bytes(), false, true, time_req);
                             sentFinAck = true;
                             setTimer();
-                        } else if (inPacket.isACK() && sentFinAck && inPacket.getSeqNum() >= nextSeqNum) { // TODO: check this is correct
+                        } else if (inPacket.isACK() && sentFinAck && inPacket.getSeqNum() >= nextSeqNum) {
                             logger.info("Received ACK after sending FIN + ACK. Closing Connection to (" + dstAddress + ", " + dstPort + ")");
                             stopTimer();
                             break;
@@ -152,7 +152,7 @@ public class MSTCPResponderConnection {
                             CodeVectorElement[] codeVector = more.getCodeVector();
                             BigInteger encodedData = BigInteger.ZERO;
                             for (CodeVectorElement c : codeVector) {
-                                if (c.getBlock() == -1)
+                                if (c.getBlock() == -1 || c.getCoefficient() == 0)
                                     continue;
                                 logger.info("Block " + c.getBlock() + " with coefficient " + c.getCoefficient());
                                 raf.seek(c.getBlock() * Utils.blockSize);

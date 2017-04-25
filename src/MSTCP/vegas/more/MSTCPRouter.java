@@ -19,6 +19,8 @@ import org.jnetpcap.protocol.network.Ip4;
 import org.jnetpcap.protocol.tcpip.Udp;
 
 /**
+ * NOTE: THIS CLASS IS HERE FOR REFERENCE FOR FUTURE DEVELOPMENT AND WILL NOT WORK AS DESIRED IN ITS CURRENT FORM.
+ * 
  *  The router running this must drop UDP packets
  *      "iptables -A FORWARD -p udp -j DROP"
  *  Can also try and filter traffic from/to specific ports reserved for MSTCP e.g. 14000-14020, 16000-16020
@@ -32,11 +34,11 @@ public class MSTCPRouter {
     final HashMap<Integer, FlowData> flowBuffer = new HashMap<Integer, FlowData>(); // map flowIDs to flow data
     
     private class FlowData {
-        final int flowID;
+        // final int flowID;
         final NetworkCoder networkCoder;
         
         public FlowData(int flowID, long fileSize, InetAddress reqAddr) {
-            this.flowID = flowID;
+            // this.flowID = flowID;
             this.networkCoder = new NetworkCoder(logger, fileSize, flowID, false);
         }
     }

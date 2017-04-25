@@ -23,8 +23,9 @@ public class MSTCPRequester {
     final int total_alpha = Utils.total_alpha;
     Double total_rate = 0.0;
     
-    short nextReqBatch  = 0; // next batch to request
-    int nextReqBlock  = 0; // first block of the new batch to request
+    short prevReqBatch = 0; // previous batch requested (used when requesting dropped packets)
+    short nextReqBatch = 0; // next batch to request
+    int nextReqBlock   = 0; // first block of the new batch to request
     double nextBatchReqs = 0.0; // number of remaining requests to make for current batch (including redundancy for loss rate) 
     
     boolean transfer_complete = false;
@@ -93,20 +94,20 @@ public class MSTCPRequester {
     // called by connections, returns next needed block and records which connection it'll come on
     public synchronized CodeVectorElement[] codeVector(int recvPort, double p_drop) {
         short batch = nextReqBatch;
-        int batchSize = Math.min(Utils.batchSize, networkCoder.fileBlocks - (nextReqBatch * Utils.batchSize));
-        if (batchSize <= 0)
-            batchSize = networkCoder.fileBlocks;
+        int batchSize = -1;
         
         if (batch >= networkCoder.fileBatches) { // have we made requests for all batches
             boolean complete = true;
-            for (batch=networkCoder.nextDecBatch; batch < networkCoder.fileBatches; batch++) { // find any batches for which we need to repeat requests
-                batchSize = Math.min(Utils.batchSize, networkCoder.fileBlocks - batch * Utils.batchSize);
+            for (short i=networkCoder.nextDecBatch; i < networkCoder.fileBatches; i++) { // find any batches for which we need to repeat requests
+                batchSize = Math.min(Utils.batchSize, networkCoder.fileBlocks - i * Utils.batchSize);
                 if (batchSize < 0)
                     batchSize = networkCoder.fileBlocks;
                 
-                if (!networkCoder.packetBuffer.containsKey(batch) ||networkCoder.packetBuffer.get(batch).size() < batchSize) {
+                if (!networkCoder.packetBuffer.containsKey(i) || networkCoder.packetBuffer.get(i).size() < batchSize) {
+                    batch = i;
                     complete = false;
-                    break;
+                    if (prevReqBatch != batch)
+                        break;
                 }
             }
             
@@ -116,6 +117,12 @@ public class MSTCPRequester {
             }
             logger.info("Additional Request for batch " + batch + ".");
         }
+        
+        batchSize = Math.min(Utils.batchSize, networkCoder.fileBlocks - (batch * Utils.batchSize));
+        if (batchSize <= 0)
+            batchSize = networkCoder.fileBlocks;
+        
+        prevReqBatch = batch;
             
         logger.info("Request for batch " + batch + " on connection " + recvPort);
         int baseBlock = (batch == nextReqBatch ? nextReqBlock : batch * Utils.batchSize);
@@ -125,10 +132,10 @@ public class MSTCPRequester {
         
         System.out.println("batch " + batch + " batchSize " + batchSize);
         for (int i=0; i<batchSize; i++)
-            codeVector[i] = new CodeVectorElement((short) (baseBlock + i), networkCoder.nextCoefficient());
+            codeVector[i] = new CodeVectorElement((short) (baseBlock + i), networkCoder.nextCoefficient(batchSize));
         
         if (batch == nextReqBatch) {
-            nextBatchReqs += p_drop; // redundancy
+            nextBatchReqs += (1.0 / (1.0 - p_drop)) - 1.0; // redundancy
             nextBatchReqs -= 1; // packet sent
             
             if (nextBatchReqs < 0.5) {
