@@ -50,10 +50,6 @@ public class MSTCPSocket {
                             outBuffer.notifyAll();
                         }
                         return;
-                    } 
-                    if (Utils.drop()) {
-                        System.out.println("Dropping packet ");
-                        continue;
                     }
                     Utils.delay(logger);
                     outSocket.send(d);
@@ -102,7 +98,10 @@ public class MSTCPSocket {
     }
 
     public void send(DatagramPacket d) throws IOException {
-        outBuffer.add(d);
+//        if (!Utils.drop()) {
+//            logger.info("Packet Dropped.");
+            outBuffer.add(d);
+//        }
     }
 
     public DatagramPacket receive() {
@@ -123,6 +122,10 @@ public class MSTCPSocket {
             inSocket.close();
             outSocket.close();
         }
+    }
+    
+    public boolean isClosed() {
+        return inSocket.isClosed() && outSocket.isClosed();
     }
 
     // @Override

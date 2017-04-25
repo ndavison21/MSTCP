@@ -14,7 +14,7 @@ public class NetworkCoder extends Thread {
     final Logger logger;
     
     boolean decode = false; // do we decode packets when able
-    boolean decoding = false; // are we currently decoding
+    Boolean decoding = false; // are we currently decoding
     LinkedBlockingQueue<byte[]> decodedPackets;
     HashMap<Short, MOREPacket> preEncodedPackets; // maps batches to their pre-encoded packet
     
@@ -24,13 +24,13 @@ public class NetworkCoder extends Thread {
     int fileBlocks  = -1; // filesize in blocks
     int fileBatches = -1; // filesize in batches
     
-    int nextDecBatch = 0; // next batch to decode
-    int nextDecBlock = 0; // first block of the next batch to decode
+    short nextDecBatch = 0; // next batch to decode
+    int nextDecBlock   = 0; // first block of the next batch to decode
 
     LinkedBlockingQueue<MOREPacket> receivedPackets; // connections add their received packets to this
-    HashMap<Integer, double[][]> innovChecker = new HashMap<Integer, double[][]>(); // maps batches to their innovative checker matrices
+    HashMap<Short, double[][]> innovChecker = new HashMap<Short, double[][]>(); // maps batches to their innovative checker matrices
     
-    HashMap<Integer, Vector<MOREPacket>> packetBuffer = new HashMap<Integer, Vector<MOREPacket>>(); // maps batches to packets
+    HashMap<Short, Vector<MOREPacket>> packetBuffer = new HashMap<Short, Vector<MOREPacket>>(); // maps batches to packets
 
     Random random = new Random();
     
@@ -72,7 +72,9 @@ public class NetworkCoder extends Thread {
             public void run() {
                 synchronized(preEncodedPackets) { // pre-encode new packet
                     if (packetBuffer.containsKey(batch)) {
-                        preEncodedPackets.put(batch, packetBuffer.get(1).lastElement()); // TODO: combine packets in buffer
+                        preEncodedPackets.put(batch, packetBuffer.get(batch).lastElement()); // TODO: combine packets in buffer
+                    } else {
+                        logger.info("No pre-encoded packet for batch " + batch + ".");
                     }
                 }
             }
@@ -84,7 +86,7 @@ public class NetworkCoder extends Thread {
     
     private void updatePreEncodedPacket(MOREPacket more) { // add packet to pre-encoded packet
         synchronized(preEncodedPackets) {
-            MOREPacket preEncoded = preEncodedPackets.get(more.getFlowID());
+            MOREPacket preEncoded = preEncodedPackets.get(more.getBatch());
             if (preEncoded == null)
                 preEncoded = more;
             else {
@@ -124,8 +126,9 @@ public class NetworkCoder extends Thread {
     
     public synchronized boolean isInnovative(MOREPacket more) {
         CodeVectorElement[] codeVector = more.getCodeVector();
-        int batch = more.getBatch(); // the batch this packet belongs to
+        short batch = more.getBatch(); // the batch this packet belongs to
         int baseBlock = batch * Utils.batchSize;
+        
         
         if (nextDecBatch <= fileBatches && (!decode || batch > nextDecBatch || (!decoding && batch == nextDecBatch))) { // batch has not already been decoded
             int batchSize = Math.min(Utils.batchSize, fileBlocks - batch * Utils.batchSize);
@@ -162,11 +165,14 @@ public class NetworkCoder extends Thread {
                         for (int j=0; j<batchSize; j++)
                             coefficients[j] /= ui;
                         innovMatrix[i] = coefficients;
+                        innovChecker.put(batch, innovMatrix);
                         
                         if (decode) {
-                            if (canDecode(batch) && !decoding) {
-                                decoding = true;
-                                (new Decoder()).start();
+                            synchronized(decoding) {
+                                if (canDecode(batch) && !decoding) {
+                                    decoding = true;
+                                    (new Decoder()).start();
+                                }
                             }
                         } else {
                             // update pre-encoded packet
@@ -183,7 +189,7 @@ public class NetworkCoder extends Thread {
         return false;
     }
     
-    private boolean canDecode(int batch) { // do we have enough DoFs to decode the batch
+    private boolean canDecode(short batch) { // do we have enough DoFs to decode the batch
         int batchSize = Math.min(Utils.batchSize, fileBlocks - batch * Utils.batchSize);
         if (batchSize < 0)
             batchSize = fileBlocks;
@@ -195,7 +201,6 @@ public class NetworkCoder extends Thread {
     private class Decoder extends Thread {
         public void run() {
             decode();
-            decoding = false;
         }
         
         public synchronized void decode() {            
@@ -249,6 +254,10 @@ public class NetworkCoder extends Thread {
                 
                 nextDecBatch++;
                 nextDecBlock+= batchSize;
+            }
+            
+            synchronized(decoding) {
+                decoding = false;
             }
         }
     }

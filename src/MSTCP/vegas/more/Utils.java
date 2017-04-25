@@ -15,22 +15,22 @@ public final class Utils {
     public static final int DATA_ENUM = 0;
     public static final int SYN_ENUM  = 1;
     public static final int FIN_ENUM  = 2;
+    
+    public static final boolean debug = true; // turn off timeouts so can step through with debug mode
 
     public static final boolean localhost    = true;  // get public or local IP
-    public static final boolean delay        = true; // artificially delay packets
-    public static final boolean drop         = true; // artificially drop packets
     public static final Random rand          = new Random();
     public static final int bufferSize       = 3;     // buffer size (drop packets received when buffer is full)
     public static final int latency          = 50;  // artificial mean latency
     public static final int latency_variance = 10;  // artificial range of latency
-    public static final double p_drop        = 0.1;  // artificial drop late
+    public static final double p_drop        = 0;  // artificial drop late (drop if rand is less than this)
     public static final boolean router       = true;  // send packets to router (not destination)
     public static final int router_port      = 15000; // port router is connected to
     
     public static final double p_smooth      = 0.2;   // smoothing factor for monitoring drop rate
 
     public static final int noOfSources   = 1;
-    public static final int batchSize     = 3;    // to keep matrix sizes small we send blocks in smaller groups
+    public static final int batchSize     = 20;    // to keep matrix sizes small we send blocks in smaller groups
     public static final int pktSize       = 1000; // 1000 Bytes total (Header 28 bytes, Block 972 bytes)
     public static final int tcpSize       = 28;   // TCP Header no options
     public static final int moreSize      = 10;   // MORE Header with no code vector or data
@@ -42,11 +42,11 @@ public final class Utils {
 
     // retransmit parameters
     public static final int synAttempts  = 30;
-    public static final int synTimeout   = 1000;
+    public static final int synTimeout   = debug ? Integer.MAX_VALUE : 500;
     public static final int dataAttempts = 3;
-    public static final int dataTimeout  = 1000;
+    public static final int dataTimeout  = debug ? Integer.MAX_VALUE : 1000;
     public static final int finAttempts  = 3;
-    public static final int finTimeout   = 1000;
+    public static final int finTimeout   = debug ? Integer.MAX_VALUE : 500;
 
     // congestion control parameter
     public static final int total_alpha = 10;
@@ -96,20 +96,15 @@ public final class Utils {
     }
 
     public static boolean drop() {
-        if (drop)
-            return (rand.nextDouble() < p_drop);
-
-        return false;
+        return (rand.nextDouble() < p_drop);
     }
 
     public static void delay(Logger logger) {
-        if (delay) {
-            try {
-                Thread.sleep(latency + rand.nextInt(latency_variance) - latency_variance / 2);
-            } catch (InterruptedException e) {
-                logger.log(Level.SEVERE, e.getMessage(), e);
-                System.exit(1);
-            }
+        try {
+            Thread.sleep(latency + rand.nextInt(latency_variance) - latency_variance / 2);
+        } catch (InterruptedException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+            System.exit(1);
         }
     }
 

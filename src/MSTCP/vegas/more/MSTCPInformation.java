@@ -7,9 +7,9 @@ public class MSTCPInformation {
 
     byte[] recvAddr;
     int recvPort;    // can uniquely identify the connection by the port it receives on
+    int flowID;
     String filename;
     long fileSize = -1;
-    int flowID;
     Vector<SourceInformation> sources;
 
     
@@ -21,9 +21,10 @@ public class MSTCPInformation {
     // For sending with SYN + ACK
     public MSTCPInformation(Vector<SourceInformation> sources, byte[] recvAddr, int recvPort, String filename, long filesize, int flowID) {
         super();
-        this.sources = sources;
+        this.sources  = sources;
         this.recvAddr = recvAddr;
         this.recvPort = recvPort;
+        this.flowID   = flowID;
         this.filename = filename;
         this.fileSize = filesize;
     }
@@ -33,11 +34,12 @@ public class MSTCPInformation {
         this.recvAddr = new byte[4];
         bb.get(recvAddr);
         this.recvPort = bb.getInt();
+        this.flowID = bb.getInt();
+        this.fileSize = bb.getLong();
         int filenameLength = bb.getInt();
         byte[] filenameBytes = new byte[filenameLength];
         bb.get(filenameBytes);
         this.filename = new String(filenameBytes);
-        this.fileSize = bb.getLong();
         
         int noOfSources = bb.getInt();
         if (noOfSources > 0) {
@@ -71,6 +73,7 @@ public class MSTCPInformation {
         int size = 0;
         size += 4; // for address (InetAddress)
         size += 4; // for receiver port (int) 
+        size += 4; // for flowID
         size += 4; // for length of filename (int)
         size += filename.getBytes().length; // for filename (String -> bytes)
         size += 8; // for filesize (long)
@@ -93,10 +96,12 @@ public class MSTCPInformation {
         ByteBuffer bb = ByteBuffer.allocate(size);
         bb.put(recvAddr);
         bb.putInt(recvPort);
+        bb.putInt(flowID);
+        bb.putLong(fileSize);
+        
         bb.putInt(filename.getBytes().length);
         bb.put(filename.getBytes());
         
-        bb.putLong(fileSize);
         bb.putInt(sources == null ? 0 : sources.size());
         if (sources != null) {
             for (byte[] s: sourceBytes) {
@@ -109,6 +114,16 @@ public class MSTCPInformation {
         return bb.array();
         
     }
+    
+    public static int getFlowID(byte[] mstcpBytes) {
+        return ByteBuffer.wrap(mstcpBytes, 8, 4).getInt();
+    }
+    
+    public static long getFileSize(byte[] mstcpBytes) {
+        return ByteBuffer.wrap(mstcpBytes, 12, 8).getLong();
+    }
+
+
     
     
 }

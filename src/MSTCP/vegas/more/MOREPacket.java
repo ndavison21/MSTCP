@@ -6,6 +6,9 @@ import java.nio.ByteBuffer;
 public class MOREPacket {
     static int BASE_SIZE = Utils.moreSize * 8; // base size of the packet in bits without code vector or encoded data
     
+    public static short FORWARD_PACKET = 0;
+    public static short RETURN_PACKET  = 1;
+    
 
     private int   flowID     = -1;  // 32 bits, flow identifier, hopefully unique
     private short packetType = -1;  // 16 bits, (0 means forward packet, 1 means response packet)
@@ -32,8 +35,12 @@ public class MOREPacket {
         this(flowID, packetType, batch, codeVector, new BigInteger(encodedData));
     }
     
-    public MOREPacket(int flowID, short batch, CodeVectorElement[] codeVector) {
-        this(flowID, (short) 0, batch, codeVector, (BigInteger) null);
+    public MOREPacket(int flowID, short packetType, short batch, CodeVectorElement[] codeVector) {
+        this(flowID, packetType, batch, codeVector, (BigInteger) null);
+    }
+    
+    public MOREPacket(int flowID, short packetType) {
+        this(flowID, packetType, (short) -1, null);
     }
 
     public int getFlowID() {
@@ -128,11 +135,11 @@ public class MOREPacket {
     }
     
     public static int getFlowID(byte[] moreBytes) {
-        return ByteBuffer.wrap(moreBytes, 16, 4).getInt();
+        return ByteBuffer.wrap(moreBytes, 0, 4).getInt();
     }
     
     public static short getPacketType(byte[] moreBytes) {
-        return ByteBuffer.wrap(moreBytes, 20, 2).getShort();
+        return ByteBuffer.wrap(moreBytes, 4, 2).getShort();
     }
     
 

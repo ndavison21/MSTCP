@@ -18,11 +18,11 @@ public class MSTCPForwarder {
     InetAddress localhost; // used for network emulation, in practice get destination address from IP layer
     
     private class FlowData { // class to store data and functionalilty for flow
-        final int flowID;
+        // final int flowID;
         final NetworkCoder networkCoder;
                 
-        public FlowData(int flowID, long fileSize, InetAddress reqAddr) {
-            this.flowID = flowID;
+        public FlowData(int flowID, long fileSize) {
+            // this.flowID = flowID;
             this.networkCoder = new NetworkCoder(logger, fileSize, flowID, false);
         }
     }
@@ -46,28 +46,34 @@ public class MSTCPForwarder {
                 InetAddress destAddr = data.getAddress(); // TODO: get from IP layer
                 
                 if (tcpPacket.verifyChecksum()) { // if it's corrupted we may as well just drop now
-                    if (tcpPacket.isSYN()) {
-                        if (tcpPacket.isACK()) { // if SYN+ACK
-                            // initialise buffer for innovative packets
-                            MSTCPInformation mstcpInfo = new MSTCPInformation(tcpPacket.getData());
-                            if (!flowBuffer.containsKey(mstcpInfo.flowID)) {
-                                flowBuffer.put(mstcpInfo.flowID, new FlowData(mstcpInfo.flowID, mstcpInfo.fileSize, data.getAddress()));
+                    if (tcpPacket.isSYN() && tcpPacket.isACK()) { // if SYN+ACK
+                        // initialise buffer for innovative packets
+                        int flowID = MSTCPInformation.getFlowID(tcpPacket.getData());
+                        long fileSize = MSTCPInformation.getFileSize(tcpPacket.getData());
+                        logger.info("Received SYN+ACK for flow " + flowID + ". Initialising.");
+                        if (!flowBuffer.containsKey(flowID)) {
+                            flowBuffer.put(flowID, new FlowData(flowID, fileSize));
+                        }
+                    } else if (MOREPacket.getPacketType(tcpPacket.getData()) == MOREPacket.RETURN_PACKET) { // only interested in return packets
+                        if (tcpPacket.isACK()) {
+                            if (tcpPacket.isFIN()) { // if FIN+ACK
+                                flowBuffer.remove(MOREPacket.getFlowID(tcpPacket.getData())); // delete buffer
+                            } else { // if ACK+Data
+                                
+                                MOREPacket more = new MOREPacket(tcpPacket.getData());
+                                FlowData flow = flowBuffer.get(more.getFlowID());
+                                if (flow == null) { // didn't see SYN+ACK, don't have file length so not much we can do
+                                    logger.warning("Received packet for unitialised flow " + more.getFlowID() + ". Forwarding to next hop.");
+                                } else {
+                                    flow.networkCoder.isInnovative(more); // if innovative store packet and update pre-encoded packet
+                                    more = flow.networkCoder.getPreEncodedPacket(more.getBatch()); // send pre-encoded packet and pre-encode new packet
+                                    tcpPacket.setData(more.bytes());
+                                }
+                                
                             }
                         }
-                    } else if (tcpPacket.isACK()) { // if ACK+Data
-                        MOREPacket more = new MOREPacket(tcpPacket.getData());
-                        FlowData flow = flowBuffer.get(more.getFlowID());
-                        if (flow == null) { // didn't see SYN+ACK, don't have file length so not much we can do
-                            logger.warning("Received packet for unitialised flow " + more.getFlowID() + ". Forwarding to next hop.");
-                        } else {
-                            flow.networkCoder.isInnovative(more); // if innovative store packet and update pre-encoded packet
-                            more = flow.networkCoder.getPreEncodedPacket(more.getBatch()); // send pre-encoded packet and pre-encode new packet
-                            tcpPacket.setData(more.bytes());
-                        }
-                    } else if (tcpPacket.isFIN()) { // if FIN
-                        MOREPacket more = new MOREPacket(tcpPacket.getData());
-                        flowBuffer.remove(more.getFlowID()); // delete buffer
                     }
+
                     
                     byte[] tcpBytes = tcpPacket.bytes();
                     socket.send(new DatagramPacket(tcpBytes, tcpBytes.length, destAddr, tcpPacket.getDestPort()));

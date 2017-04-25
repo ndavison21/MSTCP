@@ -15,8 +15,8 @@ public class Test {
         try {
             System.out.println("Starting Test.");
             
-            String[] files = new String[]{"hello.txt", "hello_800.txt", "hello_repeat.txt", "hello_repeat_repeat.txt", "me.jpg"};
-            // String file = "hello_repeat_repeat.txt";
+            //String[] files = new String[]{"hello.txt", "hello_800.txt", "hello_repeat.txt", "hello_repeat_repeat.txt", "me.jpg"};
+            String file = "hello_repeat_repeat.txt";
             
             final Vector<SourceInformation> sources = new Vector<SourceInformation>();
             sources.add(new SourceInformation(Utils.getIPAddress(null), 16000));
@@ -47,8 +47,8 @@ public class Test {
             
             TimeUnit.SECONDS.sleep(2);
             
-            // for(;;) {
-            for (String file: files) {
+            for(int k=0; k<1; k++) {
+            //for (String file: files) {
                 
                 System.out.println("Starting Transfer of " + file + ".");
                 
@@ -90,6 +90,10 @@ public class Test {
 
     
     public static void main(String[] args) throws InterruptedException, IOException {
+        File logs = new File("./logs");
+        for(File file: logs.listFiles()) 
+            if (!file.isDirectory()) 
+                file.delete();
         triangle();
     }
 }

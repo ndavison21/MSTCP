@@ -52,7 +52,7 @@ public class MSTCPRequesterConnection extends Thread {
     Double equilibrium_rate = 0.0;
     
     // calculating redundancy to send
-    double p_drop = (Utils.drop ? Utils.p_drop : 0);
+    double p_drop = Utils.p_drop;
     
     // fast retransmit
     LinkedBlockingQueue<Integer> toRetransmit; // sequence number of packets to retransmit
@@ -101,10 +101,11 @@ public class MSTCPRequesterConnection extends Thread {
     
     public void sendFIN(boolean ack) {
         int rpt = 1;
-        TCPPacket fin = new TCPPacket(recvPort, dstPort, nextSeqNum, cwnd);
+        MOREPacket more = new MOREPacket(requester.mstcpInformation.flowID, MOREPacket.FORWARD_PACKET);
+        TCPPacket fin = new TCPPacket(recvPort, dstPort, nextSeqNum, cwnd, more.bytes());
         fin.setFIN();
         if (ack) {
-            rpt = 3; // send it a few times to make sure it gets there
+            rpt = 20; // send it a few times to make sure it gets there
             fin.setACK(nextSeqNum);
             logger.info("Received FIN + ACK. Sending ACK to (" + dstAddr + ", " + dstPort + ")");
         } else {
@@ -149,7 +150,10 @@ public class MSTCPRequesterConnection extends Thread {
                     sendFIN(true);
                 
                 } finally {
-                    socket.close();
+                    synchronized(socket) {
+                        socket.close();
+                        socket.notifyAll();
+                    }
                     logger.info("We Done Here.");
                     for (Handler handler: logger.getHandlers())
                         handler.close();
@@ -292,7 +296,7 @@ public class MSTCPRequesterConnection extends Thread {
     
                         double mult = 1.0;
                         if (tcpPacket.getACK() < tcpPacket.getSeqNum()) { // duplicate ACK, may need to retransmit
-                            double timeout = sentRequests.peek().getTime_req() + (2 * rtt);
+                            double timeout = Utils.debug ? Integer.MAX_VALUE : sentRequests.peek().getTime_req() + (2 * rtt);
                             if (timeout < 0)
                                 timeout = (2 * rtt) - (Integer.MAX_VALUE - sentRequests.peek().getTime_req());
                             if ((System.currentTimeMillis() % Integer.MAX_VALUE) > timeout) {
@@ -412,6 +416,7 @@ public class MSTCPRequesterConnection extends Thread {
                     if (toRetransmit.isEmpty()) {
                         synchronized(initialSeqNum) {
                             if (nextSeqNum >= base + cwnd) {
+                                logger.info("Congestion window full. Waiting.");
                                 initialSeqNum.wait();
                             }
                         }
@@ -425,7 +430,7 @@ public class MSTCPRequesterConnection extends Thread {
                     
                     short batch = (short) (codeVector[0].getBlock() / Utils.batchSize);
                     
-                    MOREPacket more = new MOREPacket(requester.mstcpInformation.flowID, batch, codeVector);;
+                    MOREPacket more = new MOREPacket(requester.mstcpInformation.flowID, MOREPacket.FORWARD_PACKET, batch, codeVector);;
                     
                     int seqNum = (toRetransmit.isEmpty() ? nextSeqNum : toRetransmit.take());
                     
@@ -443,7 +448,10 @@ public class MSTCPRequesterConnection extends Thread {
                     synchronized(initialSeqNum) {
                         nextSeqNum++;
                     }
-                    socket.send(new DatagramPacket(request, request.length, dstAddr, Utils.router ? Utils.router_port : dstPort));
+                    if (!Utils.drop())
+                        socket.send(new DatagramPacket(request, request.length, dstAddr, Utils.router ? Utils.router_port : dstPort));
+                    else
+                        logger.info("Packet Dropped.");
                 }
             } catch(IOException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);

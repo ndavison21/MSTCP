@@ -23,7 +23,7 @@ public class MSTCPRequester {
     final int total_alpha = Utils.total_alpha;
     Double total_rate = 0.0;
     
-    int nextReqBatch  = 0; // next batch to request
+    short nextReqBatch  = 0; // next batch to request
     int nextReqBlock  = 0; // first block of the new batch to request
     double nextBatchReqs = 0.0; // number of remaining requests to make for current batch (including redundancy for loss rate) 
     
@@ -75,6 +75,15 @@ public class MSTCPRequester {
         for (MSTCPRequesterConnection c: connections) {
             c.close();
         }
+        
+        for (MSTCPRequesterConnection c: connections) {
+            synchronized(c.socket) {
+                while (!c.socket.isClosed()) {
+                    c.socket.wait();
+                }
+            }
+        }
+        
         logger.info("We Done here.");
         
         for (Handler handler: logger.getHandlers())
@@ -83,30 +92,29 @@ public class MSTCPRequester {
     
     // called by connections, returns next needed block and records which connection it'll come on
     public synchronized CodeVectorElement[] codeVector(int recvPort, double p_drop) {
-        int batch = nextReqBatch;
+        short batch = nextReqBatch;
         int batchSize = Math.min(Utils.batchSize, networkCoder.fileBlocks - (nextReqBatch * Utils.batchSize));
         if (batchSize <= 0)
             batchSize = networkCoder.fileBlocks;
         
         if (batch >= networkCoder.fileBatches) { // have we made requests for all batches
-            
-            for (batch=0; batch < networkCoder.fileBatches; batch++) { // find any batches for which we need to repeat requests
-                batchSize = Math.min(Utils.batchSize, networkCoder.fileBlocks - nextReqBatch * Utils.batchSize);
+            boolean complete = true;
+            for (batch=networkCoder.nextDecBatch; batch < networkCoder.fileBatches; batch++) { // find any batches for which we need to repeat requests
+                batchSize = Math.min(Utils.batchSize, networkCoder.fileBlocks - batch * Utils.batchSize);
                 if (batchSize < 0)
                     batchSize = networkCoder.fileBlocks;
                 
-                if (networkCoder.packetBuffer.containsKey(batch)) {
-                    if (networkCoder.packetBuffer.get(batch).size() < batchSize) {
-                        break;
-                    }
-                } else
+                if (!networkCoder.packetBuffer.containsKey(batch) ||networkCoder.packetBuffer.get(batch).size() < batchSize) {
+                    complete = false;
                     break;
+                }
             }
             
-            if (batch >= networkCoder.fileBatches) { // got all data, just need to decode.
+            if (complete) { // got all data, just need to decode.
                 logger.info("Got all data, waiting for decocde.");
                 return null;
             }
+            logger.info("Additional Request for batch " + batch + ".");
         }
             
         logger.info("Request for batch " + batch + " on connection " + recvPort);
