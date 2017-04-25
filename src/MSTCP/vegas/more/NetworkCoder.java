@@ -93,7 +93,6 @@ public class NetworkCoder extends Thread {
                             }
                         }
                             
-                        preEncodedPackets.put(batch, packetBuffer.get(batch).lastElement()); // TODO: combine packets in buffer
                     } else {
                         logger.info("No pre-encoded packet for batch " + batch + ".");
                     }
