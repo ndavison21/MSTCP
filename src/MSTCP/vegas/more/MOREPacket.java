@@ -31,6 +31,10 @@ public class MOREPacket {
         this.encodedData = encodedData;
     }
     
+    public MOREPacket clone() {
+        return new MOREPacket(this.bytes());
+    }
+    
     public MOREPacket(int flowID, short packetType, short batch, CodeVectorElement[] codeVector, byte[] encodedData) {
         this(flowID, packetType, batch, codeVector, new BigInteger(encodedData));
     }

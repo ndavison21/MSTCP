@@ -16,7 +16,7 @@ public class Test {
             System.out.println("Starting Test.");
             
             //String[] files = new String[]{"hello.txt", "hello_800.txt", "hello_repeat.txt", "hello_repeat_repeat.txt", "me.jpg"};
-            String file = "hello_repeat_repeat.txt";
+            String file = "me.jpg";
             
             final Vector<SourceInformation> sources = new Vector<SourceInformation>();
             sources.add(new SourceInformation(Utils.getIPAddress(null), 16000));
@@ -47,7 +47,7 @@ public class Test {
             
             TimeUnit.SECONDS.sleep(2);
             
-            for(int k=0; k<10; k++) {
+            for(int k=0; k<1; k++) {
             //for (String file: files) {
                 
                 System.out.println("Starting Transfer of " + file + ".");

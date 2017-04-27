@@ -8,10 +8,11 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class NetworkCoder extends Thread {
+public class DEPRECATED_NetworkCoder extends Thread {
     final Logger logger;
     
     boolean decode = false; // do we decode packets when able
@@ -27,6 +28,8 @@ public class NetworkCoder extends Thread {
     
     short nextDecBatch = 0; // next batch to decode
     int nextDecBlock   = 0; // first block of the next batch to decode
+    
+    Semaphore sem_preEncoded = new Semaphore(1);
 
     LinkedBlockingQueue<MOREPacket> receivedPackets; // connections add their received packets to this
     HashMap<Short, double[][]> innovChecker = new HashMap<Short, double[][]>(); // maps batches to their innovative checker matrices
@@ -35,7 +38,7 @@ public class NetworkCoder extends Thread {
 
     Random random = new Random();
     
-    public NetworkCoder(Logger logger, long fileSize, int flowID, boolean decode) {
+    public DEPRECATED_NetworkCoder(Logger logger, long fileSize, int flowID, boolean decode) {
         this.logger = logger;
         this.fileSize = fileSize;
         this.fileBlocks = (int) (fileSize / Utils.blockSize + (fileSize % Utils.blockSize > 0 ? 1: 0));
@@ -65,38 +68,42 @@ public class NetworkCoder extends Thread {
     public MOREPacket getPreEncodedPacket(final short batch) {
         MOREPacket prevPacket = null;
         
-        synchronized(preEncodedPackets) {
-            prevPacket = preEncodedPackets.remove(batch); // get pre-encoded packet
+        try {
+            sem_preEncoded.acquire();
+        } catch (InterruptedException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+            System.exit(1);
         }
+        prevPacket = preEncodedPackets.remove(batch); // get pre-encoded packet
         
         (new Thread() {
             public void run() {
-                synchronized(preEncodedPackets) { // pre-encode new packet
-                    if (packetBuffer.containsKey(batch)) {
-                        preEncodedPackets.remove(batch);
-                        Vector<MOREPacket> batchBuffer = packetBuffer.get(batch);
+            // pre-encode new packet
+                if (packetBuffer.containsKey(batch)) {
+                    preEncodedPackets.remove(batch);
+                    Vector<MOREPacket> batchBuffer = packetBuffer.get(batch);
 
-                        if (batchBuffer.size() <= 3)
-                            for (MOREPacket more: batchBuffer)
-                                updatePreEncodedPacket(more);
-                        else {
-                            // choose 3 packets
-                            ArrayList<Integer> pkts = new ArrayList<Integer>(3);
-                            int pkt = random.nextInt(batchBuffer.size());
-                            for (int i=0; i<3; i++) {
+                    if (batchBuffer.size() <= 3)
+                        for (MOREPacket more: batchBuffer)
+                            updatePreEncodedPacket(more);
+                    else {
+                        // choose 3 packets
+                        ArrayList<Integer> pkts = new ArrayList<Integer>(3);
+                        int pkt = random.nextInt(batchBuffer.size());
+                        for (int i=0; i<3; i++) {
+                            pkt = random.nextInt(batchBuffer.size());
+                            while (pkts.contains(pkt)) {
                                 pkt = random.nextInt(batchBuffer.size());
-                                while (pkts.contains(pkt)) {
-                                    pkt = random.nextInt(batchBuffer.size());
-                                }
-                                updatePreEncodedPacket(batchBuffer.get(pkt));
-                                
                             }
-                        }
+                            updatePreEncodedPacket(batchBuffer.get(pkt));
                             
-                    } else {
-                        logger.info("No pre-encoded packet for batch " + batch + ".");
+                        }
                     }
+                        
+                } else {
+                    logger.info("No pre-encoded packet for batch " + batch + ".");
                 }
+                sem_preEncoded.release();
             }
         }).start();
         
@@ -104,47 +111,44 @@ public class NetworkCoder extends Thread {
     }
     
     
-    private void updatePreEncodedPacket(MOREPacket more) { // add packet to pre-encoded packet
-        synchronized(preEncodedPackets) {
-            MOREPacket preEncoded = preEncodedPackets.get(more.getBatch());
-            if (preEncoded == null)
-                preEncoded = more;
-            else {
-                int batchSize = Math.min(Utils.batchSize, fileBlocks - more.getBatch() * Utils.batchSize);
-                if (batchSize < 0)
-                    batchSize = fileBlocks;
-                MOREPacket prevPkt = preEncodedPackets.get(more.getBatch());
-                short baseBlock = (short) (more.getBatch() * Utils.batchSize);
+    private synchronized void updatePreEncodedPacket(MOREPacket more) { // add packet to pre-encoded packet
+        MOREPacket preEncoded = preEncodedPackets.get(more.getBatch());
+        if (preEncoded == null)
+            preEncoded = more;
+        else {
+            int batchSize = Math.min(Utils.batchSize, fileBlocks - more.getBatch() * Utils.batchSize);
+            if (batchSize < 0)
+                batchSize = fileBlocks;
+            MOREPacket prevPkt = preEncodedPackets.get(more.getBatch());
+            short baseBlock = (short) (more.getBatch() * Utils.batchSize);
+            
+            CodeVectorElement[] prevCodeVector = prevPkt.getCodeVector();
+            CodeVectorElement[] innovCodeVector = more.getCodeVector();
+            CodeVectorElement[] newCodeVector = new CodeVectorElement[batchSize];
+            
+            short i=0, j=0, k=0;
+            short block, coefficient;
+            for (i=0; i<batchSize; i++) {
+                block = (short) (baseBlock + i);
+                coefficient = 0;
+                if (prevCodeVector[j].getBlock() == block)
+                    coefficient += prevCodeVector[j++].getCoefficient();
+                if (innovCodeVector[k].getBlock() == block)
+                    coefficient += innovCodeVector[k++].getCoefficient();
                 
-                CodeVectorElement[] prevCodeVector = prevPkt.getCodeVector();
-                CodeVectorElement[] innovCodeVector = more.getCodeVector();
-                CodeVectorElement[] newCodeVector = new CodeVectorElement[batchSize];
-                
-                short i=0, j=0, k=0;
-                short block, coefficient;
-                for (i=0; i<batchSize; i++) {
-                    block = (short) (baseBlock + i);
-                    coefficient = 0;
-                    if (prevCodeVector[j].getBlock() == block)
-                        coefficient += prevCodeVector[j++].getCoefficient();
-                    if (innovCodeVector[k].getBlock() == block)
-                        coefficient += innovCodeVector[k++].getCoefficient();
-                    
-                    newCodeVector[i] = new CodeVectorElement(block, coefficient);
-                }
-                
-                BigInteger encodedData = preEncoded.getEncodedData().add(more.getEncodedData());
-                
-                preEncoded.setCodeVector(newCodeVector);
-                preEncoded.setEncodedData(encodedData);
+                newCodeVector[i] = new CodeVectorElement(block, coefficient);
             }
             
-            preEncodedPackets.put(preEncoded.getBatch(), preEncoded);
-        
+            BigInteger encodedData = preEncoded.getEncodedData().add(more.getEncodedData());
+            
+            preEncoded.setCodeVector(newCodeVector);
+            preEncoded.setEncodedData(encodedData);
         }
+        
+        preEncodedPackets.put(preEncoded.getBatch(), preEncoded);
     }
     
-    public synchronized boolean isInnovative(MOREPacket more) {
+    public boolean isInnovative(MOREPacket more) {
         CodeVectorElement[] codeVector = more.getCodeVector();
         short batch = more.getBatch(); // the batch this packet belongs to
         int baseBlock = batch * Utils.batchSize;

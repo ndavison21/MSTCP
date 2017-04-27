@@ -212,10 +212,10 @@ public class MSTCPRequesterConnection extends Thread {
                     base_rtt = time_ack + tcpPacket.getTime_req();
                     logger.info("Received SYN + ACK. RTT: " + base_rtt);
                     requester.mstcpInformation.update(new MSTCPInformation(tcpPacket.getData()));
-                    if (requester.networkCoder == null) {
-                    	requester.networkCoder = new NetworkCoder(requester.logger, requester.mstcpInformation.fileSize, requester.mstcpInformation.flowID, true);
+                    if (requester.sourceCoder == null) {
+                    	requester.sourceCoder = new SourceCoder(requester.logger, requester.mstcpInformation.fileSize);
                     	
-                    	requester.nextBatchReqs = Math.min(Utils.batchSize, requester.networkCoder.fileBlocks);
+                    	requester.nextBatchReqs = Math.min(Utils.batchSize, requester.sourceCoder.fileBlocks);
                     }
                     return true;
                 }
@@ -385,11 +385,11 @@ public class MSTCPRequesterConnection extends Thread {
                         
                         logger.info("Received Block from (" + dstAddr + ", " + dstPort + ")");
                         // pass data to receiver
-                        requester.networkCoder.receivedPackets.put(new MOREPacket(tcpPacket.getData()));
+                        requester.sourceCoder.receivedPackets.put(new MOREPacket(tcpPacket.getData()));
                     } else {
                         if (base <= tcpPacket.getSeqNum()) {
                             logger.info("Received Packet Out of Order (seqNum " + tcpPacket.getSeqNum() + ", base " + base + ". Passing to Requester anyway.");
-                            requester.networkCoder.receivedPackets.put(new MOREPacket(tcpPacket.getData()));
+                            requester.sourceCoder.receivedPackets.put(new MOREPacket(tcpPacket.getData()));
                         } else
                             logger.info("Received Corrputed Packet");
                     }
@@ -449,7 +449,8 @@ public class MSTCPRequesterConnection extends Thread {
                         nextSeqNum++;
                     }
                     if (!Utils.drop())
-                        socket.send(new DatagramPacket(request, request.length, dstAddr, Utils.router ? Utils.router_port : dstPort));
+                        //for (int i=0; i<Utils.batchSize; i++)
+                            socket.send(new DatagramPacket(request, request.length, dstAddr, Utils.router ? Utils.router_port : dstPort));
                     else
                         logger.info("Packet Dropped.");
                 }

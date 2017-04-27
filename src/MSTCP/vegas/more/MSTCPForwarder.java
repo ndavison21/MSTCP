@@ -19,11 +19,11 @@ public class MSTCPForwarder {
     
     private class FlowData { // class to store data and functionalilty for flow
         // final int flowID;
-        final NetworkCoder networkCoder;
+        final NetworkCoder_2 networkCoder;
                 
         public FlowData(int flowID, long fileSize) {
             // this.flowID = flowID;
-            this.networkCoder = new NetworkCoder(logger, fileSize, flowID, false);
+            this.networkCoder = new NetworkCoder_2(logger, fileSize);
         }
     }
     
@@ -65,8 +65,7 @@ public class MSTCPForwarder {
                                 if (flow == null) { // didn't see SYN+ACK, don't have file length so not much we can do
                                     logger.warning("Received packet for unitialised flow " + more.getFlowID() + ". Forwarding to next hop.");
                                 } else {
-                                    flow.networkCoder.isInnovative(more); // if innovative store packet and update pre-encoded packet
-                                    more = flow.networkCoder.getPreEncodedPacket(more.getBatch()); // send pre-encoded packet and pre-encode new packet
+                                    more = flow.networkCoder.processPacket(more); // if innovative store packet and update pre-encoded packet
                                     tcpPacket.setData(more.bytes());
                                 }
                                 

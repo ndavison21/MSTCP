@@ -21,8 +21,8 @@ public final class Utils {
     public static final boolean localhost    = true;  // get public or local IP
     public static final Random rand          = new Random();
     public static final int bufferSize       = 3;     // buffer size (drop packets received when buffer is full)
-    public static final int latency          = 50;  // artificial mean latency
-    public static final int latency_variance = 10;  // artificial range of latency
+    public static final int latency          = 0;  // artificial mean latency
+    public static final int latency_variance = 0;  // artificial range of latency
     public static final double p_drop        = 0;  // artificial drop late (drop if rand is less than this)
     public static final boolean router       = true;  // send packets to router (not destination)
     public static final int router_port      = 15000; // port router is connected to
@@ -30,7 +30,7 @@ public final class Utils {
     public static final double p_smooth      = 0.2;   // smoothing factor for monitoring drop rate
 
     public static final int noOfSources   = 1;
-    public static final int batchSize     = 20;    // to keep matrix sizes small we send blocks in smaller groups
+    public static final int batchSize     = 16;    // to keep matrix sizes small we send blocks in smaller groups
     public static final int pktSize       = 1000; // 1000 Bytes total (Header 28 bytes, Block 972 bytes)
     public static final int tcpSize       = 28;   // TCP Header no options
     public static final int moreSize      = 10;   // MORE Header with no code vector or data
@@ -101,7 +101,8 @@ public final class Utils {
 
     public static void delay(Logger logger) {
         try {
-            Thread.sleep(latency + rand.nextInt(latency_variance) - latency_variance / 2);
+            if (Utils.latency > 0)
+                Thread.sleep(latency + rand.nextInt(latency_variance) - latency_variance / 2);
         } catch (InterruptedException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
             System.exit(1);
