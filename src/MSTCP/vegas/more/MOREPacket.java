@@ -112,7 +112,7 @@ public class MOREPacket {
         this.dataLength   = bb.getShort();
         this.codeVector = new CodeVectorElement[this.vectorLength];
         for (short i=0; i<this.vectorLength; i++)
-            this.codeVector[i] = new CodeVectorElement(bb.getShort(), bb.getShort());
+            this.codeVector[i] = new CodeVectorElement(bb.getShort(), bb.getInt());
         if (packetType == 1) {
             byte[] encodedDataBytes = new byte[dataLength];
             bb.get(encodedDataBytes);
@@ -123,7 +123,7 @@ public class MOREPacket {
     
     public byte[] bytes() {
     	byte[] encodedDataBytes = (encodedData == null ? new byte[0] : encodedData.toByteArray());
-        ByteBuffer bb = ByteBuffer.allocate(BASE_SIZE + 2*vectorLength + encodedDataBytes.length);
+        ByteBuffer bb = ByteBuffer.allocate(BASE_SIZE + 4*vectorLength + encodedDataBytes.length);
 
         bb.putInt(flowID);
         bb.putShort(packetType);

@@ -8,7 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-public class NetworkCoder_2 {
+public class NetworkCoder {
     final Logger logger;
     
     int fileBlocks = -1;
@@ -21,7 +21,7 @@ public class NetworkCoder_2 {
 
     Random random = new Random();
     
-    public NetworkCoder_2(Logger logger, long fileSize) {
+    public NetworkCoder(Logger logger, long fileSize) {
         this.logger = logger;
         this.fileBlocks = (int) (fileSize / Utils.blockSize + (fileSize % Utils.blockSize > 0 ? 1: 0));
     }
@@ -124,7 +124,8 @@ public class NetworkCoder_2 {
             CodeVectorElement[] newCodeVector = new CodeVectorElement[batchSize];
             
             short i=0, j=0, k=0;
-            short block, coefficient;
+            short block;
+            int coefficient;
             for (i=0; i<batchSize; i++) {
                 block = (short) (baseBlock + i);
                 coefficient = 0;

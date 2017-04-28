@@ -35,7 +35,7 @@ public final class Utils {
     public static final int tcpSize       = 28;   // TCP Header no options
     public static final int moreSize      = 10;   // MORE Header with no code vector or data
     public static final int blockSize     = 800;  // size of data blocks
-    public static final int transferSize  = blockSize + 1; // we prepend a byte containing '1' to ensure not bytes are truncated
+    public static final int transferSize  = blockSize + 1; // we prefix a byte to avoid bytes being dropped
     public static final int maxVectorSize = pktSize - (tcpSize + moreSize + blockSize); // maximum size of code vector in bytes
     public static final int precision     = 2000; // number decimal places to calculate to  (must be greater than log10(2 ^ blockSize) )
     

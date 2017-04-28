@@ -15,7 +15,8 @@ public class Test {
         try {
             System.out.println("Starting Test.");
             
-            //String[] files = new String[]{"hello.txt", "hello_800.txt", "hello_repeat.txt", "hello_repeat_repeat.txt", "me.jpg"};
+            // String[] files = new String[]{"hello.txt", "hello_800.txt", "hello_repeat.txt", "hello_repeat_repeat.txt", "me.jpg"};
+            //String file = "hello_repeat_repeat.txt";
             String file = "me.jpg";
             
             final Vector<SourceInformation> sources = new Vector<SourceInformation>();
@@ -47,7 +48,7 @@ public class Test {
             
             TimeUnit.SECONDS.sleep(2);
             
-            for(int k=0; k<1; k++) {
+            for(int k=0; k<100; k++) {
             //for (String file: files) {
                 
                 System.out.println("Starting Transfer of " + file + ".");
@@ -62,18 +63,18 @@ public class Test {
                 
                 for (int i=0; i<o.length; i++) {
                     if (o[i] != r[i]) {
-                        System.out.println("Difference at byte " + i + ". Original is " + o[i] + ", Received is " + r[i]);
+                        System.out.println("Difference at byte " + i + " block " + (i / Utils.blockSize) + " batch " + (i / (Utils.blockSize*Utils.batchSize)));
+                        i += Utils.blockSize;
                     }
                 }
                 
                 if (o.length > r.length)
-                    System.out.println("Original file contains more bytes.");
+                    System.out.println("Original file contains " + (o.length - r.length) + " more bytes.");
                 else if (r.length > o.length)
-                    System.out.println("Received file contains more bytes.");
+                    System.out.println("Received file contains " + (r.length - o.length) + " more bytes.");
                 
                 System.out.println("Transfer Complete.");
                 
-                Thread.sleep(2000);
                 System.gc();
                 
             }

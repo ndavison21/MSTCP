@@ -4,10 +4,10 @@ import java.nio.ByteBuffer;
 
 public class CodeVectorElement {
 	private short block;
-	private short coefficient;
+	private int coefficient;
 	private double innovCoefficient;
 	
-	public CodeVectorElement(short block, short coefficient) {
+	public CodeVectorElement(short block, int coefficient) {
 		this.block = block;
 		this.coefficient = coefficient;
 		this.innovCoefficient = coefficient;
@@ -16,7 +16,7 @@ public class CodeVectorElement {
 	public CodeVectorElement(byte[] bytes) {
 		ByteBuffer bb = ByteBuffer.wrap(bytes);
 		this.block = bb.getShort();
-		this.coefficient = bb.getShort();
+		this.coefficient = bb.getInt();
 		this.innovCoefficient = this.coefficient;
 	}
 
@@ -24,7 +24,7 @@ public class CodeVectorElement {
 		return block;
 	}
 
-	public short getCoefficient() {
+	public int getCoefficient() {
 		return coefficient;
 	}
 	
@@ -32,7 +32,7 @@ public class CodeVectorElement {
         this.block = block;
     }
 
-    public void setCoefficient(short coefficeint) {
+    public void setCoefficient(int coefficeint) {
         this.coefficient = coefficeint;
         this.innovCoefficient = coefficient;
     }
@@ -42,14 +42,15 @@ public class CodeVectorElement {
     }
 
     public void setInnovCoefficient(double innovCoefficient) {
-        this.coefficient = (short) innovCoefficient;
+        this.coefficient = (int) innovCoefficient;
         this.innovCoefficient = innovCoefficient;
     }
 
     public byte[] bytes() {
-		ByteBuffer bb = ByteBuffer.allocate(4);
+		ByteBuffer bb = ByteBuffer.allocate(6);
 		bb.putShort(block);
-		bb.putShort(coefficient);
+		bb.putInt(coefficient);
 		return bb.array();
 	}
+    
 }

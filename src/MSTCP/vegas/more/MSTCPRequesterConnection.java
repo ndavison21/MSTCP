@@ -385,7 +385,8 @@ public class MSTCPRequesterConnection extends Thread {
                         
                         logger.info("Received Block from (" + dstAddr + ", " + dstPort + ")");
                         // pass data to receiver
-                        requester.sourceCoder.receivedPackets.put(new MOREPacket(tcpPacket.getData()));
+                        if (!requester.transfer_complete)
+                            requester.sourceCoder.receivedPackets.put(new MOREPacket(tcpPacket.getData()));
                     } else {
                         if (base <= tcpPacket.getSeqNum()) {
                             logger.info("Received Packet Out of Order (seqNum " + tcpPacket.getSeqNum() + ", base " + base + ". Passing to Requester anyway.");

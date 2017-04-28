@@ -59,16 +59,20 @@ public class MSTCPRequester {
         
         // start writing data to file
         File file = new File(path + "received_" + filename);
+        file.delete();
+        file.createNewFile();
         RandomAccessFile raf = new RandomAccessFile(file, "rw");
         
         // get decoded packets and write to file
         DecodedBlock block;
-        long remainingBytes = mstcpInformation.fileSize;
-        while (remainingBytes > 0) {
+        long bytesWritten = 0;
+        while (bytesWritten < mstcpInformation.fileSize) {
             block = sourceCoder.decodedBlocks.take();
             raf.seek(block.block * Utils.blockSize);
             raf.write(block.data, 1, block.data.length - 1);
-            remainingBytes -= (block.data.length - 1);
+            bytesWritten += block.data.length - 1;
+
+            System.out.println("Block " + (block.block < 100 ? block.block < 10 ? "  " : " " : "") + block.block + " length " + block.data.length + " written " + bytesWritten + " bytes");
         }
         
         logger.info("Closing Connections.");

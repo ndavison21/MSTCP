@@ -108,7 +108,6 @@ public class MSTCPResponderConnection {
             TCPPacket inPacket;
             int time_recv;
 
-            long remaining = -1;
             byte[] dataBytes = new byte[Utils.transferSize];
             BigInteger data;
 
@@ -156,16 +155,13 @@ public class MSTCPResponderConnection {
                                     continue;
                                 logger.info("Block " + c.getBlock() + " with coefficient " + c.getCoefficient());
                                 raf.seek(c.getBlock() * Utils.blockSize);
-                                remaining = raf.length() - c.getBlock() * Utils.blockSize;
-                                if (remaining < 0) // case for when the file is less than 1 block in size
-                                    remaining = raf.length();
-                                if (remaining < Utils.blockSize)
-                                    dataBytes = new byte[(int) remaining + 1];
-                                else if (dataBytes.length < Utils.transferSize)
+                                if ((c.getBlock() + 1L) * Utils.blockSize > raf.length())
+                                    dataBytes = new byte[(int) (raf.length() - (c.getBlock() * Utils.blockSize)) + 1];
+                                else if (dataBytes.length != Utils.transferSize)
                                     dataBytes = new byte[Utils.transferSize];
                                 dataBytes[0] = 1;
                                 raf.read(dataBytes, 1, dataBytes.length - 1);
-                                data = new BigInteger(dataBytes); // TODO: better variable names
+                                data = new BigInteger(dataBytes);       
                                 data = data.multiply(BigInteger.valueOf(c.getCoefficient()));
                                 encodedData = encodedData.add(data);
                             }

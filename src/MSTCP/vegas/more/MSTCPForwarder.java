@@ -19,11 +19,11 @@ public class MSTCPForwarder {
     
     private class FlowData { // class to store data and functionalilty for flow
         // final int flowID;
-        final NetworkCoder_2 networkCoder;
+        final NetworkCoder networkCoder;
                 
         public FlowData(int flowID, long fileSize) {
             // this.flowID = flowID;
-            this.networkCoder = new NetworkCoder_2(logger, fileSize);
+            this.networkCoder = new NetworkCoder(logger, fileSize);
         }
     }
     
