@@ -101,8 +101,7 @@ public class MSTCPResponderConnection {
 
             logger.info("Opened File " + mstcpInfo.filename + ". Sending SYN + ACK to (" + dstAddress + ", " + dstPort + ")");
             byte[] outBytes = generateTCPPacket(initialSeqNum, mstcpInfo.bytes(), true, false, time_req);
-            responder.socket.send(new DatagramPacket(outBytes, outBytes.length, dstAddress,
-                    Utils.router ? Utils.router_port : dstPort));
+            responder.socket.send(new DatagramPacket(outBytes, outBytes.length, dstAddress, responder.routerPort));
 
             DatagramPacket udpPkt;
             TCPPacket inPacket;
@@ -173,7 +172,7 @@ public class MSTCPResponderConnection {
                             Arrays.fill(dataBytes, (byte) 0);
                         }
                     }
-                    responder.socket.send(new DatagramPacket(outBytes, outBytes.length, dstAddress, Utils.router ? Utils.router_port : dstPort));
+                    responder.socket.send(new DatagramPacket(outBytes, outBytes.length, dstAddress, responder.routerPort));
                 } else {
                     logger.info("Received Corrupted Packet");
                 }

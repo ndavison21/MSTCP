@@ -28,8 +28,12 @@ public class MiddleForwarder {
     }
     
     public MiddleForwarder(int recvPort) throws SocketException {
+        this(recvPort, 0, 0);
+    }
+    
+    public MiddleForwarder(int recvPort, int delay, double p_drop) throws SocketException {
         this.logger = Utils.getLogger(this.getClass().getName() + "_" + recvPort);
-        this.socket = new MSTCPSocket(logger, recvPort);
+        this.socket = new MSTCPSocket(logger, recvPort, delay, p_drop);
         try {
             this.localhost = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {

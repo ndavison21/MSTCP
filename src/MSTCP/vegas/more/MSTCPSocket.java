@@ -14,6 +14,10 @@ public class MSTCPSocket {
     private final DatagramSocket outSocket;
     private final Receiver receiver;
     private final Sender sender;
+    
+    private final int delay;
+    private final double p_drop;
+    
     private LinkedBlockingQueue<DatagramPacket> inBuffer = new LinkedBlockingQueue<DatagramPacket>();
     private LinkedBlockingQueue<DatagramPacket> outBuffer = new LinkedBlockingQueue<DatagramPacket>();
 
@@ -24,9 +28,14 @@ public class MSTCPSocket {
                 for (;;) {
                     DatagramPacket d = new DatagramPacket(new byte[Utils.pktSize], Utils.pktSize);
                     inSocket.receive(d);
+                    if (Utils.rand.nextDouble() < p_drop){
+                        logger.info("Packet Dropped");
+                        continue;
+                    }
+                    Thread.sleep(delay);
                     inBuffer.add(d);
                 }
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 if (e instanceof SocketException && inSocket.isClosed()) {
                     return;
                 }
@@ -51,7 +60,6 @@ public class MSTCPSocket {
                         }
                         return;
                     }
-                    Utils.delay(logger);
                     outSocket.send(d);
                 }
             } catch (InterruptedException e) {
@@ -78,14 +86,19 @@ public class MSTCPSocket {
         }
     }
     
-    public MSTCPSocket(Logger logger) throws SocketException { // connect to any free port
-        this(logger, -1);
+    public MSTCPSocket(Logger logger, int port) throws SocketException { // connect to any free port
+        this(logger, port, 0, 0);
     }
 
-    public MSTCPSocket(Logger logger, int port) throws SocketException {
+    
+    
+    public MSTCPSocket(Logger logger, int port, int delay, double p_drop) throws SocketException {
         this.logger    = logger;
         this.inSocket  = port == -1 ? new DatagramSocket() : new DatagramSocket(port);
         this.outSocket = new DatagramSocket();
+        this.delay = delay;
+        this.p_drop = p_drop;
+        
         this.receiver  = new Receiver();
         this.sender    = new Sender();
         

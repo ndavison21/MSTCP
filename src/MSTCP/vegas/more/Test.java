@@ -51,11 +51,23 @@ public class Test {
             }).start();
             
             for (i=1; i<5; i++) {
-                final int port = 15000 + i;
+                final int port1 = 15000 + i;
                 (new Thread() {
                     public void run() {
                         try {
-                            new MiddleForwarder(port);
+                            new MiddleForwarder(port1, 10, 0.01);
+                        } catch (SocketException e) {
+                            e.printStackTrace();
+                            System.exit(1);
+                        }   
+                    }
+                }).start();
+                i++;
+                final int port2 = 15000 + i;
+                (new Thread() {
+                    public void run() {
+                        try {
+                            new MiddleForwarder(port2, 30, 0.1);
                         } catch (SocketException e) {
                             e.printStackTrace();
                             System.exit(1);

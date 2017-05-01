@@ -57,7 +57,7 @@ public class MSTCPRequesterConnection extends Thread {
     public Bool active = new Bool(true);
     
     // calculating redundancy to send
-    double p_drop = Utils.p_drop;
+    double p_drop = 1.0/3.0; // approximate at 1/3 to begin with
     
     // fast retransmit
     LinkedBlockingQueue<Integer> toRetransmit; // sequence number of packets to retransmit
@@ -467,11 +467,8 @@ public class MSTCPRequesterConnection extends Thread {
                     synchronized(initialSeqNum) {
                         nextSeqNum++;
                     }
-                    if (!Utils.drop())
-                        //for (int i=0; i<Utils.batchSize; i++)
-                            socket.send(new DatagramPacket(request, request.length, dstAddr, routerPort));
-                    else
-                        logger.info("Packet Dropped.");
+
+                    socket.send(new DatagramPacket(request, request.length, dstAddr, routerPort));
                 }
             } catch(IOException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);

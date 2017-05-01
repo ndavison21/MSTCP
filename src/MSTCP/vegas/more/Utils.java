@@ -16,18 +16,12 @@ public final class Utils {
     public static final int SYN_ENUM  = 1;
     public static final int FIN_ENUM  = 2;
     
-    public static final boolean debug = false; // turn off timeouts so can step through with debug mode
+    public static final boolean debug  = false; // turn off timeouts so can step through with debug mode
     public static final boolean decode = false; // perform decoding of packets at received
     public static final boolean recode = false; // perform recoding of packets in the network
 
     public static final boolean localhost    = true;  // get public or local IP
     public static final Random rand          = new Random();
-    public static final int bufferSize       = 50;     // buffer size (drop packets received when buffer is full)
-    public static final int latency          = 10;  // artificial mean latency
-    public static final int latency_variance = 0;  // artificial range of latency
-    public static final double p_drop        = 0.1;  // artificial drop late (drop if rand is less than this)
-    public static final boolean router       = true;  // send packets to router (not destination)
-    public static final int router_port      = 15000; // port router is connected to
     
     public static final double p_smooth      = 0.2;   // smoothing factor for monitoring drop rate
 
@@ -41,9 +35,9 @@ public final class Utils {
     public static final int tcpSize       = 28;   // TCP Header no options
     public static final int moreSize      = 10;   // MORE Header with no code vector or data
     public static final int blockSize     = 800;  // size of data blocks
-    public static final int transferSize  = blockSize + 1; // we prefix a byte to avoid bytes being dropped
+    public static final int transferSize  = blockSize + 1; // we prefix a byte to avoid bytes being dropped when converting to BigInteger
     public static final int maxVectorSize = pktSize - (tcpSize + moreSize + blockSize); // maximum size of code vector in bytes
-    public static final int precision     = 2000; // number decimal places to calculate to  (must be greater than log10(2 ^ blockSize) )
+    public static final int precision     = 2000; // number of decimal places to calculate to  (must be greater than log10(2 ^ blockSize) )
     
 
     // retransmit parameters
@@ -54,7 +48,7 @@ public final class Utils {
     public static final int finAttempts  = 3;
     public static final int finTimeout   = debug ? Integer.MAX_VALUE : 500;
 
-    // congestion control parameter
+    // congestion control parameter TODO: understand what this represents
     public static final int total_alpha = 10;
 
     public static String getIPAddress(Logger logger) {
@@ -99,19 +93,6 @@ public final class Utils {
         }
 
         return address;
-    }
-
-    public static boolean drop() {
-        return (rand.nextDouble() < p_drop);
-    }
-
-    public static void delay(Logger logger) {
-        try {
-            Thread.sleep(latency + (latency_variance > 0 ? rand.nextInt(latency_variance) : 0) - latency_variance / 2);
-        } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
-            System.exit(1);
-        }
     }
 
     public static Logger getLogger(String filename) {
