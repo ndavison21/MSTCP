@@ -108,44 +108,44 @@ public class SourceCoder extends Thread {
             batchSize = fileBlocks;
         int baseBlock = batch * Utils.batchSize;
         
-        // set up coding matrix
-        BigDecimal[][] codingMatrix = new BigDecimal[batchSize][batchSize];
-        BigDecimal[] codedData = new BigDecimal[batchSize];
-        
-        BigDecimal[][] debug = new BigDecimal[batchSize][batchSize];
-        
-        for (int i=0; i<batchSize; i++) {
-            CodeVectorElement[] codeVector = batchBuffer.get(i).getCodeVector();
-            int k = 0;
-            for (int j=0; j<batchSize; j++) {
-                debug[i][j] = new BigDecimal(codeVector[k].getBlock() == baseBlock + j ? codeVector[k].getCoefficient() : 0);
-                codingMatrix[i][j] = new BigDecimal(codeVector[k].getBlock() == baseBlock + j ? codeVector[k++].getCoefficient() : 0);
+        if (Utils.decode) {
+            // set up coding matrix
+            BigDecimal[][] codingMatrix = new BigDecimal[batchSize][batchSize];
+            BigDecimal[] codedData = new BigDecimal[batchSize];
+            
+            
+            for (int i=0; i<batchSize; i++) {
+                CodeVectorElement[] codeVector = batchBuffer.get(i).getCodeVector();
+                int k = 0;
+                for (int j=0; j<batchSize; j++) {
+                    // logger.info("Block " + codeVector[k].getBlock() + " with coefficient " + codeVector[k].getCoefficient());
+                    codingMatrix[i][j] = new BigDecimal(k < codeVector.length && codeVector[k].getBlock() == baseBlock + j ? codeVector[k++].getCoefficient() : 0);
+                }
+                codedData[i] = new BigDecimal(batchBuffer.get(i).getEncodedData());
+                // logger.info("Batch " + batch + " Encoded Data " + codedData[i]);
             }
-            codedData[i] = new BigDecimal(batchBuffer.get(i).getEncodedData());
-        }
-        
-        // get the inverse
-        BigDecimal[][] inverseCodingMatrix = null;
-        try {
+            
+            // get the inverse
+            BigDecimal[][] inverseCodingMatrix = null;
             inverseCodingMatrix = invert(codingMatrix);
-        } catch (ArithmeticException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
-            System.exit(1);
-        }
-        BigDecimal block;
-
-        
-        // multiple coded data by inverse matrix to recover packets
-        for (int i=0; i<batchSize; i++) {
-            block = new BigDecimal(0);
-            for (int j=0; j<batchSize; j++) {
-                BigDecimal inverseCoefficient = inverseCodingMatrix[i][j];
-                BigDecimal codedBlock = codedData[j];
-                block = block.add(codedBlock.multiply(inverseCoefficient));
+            BigDecimal block;
+            
+            
+            // multiple coded data by inverse matrix to recover packets
+            for (int i=0; i<batchSize; i++) {
+                block = new BigDecimal(0);
+                for (int j=0; j<batchSize; j++) {
+                    BigDecimal inverseCoefficient = inverseCodingMatrix[i][j];
+                    BigDecimal codedBlock = codedData[j];
+                    block = block.add(codedBlock.multiply(inverseCoefficient));
+                }
+                BigInteger data = block.setScale(0, RoundingMode.HALF_UP).toBigInteger();
+                decodedBlocks.add(new DecodedBlock(baseBlock + i, data.toByteArray()));
             }
-            BigInteger data = block.setScale(0, RoundingMode.HALF_UP).toBigInteger();
-            byte[] dataBytes = data.toByteArray();
-            decodedBlocks.add(new DecodedBlock(baseBlock + i, data.toByteArray()));
+        } else {
+            for (int i=0; i<batchSize; i++) {
+                decodedBlocks.add(new DecodedBlock(baseBlock + i, new byte[Utils.transferSize]));
+            }
         }
         logger.info("Decoded Batch " + batch);
         
@@ -248,8 +248,7 @@ public class SourceCoder extends Thread {
             }
         }
     }
-    public int nextCoefficient(int batchSize) {
-        double prob = batchSize < 8 ? 1 : (5.0 / batchSize); // probability any given block is included TODO: find best parameters
-        return random.nextDouble() < prob ? random.nextInt( (2 * Short.MAX_VALUE) + 1) - Short.MAX_VALUE : 0;
+    public int nextCoefficient() {
+        return random.nextInt( (2 * Short.MAX_VALUE) + 1) - Short.MAX_VALUE;
     }
 }

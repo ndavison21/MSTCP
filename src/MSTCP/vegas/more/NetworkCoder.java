@@ -2,6 +2,7 @@ package MSTCP.vegas.more;
 
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -68,8 +69,15 @@ public class NetworkCoder {
                     
                     /// THIRD: Update pre-encoded packet
                     updatePreEncodedPacket(more);
-                }
+                } else
+                    logger.info("Received uninnovative packet for batch " + batch);
                 toSend = preEncodedPackets.remove(more.getBatch());
+                if (toSend == null) // happens if first packet of a batch is not innovative
+                    toSend = more;
+                // for (CodeVectorElement c: toSend.getCodeVector())
+                //     logger.info("Block " + c.getBlock() + " with coefficient " + c.getCoefficient());
+                logger.info("Encoded Data " + toSend.getEncodedData());
+                
                 preEncoding.b = true;
                 
                 (new Thread() {
@@ -121,21 +129,24 @@ public class NetworkCoder {
             
             CodeVectorElement[] prevCodeVector = preEncoded.getCodeVector();
             CodeVectorElement[] innovCodeVector = pktToAdd.getCodeVector();
-            CodeVectorElement[] newCodeVector = new CodeVectorElement[batchSize];
+            LinkedList<CodeVectorElement> newCodeVectorList = new LinkedList<CodeVectorElement>();
             
             short i=0, j=0, k=0;
             short block;
             int coefficient;
             for (i=0; i<batchSize; i++) {
                 block = (short) (baseBlock + i);
-                coefficient = 0;
-                if (prevCodeVector[j].getBlock() == block)
+                coefficient = 0; //prevCodeVector[i].getCoefficient() + innovCodeVector[i].getCoefficient();
+                if (j < prevCodeVector.length && prevCodeVector[j].getBlock() == block)
                     coefficient += prevCodeVector[j++].getCoefficient();
-                if (innovCodeVector[k].getBlock() == block)
+                if (k < innovCodeVector.length && innovCodeVector[k].getBlock() == block)
                     coefficient += innovCodeVector[k++].getCoefficient();
                 
-                newCodeVector[i] = new CodeVectorElement(block, coefficient);
+                newCodeVectorList.add(new CodeVectorElement(block, coefficient));
             }
+            
+            CodeVectorElement[] newCodeVector = new CodeVectorElement[newCodeVectorList.size()];
+            newCodeVectorList.toArray(newCodeVector);
             
             BigInteger encodedData = preEncoded.getEncodedData().add(pktToAdd.getEncodedData());
     

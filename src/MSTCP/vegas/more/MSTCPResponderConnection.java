@@ -54,8 +54,7 @@ public class MSTCPResponderConnection {
             byte[] finBytes = fin.bytes();
             try {
                 responder.socket.send(
-                        new DatagramPacket(finBytes, finBytes.length, InetAddress.getByName(responder.srcInfo.address),
-                                Utils.router ? Utils.router_port : responder.srcInfo.port));
+                        new DatagramPacket(finBytes, finBytes.length, InetAddress.getByName(responder.recvAddr), responder.routerPort));
             } catch (IOException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
                 System.exit(1);
@@ -77,7 +76,7 @@ public class MSTCPResponderConnection {
         return tcpPacket.bytes();
     }
 
-    public MSTCPResponderConnection(TCPPacket syn, MSTCPResponder responder, int time_req) {
+    public MSTCPResponderConnection(TCPPacket syn, MSTCPResponder responder, int time_req, int recvPort) {
         this.logger = responder.logger; // TODO: its own logger or prefix logging messages?
 
         try {
@@ -91,8 +90,9 @@ public class MSTCPResponderConnection {
             this.dstPort = mstcpInfo.recvPort;
 
             for (SourceInformation s : mstcpInfo.sources) { // set this sender to connected
-                if (s.address == responder.srcInfo.address && s.port == responder.srcInfo.port) {
-                    s.connected = true;
+                if (s.address == responder.recvAddr) {
+                    s.ports.put(recvPort, true);
+                    s.connected++;
                 }
             }
 
@@ -153,7 +153,7 @@ public class MSTCPResponderConnection {
                             for (CodeVectorElement c : codeVector) {
                                 if (c.getBlock() == -1 || c.getCoefficient() == 0)
                                     continue;
-                                logger.info("Block " + c.getBlock() + " with coefficient " + c.getCoefficient());
+                                // logger.info("Block " + c.getBlock() + " with coefficient " + c.getCoefficient());
                                 raf.seek(c.getBlock() * Utils.blockSize);
                                 if ((c.getBlock() + 1L) * Utils.blockSize > raf.length())
                                     dataBytes = new byte[(int) (raf.length() - (c.getBlock() * Utils.blockSize)) + 1];

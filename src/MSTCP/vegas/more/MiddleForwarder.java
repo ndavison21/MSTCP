@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class MSTCPForwarder {
+public class MiddleForwarder {
     final Logger logger;
     
     final MSTCPSocket socket; // socket for receiving and forwarding packets. TODO: intercept packets using pcap
@@ -27,7 +27,7 @@ public class MSTCPForwarder {
         }
     }
     
-    public MSTCPForwarder(int recvPort) throws SocketException {
+    public MiddleForwarder(int recvPort) throws SocketException {
         this.logger = Utils.getLogger(this.getClass().getName() + "_" + recvPort);
         this.socket = new MSTCPSocket(logger, recvPort);
         try {
@@ -44,17 +44,11 @@ public class MSTCPForwarder {
                 data = socket.receive(); // TODO: get from pcap
                 TCPPacket tcpPacket = new TCPPacket(data.getData());
                 InetAddress destAddr = data.getAddress(); // TODO: get from IP layer
-                
+
+                int nextPort;
                 if (tcpPacket.verifyChecksum()) { // if it's corrupted we may as well just drop now
-                    if (tcpPacket.isSYN() && tcpPacket.isACK()) { // if SYN+ACK
-                        // initialise buffer for innovative packets
-                        int flowID = MSTCPInformation.getFlowID(tcpPacket.getData());
-                        long fileSize = MSTCPInformation.getFileSize(tcpPacket.getData());
-                        logger.info("Received SYN+ACK for flow " + flowID + ". Initialising.");
-                        if (!flowBuffer.containsKey(flowID)) {
-                            flowBuffer.put(flowID, new FlowData(flowID, fileSize));
-                        }
-                    } else if (MOREPacket.getPacketType(tcpPacket.getData()) == MOREPacket.RETURN_PACKET) { // only interested in return packets
+                    if (MOREPacket.getPacketType(tcpPacket.getData()) == MOREPacket.RETURN_PACKET) { // only interested in return packets
+                        nextPort = 15000;
                         if (tcpPacket.isACK()) {
                             if (tcpPacket.isFIN()) { // if FIN+ACK
                                 flowBuffer.remove(MOREPacket.getFlowID(tcpPacket.getData())); // delete buffer
@@ -72,11 +66,37 @@ public class MSTCPForwarder {
                                 
                             }
                         }
-                    }
+                    } else {
+                        switch (tcpPacket.getDestPort()) { // TODO: delay and drop
+                            case 16000:
+                                nextPort = 15005;
+                                break;
+                            case 16001:
+                                nextPort = 15005;
+                                break;
+                            case 16002:
+                                nextPort = 15006;
+                                break;
+                            case 16003:
+                                nextPort = 15006;
+                                break;
+                            default:
+                                nextPort = tcpPacket.getDestPort();
+                        }
+                        
+                        if (tcpPacket.isSYN() && tcpPacket.isACK()) { // if SYN+ACK
+                            // initialise buffer for innovative packets
+                            int flowID = MSTCPInformation.getFlowID(tcpPacket.getData());
+                            long fileSize = MSTCPInformation.getFileSize(tcpPacket.getData());
+                            logger.info("Received SYN+ACK for flow " + flowID + ". Initialising.");
+                            if (!flowBuffer.containsKey(flowID))
+                                flowBuffer.put(flowID, new FlowData(flowID, fileSize));
+                        }
+                    } 
 
                     
                     byte[] tcpBytes = tcpPacket.bytes();
-                    socket.send(new DatagramPacket(tcpBytes, tcpBytes.length, destAddr, tcpPacket.getDestPort()));
+                    socket.send(new DatagramPacket(tcpBytes, tcpBytes.length, destAddr, nextPort));
                 } else
                     logger.info("Dropping Corrupted Packet.");
             }

@@ -3,7 +3,6 @@ package MSTCP.vegas.more;
 import java.io.File;
 import java.io.IOException;
 import java.net.SocketException;
-import java.nio.file.Files;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
@@ -20,25 +19,30 @@ public class Test {
             String file = "me.jpg";
             
             final Vector<SourceInformation> sources = new Vector<SourceInformation>();
-            sources.add(new SourceInformation(Utils.getIPAddress(null), 16000));
-            sources.add(new SourceInformation(Utils.getIPAddress(null), 16001));
+            sources.add(new SourceInformation("127.0.0.1", new int[] {16000, 16001}));
+            sources.add(new SourceInformation("127.0.0.2", new int[] {16002, 16003}));
             
-            (new Thread() {
-                public void run() {
-                    new MSTCPResponder(Utils.getIPAddress(null), 16000, "./", sources);
+            // Creating sources
+            int i = 0;
+            for (final SourceInformation source: sources) {
+                final int routerPort = 15005 + i;
+               // final int routerPort = 15000 + i;
+                for (final int port: source.ports.keySet()) {
+                    (new Thread() {
+                        public void run() {
+                            new MSTCPResponder(source.address, port, routerPort, "./", sources);
+                        }
+                    }).start();
                 }
-            }).start();
+                i++;
+            }
             
-            (new Thread() {
-                public void run() {
-                    new MSTCPResponder(Utils.getIPAddress(null), 16001, "./", sources);
-                }
-            }).start();
             
+            // Creating Routers
             (new Thread() {
                 public void run() {
                     try {
-                        new MSTCPForwarder(Utils.router_port);
+                        new RequesterForwarder(15000);
                     } catch (SocketException e) {
                         e.printStackTrace();
                         System.exit(1);
@@ -46,35 +50,50 @@ public class Test {
                 }
             }).start();
             
+            for (i=1; i<5; i++) {
+                final int port = 15000 + i;
+                (new Thread() {
+                    public void run() {
+                        try {
+                            new MiddleForwarder(port);
+                        } catch (SocketException e) {
+                            e.printStackTrace();
+                            System.exit(1);
+                        }   
+                    }
+                }).start();
+            }
+            
+            for (i=5; i<7; i++) {
+                final int port = 15000 + i;
+                (new Thread() {
+                    public void run() {
+                        try {
+                            new ResponderForwarder(port);
+                        } catch (SocketException e) {
+                            e.printStackTrace();
+                            System.exit(1);
+                        }   
+                    }
+                }).start();
+                
+            }
+            
             TimeUnit.SECONDS.sleep(2);
             
-            for(int k=0; k<100; k++) {
+            File logs = new File("./logs");
+            
+            for(int k=0; k<1000; k++) {
             //for (String file: files) {
+
+                for(File log: logs.listFiles()) 
+                    if (!log.isDirectory()) 
+                        log.delete();
                 
-                System.out.println("Starting Transfer of " + file + ".");
+                System.out.println("#" + k + " Starting Transfer of " + file + ".");
                 
                 new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null), 14000, 16000, "./", file);
-            
-                File original = new File("./" + file);
-                File received = new File("./received_" + file);
-                
-                byte[] o = Files.readAllBytes(original.toPath());
-                byte[] r = Files.readAllBytes(received.toPath());
-                
-                for (int i=0; i<o.length; i++) {
-                    if (o[i] != r[i]) {
-                        System.out.println("Difference at byte " + i + " block " + (i / Utils.blockSize) + " batch " + (i / (Utils.blockSize*Utils.batchSize)));
-                        i += Utils.blockSize;
-                    }
-                }
-                
-                if (o.length > r.length)
-                    System.out.println("Original file contains " + (o.length - r.length) + " more bytes.");
-                else if (r.length > o.length)
-                    System.out.println("Received file contains " + (r.length - o.length) + " more bytes.");
-                
                 System.out.println("Transfer Complete.");
-                
                 System.gc();
                 
             }

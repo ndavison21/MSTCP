@@ -17,6 +17,7 @@ public class MSTCPRequesterConnection extends Thread {
     
     final int recvPort;
     final InetAddress dstAddr;
+    final int routerPort;
     final int dstPort;
     MSTCPRequester requester;
     
@@ -28,6 +29,7 @@ public class MSTCPRequesterConnection extends Thread {
     
     Timer timer;
     int synAttempts = 0;
+    int dataAttempts = 0;
     
     // rtt measurements
     int time_recv    = -1;
@@ -50,6 +52,9 @@ public class MSTCPRequesterConnection extends Thread {
     double queue_delay     = 0;
     double backoff_factor  = -1;
     Double equilibrium_rate = 0.0;
+    
+    // tracking whether connection is still active
+    public Bool active = new Bool(true);
     
     // calculating redundancy to send
     double p_drop = Utils.p_drop;
@@ -116,7 +121,7 @@ public class MSTCPRequesterConnection extends Thread {
         
         try {
             for(int i=0; i<rpt; i++)
-                socket.send(new DatagramPacket(finBytes, finBytes.length, dstAddr, Utils.router ? Utils.router_port : dstPort));
+                socket.send(new DatagramPacket(finBytes, finBytes.length, dstAddr, routerPort));
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
             System.exit(1);
@@ -130,36 +135,32 @@ public class MSTCPRequesterConnection extends Thread {
         outThread.interrupt();
         stopTimer();
         
-        new Thread() {
-            public void run() {
-                try {
-                    TCPPacket in;
-                    DatagramPacket inPkt;
-                    
-                    sendFIN(false);
-                    
-                    for (;;) {
-                        inPkt = socket.receive();
-                        in = new TCPPacket(inPkt.getData());
-                        
-                        if (in.verifyChecksum() && in.isACK() && in.getSeqNum() == nextSeqNum)
-                            break;
-                    }
-                    
-                    stopTimer();
-                    sendFIN(true);
+        try {
+            TCPPacket in;
+            DatagramPacket inPkt;
+            
+            sendFIN(false);
+            
+            for (;;) {
+                inPkt = socket.receive();
+                in = new TCPPacket(inPkt.getData());
                 
-                } finally {
-                    synchronized(socket) {
-                        socket.close();
-                        socket.notifyAll();
-                    }
-                    logger.info("We Done Here.");
-                    for (Handler handler: logger.getHandlers())
-                        handler.close();
-                }
+                if (in.verifyChecksum() && in.isACK() && in.getSeqNum() == nextSeqNum)
+                    break;
             }
-        }.start();
+            
+            stopTimer();
+            sendFIN(true);
+        
+        } finally {
+            synchronized(socket) {
+                socket.close();
+                socket.notifyAll();
+            }
+            logger.info("We Done Here.");
+            for (Handler handler: logger.getHandlers())
+                handler.close();
+        }
 
     }  
     
@@ -170,9 +171,15 @@ public class MSTCPRequesterConnection extends Thread {
     }
     
     private boolean sendSYN() {
-        if (synAttempts > Utils.synAttempts)
-            return false;
-        
+        if (synAttempts > Utils.synAttempts) {
+            synchronized(active) {
+                logger.info("SYN limit reached. Giving up.");
+                active.b = false;
+                active.notifyAll();
+                return false;
+            }
+        }
+            
         logger.info("Sending SYN " + synAttempts + " to (" + dstAddr.toString() + ", " + dstPort + ")");
         TCPPacket synPacket = new TCPPacket(recvPort, dstPort, nextSeqNum, cwnd);
         synPacket.setSYN();
@@ -184,7 +191,7 @@ public class MSTCPRequesterConnection extends Thread {
         
         byte[] synBytes = synPacket.bytes();
         try {
-            socket.send(new DatagramPacket(synBytes, synBytes.length, dstAddr, Utils.router ? Utils.router_port : dstPort));
+            socket.send(new DatagramPacket(synBytes, synBytes.length, dstAddr, routerPort));
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
             return false;
@@ -217,6 +224,7 @@ public class MSTCPRequesterConnection extends Thread {
                     	
                     	requester.nextBatchReqs = Math.min(Utils.batchSize, requester.sourceCoder.fileBlocks);
                     }
+                    this.active.b = true;
                     return true;
                 }
                 
@@ -249,7 +257,14 @@ public class MSTCPRequesterConnection extends Thread {
     }
     
     private void goBackN() {
-        logger.info("Data Timed Out. Resending all packets.");
+        if (dataAttempts > Utils.dataAttempts) {
+            logger.info("Data limit reached. Giving up.");
+            active.b = false;
+            active.notifyAll();
+            return;
+        }
+        
+        logger.info("Data Time Out. Resending all packets.");
 
         synchronized (equilibrium_rate) {
             equilibrium_rate = 0.0;
@@ -267,6 +282,7 @@ public class MSTCPRequesterConnection extends Thread {
             nextSeqNum = base;
             initialSeqNum.notifyAll();
         }
+        dataAttempts++;
     }
     
     private class DataTimeout extends TimerTask {
@@ -293,7 +309,7 @@ public class MSTCPRequesterConnection extends Thread {
                     TCPPacket tcpPacket = new TCPPacket(data.getData());
                     
                     if (tcpPacket.verifyChecksum() && tcpPacket.isACK() && base <= tcpPacket.getSeqNum()) { // if packet is corrupted there's not much we can do...
-    
+                        dataAttempts = 0;
                         double mult = 1.0;
                         if (tcpPacket.getACK() < tcpPacket.getSeqNum()) { // duplicate ACK, may need to retransmit
                             double timeout = Utils.debug ? Integer.MAX_VALUE : sentRequests.peek().getTime_req() + (2 * rtt);
@@ -425,6 +441,8 @@ public class MSTCPRequesterConnection extends Thread {
                     
                     codeVector = requester.codeVector(recvPort, p_drop);
                     if (codeVector == null) {
+                        logger.info("Got all data, waiting for decode.");
+                        stopTimer();
                         this.interrupt();
                         return;
                     }
@@ -451,7 +469,7 @@ public class MSTCPRequesterConnection extends Thread {
                     }
                     if (!Utils.drop())
                         //for (int i=0; i<Utils.batchSize; i++)
-                            socket.send(new DatagramPacket(request, request.length, dstAddr, Utils.router ? Utils.router_port : dstPort));
+                            socket.send(new DatagramPacket(request, request.length, dstAddr, routerPort));
                     else
                         logger.info("Packet Dropped.");
                 }
@@ -477,13 +495,16 @@ public class MSTCPRequesterConnection extends Thread {
             logger.warning("Unable to Start Connection to (" + dstAddr.toString() + ", " + dstPort + ")");
     }
     
-    
     public MSTCPRequesterConnection(String addr, int recvPort, int dstPort, MSTCPRequester requester, boolean ms_join) throws UnknownHostException, SocketException {
+        this(addr, recvPort, dstPort, dstPort, requester, ms_join);
+    }
+    public MSTCPRequesterConnection(String addr, int recvPort, int dstPort, int routerPort, MSTCPRequester requester, boolean ms_join) throws UnknownHostException, SocketException {
         logger = Utils.getLogger(this.getClass().getName() + "_" + recvPort);
 
         this.dstAddr = InetAddress.getByName(addr);
         this.recvPort = recvPort;
         this.dstPort = dstPort;
+        this.routerPort = routerPort;
         this.requester = requester;
         this.socket = new MSTCPSocket(logger, recvPort);
         
