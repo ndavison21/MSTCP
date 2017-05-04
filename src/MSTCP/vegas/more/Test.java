@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 /**
  * VM ARGUMENT: -Djava.util.logging.SimpleFormatter.format="%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n"
@@ -55,7 +56,7 @@ public class Test {
                 (new Thread() {
                     public void run() {
                         try {
-                            new MiddleForwarder(port1, 0, 0.1);
+                            new MiddleForwarder(port1, 10, 0.01);
                         } catch (SocketException e) {
                             e.printStackTrace();
                             System.exit(1);
@@ -67,7 +68,7 @@ public class Test {
                 (new Thread() {
                     public void run() {
                         try {
-                            new MiddleForwarder(port2, 0, 0.1);
+                            new MiddleForwarder(port2, 30, 0.1);
                         } catch (SocketException e) {
                             e.printStackTrace();
                             System.exit(1);
@@ -94,15 +95,14 @@ public class Test {
             TimeUnit.SECONDS.sleep(2);
             
             File logs = new File("./logs");
+            for(File log: logs.listFiles()) 
+                if (!log.isDirectory()) 
+                    log.delete();
             
-            for(int k=0; k<1; k++) {
-            //for (String file: files) {
-
-                for(File log: logs.listFiles()) 
-                    if (!log.isDirectory()) 
-                        log.delete();
+            for(i=0; i<1000; i++) {
+                Utils.logger =  Utils.getLogger("experiment_" + i, Level.FINE);
                 
-                System.out.println("#" + k + " Starting Transfer of " + file + ".");
+                System.out.println("#" + i + " Starting Transfer of " + file + ".");
                 
                 new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null), 14000, 16000, "./", file);
                 System.out.println("Transfer Complete.");

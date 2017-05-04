@@ -7,8 +7,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
 import java.util.logging.Handler;
@@ -174,7 +173,14 @@ public class MSTCPRequester {
                             }
                         }
                         
+                        try {
                         logger.info("Connecting to " + newSource.address + " on port " + newPort);
+                        } catch (Exception e) {
+                            System.err.printf("%d\n", prevPort);
+                            e.printStackTrace();
+                            System.exit(1);
+                            
+                        }
                         if (routerPort == prevPort)
                             routerPort = newPort;
                         conn = new MSTCPRequesterConnection(newSource.address, conn.recvPort, newPort, routerPort, requester, true);
@@ -227,6 +233,8 @@ public class MSTCPRequester {
         }
     }
     
+    private HashMap<Short, Integer> batchRows = new HashMap<Short, Integer>();
+    
     // called by connections, returns next needed block and records which connection it'll come on
     public synchronized CodeVectorElement[] codeVector(int recvPort, double p_drop) {
         short batch = nextReqBatch;
@@ -265,19 +273,29 @@ public class MSTCPRequester {
         logger.info("Request for batch " + batch + " on connection " + recvPort);
         int baseBlock = (batch == nextReqBatch ? nextReqBlock : batch * Utils.batchSize);
         
-        HashSet<Integer> blocks = new HashSet<Integer>();
-        for (int i=0; i<Math.min(batchSize, Utils.batchElements); i++) {
-            int block = batchSize < Utils.batchElements ? i : sourceCoder.random.nextInt(batchSize);
-            while (blocks.contains(block))
-                block = sourceCoder.random.nextInt(batchSize);
-            blocks.add(block);
-        }
+        Integer nextRow = batchRows.get(batch);
+        nextRow = nextRow == null ? 0 : nextRow;
+        batchRows.put(batch, nextRow + 1);
+        byte[] coefficients = CodeMatrix.getRow(nextRow);
         
-        CodeVectorElement[] codeVector = new CodeVectorElement[blocks.size()];
+//        HashSet<Integer> blocks = new HashSet<Integer>();
+//        for (int i=0; i<Math.min(batchSize, Utils.batchElements); i++) {
+//            int block = batchSize < Utils.batchElements ? i : sourceCoder.random.nextInt(batchSize);
+//            while (blocks.contains(block))
+//                block = sourceCoder.random.nextInt(batchSize);
+//            blocks.add(block);
+//        }
+//        
+//        CodeVectorElement[] codeVector = new CodeVectorElement[blocks.size()];
+//        for (int i=0; i<codeVector.length; i++) {
+//            int block = Collections.min(blocks);
+//            blocks.remove(block);
+//            codeVector[i] = new CodeVectorElement((short) (baseBlock + block), sourceCoder.nextCoefficient());
+//        }
+        
+        CodeVectorElement[] codeVector = new CodeVectorElement[batchSize];
         for (int i=0; i<codeVector.length; i++) {
-            int block = Collections.min(blocks);
-            blocks.remove(block);
-            codeVector[i] = new CodeVectorElement((short) (baseBlock + block), sourceCoder.nextCoefficient());
+            codeVector[i] = new CodeVectorElement((short) (baseBlock + i), coefficients[i]);
         }
         
         

@@ -71,7 +71,7 @@ public class MSTCPResponderConnection {
         if (fin)
             tcpPacket.setFIN();
         
-        int ack = toAck.isEmpty() ? nextSeqNum : Collections.min(toAck);
+        int ack = syn ? initialSeqNum : toAck.isEmpty() ? nextSeqNum : Collections.min(toAck);
         tcpPacket.setACK(ack);
 
         tcpPacket.setTime_req(time_req);
@@ -86,7 +86,7 @@ public class MSTCPResponderConnection {
 
             this.responder = responder;
             this.initialSeqNum = syn.getSeqNum();
-            this.nextSeqNum = this.initialSeqNum;
+            this.nextSeqNum = this.initialSeqNum + 1;
             this.mstcpInfo = new MSTCPInformation(syn.getData());
             this.mstcpInfo.sources = responder.sources;
             this.dstAddress = InetAddress.getByAddress(mstcpInfo.recvAddr);
@@ -127,53 +127,62 @@ public class MSTCPResponderConnection {
                         time_req = time_recv - inPacket.getTime_req();
                         if (time_req < 0)
                             time_req = (Integer.MAX_VALUE - inPacket.getTime_req()) + time_recv;
-    
-                        if (inPacket.isFIN() && !sentFinAck) {
-                            logger.info("Received FIN packet " + inPacket.getSeqNum() + ". Sending FIN + ACK to (" + dstAddress + ", " + dstPort + ")");
-                            MOREPacket more = new MOREPacket(inPacket.getData());
-                            more.setPacketType(MOREPacket.RETURN_PACKET);
-                            outBytes = generateTCPPacket(inPacket.getSeqNum(), more.bytes(), false, true, time_req);
-                            sentFinAck = true;
-                            setTimer();
-                        } else if (inPacket.isACK() && sentFinAck && inPacket.getSeqNum() >= nextSeqNum) {
-                            logger.info("Received ACK after sending FIN + ACK. Closing Connection to (" + dstAddress + ", " + dstPort + ")");
-                            stopTimer();
-                            break;
-                        } else { // normal request packet
-                            if (inPacket.getSeqNum() > nextSeqNum) {
-                                for (int a=nextSeqNum; a<inPacket.getSeqNum(); a++)
-                                    toAck.add(a);
-                            } else if (toAck.contains(inPacket.getSeqNum())) {
-                                toAck.remove((Integer) inPacket.getSeqNum());
+
+                        if (sentFinAck) {
+                            if (inPacket.isACK() && inPacket.getSeqNum() >= nextSeqNum) {
+                                logger.info("Received ACK after sending FIN + ACK. Closing Connection to (" + dstAddress + ", " + dstPort + ")");
+                                stopTimer();
+                                break;
+                            } else {
+                                logger.info("Received packet while waiting for ACK after sending FIN + ACK.");
+                                continue;
                             }
-                            nextSeqNum = Math.max(nextSeqNum, inPacket.getSeqNum() + 1);
-    
-                            logger.info("Received packet " + inPacket.getSeqNum());
-    
-                            MOREPacket more = new MOREPacket(inPacket.getData());
-                            CodeVectorElement[] codeVector = more.getCodeVector();
-                            BigInteger encodedData = BigInteger.ZERO;
-                            for (CodeVectorElement c : codeVector) {
-                                if (c.getBlock() == -1 || c.getCoefficient() == 0)
-                                    continue;
-                                // logger.info("Block " + c.getBlock() + " with coefficient " + c.getCoefficient());
-                                raf.seek(c.getBlock() * Utils.blockSize);
-                                if ((c.getBlock() + 1L) * Utils.blockSize > raf.length())
-                                    dataBytes = new byte[(int) (raf.length() - (c.getBlock() * Utils.blockSize)) + 1];
-                                else if (dataBytes.length != Utils.transferSize)
-                                    dataBytes = new byte[Utils.transferSize];
-                                dataBytes[0] = 1;
-                                raf.read(dataBytes, 1, dataBytes.length - 1);
-                                data = new BigInteger(dataBytes);       
-                                data = data.multiply(BigInteger.valueOf(c.getCoefficient()));
-                                encodedData = encodedData.add(data);
+                        } else {
+                            if (inPacket.isFIN()) {
+                                logger.info("Received FIN packet " + inPacket.getSeqNum() + ". Sending FIN + ACK to (" + dstAddress + ", " + dstPort + ")");
+                                MOREPacket more = new MOREPacket(inPacket.getData());
+                                more.setPacketType(MOREPacket.RETURN_PACKET);
+                                outBytes = generateTCPPacket(inPacket.getSeqNum(), more.bytes(), false, true, time_req);
+                                sentFinAck = true;
+                                nextSeqNum = inPacket.getSeqNum();
+                                setTimer();
+                            } else { // normal request packet
+                                if (inPacket.getSeqNum() > nextSeqNum) {
+                                    for (int a=nextSeqNum; a<inPacket.getSeqNum(); a++)
+                                        toAck.add(a);
+                                } else if (toAck.contains(inPacket.getSeqNum())) {
+                                    toAck.remove((Integer) inPacket.getSeqNum());
+                                }
+                                nextSeqNum = Math.max(nextSeqNum, inPacket.getSeqNum() + 1);
+        
+                                logger.info("Received packet " + inPacket.getSeqNum());
+        
+                                MOREPacket more = new MOREPacket(inPacket.getData());
+                                CodeVectorElement[] codeVector = more.getCodeVector();
+                                BigInteger encodedData = BigInteger.ZERO;
+                                for (CodeVectorElement c : codeVector) {
+                                    if (c.getBlock() == -1 || c.getCoefficient() == 0)
+                                        continue;
+//                                    logger.info("Block " + c.getBlock() + " with coefficient " + c.getCoefficient());
+                                    raf.seek(c.getBlock() * Utils.blockSize);
+                                    if ((c.getBlock() + 1L) * Utils.blockSize > raf.length())
+                                        dataBytes = new byte[(int) (raf.length() - (c.getBlock() * Utils.blockSize)) + 1];
+                                    else if (dataBytes.length != Utils.transferSize)
+                                        dataBytes = new byte[Utils.transferSize];
+                                    dataBytes[0] = 1;
+                                    raf.read(dataBytes, 1, dataBytes.length - 1);
+                                    data = new BigInteger(dataBytes);       
+                                    data = data.multiply(BigInteger.valueOf(c.getCoefficient()));
+                                    encodedData = encodedData.add(data);
+                                }
+        
+                                more.setPacketType(MOREPacket.RETURN_PACKET);
+                                more.setEncodedData(encodedData);
+                                outBytes = generateTCPPacket(inPacket.getSeqNum(), more.bytes(), false, false, time_req);
+                                logger.info("Sending ACK " + (toAck.isEmpty() ? nextSeqNum : Collections.min(toAck)) + " + Encoded Data to (" + dstAddress + ", " + dstPort + ")");
+                                Arrays.fill(dataBytes, (byte) 0);
                             }
-    
-                            more.setPacketType(MOREPacket.RETURN_PACKET);
-                            more.setEncodedData(encodedData);
-                            outBytes = generateTCPPacket(inPacket.getSeqNum(), more.bytes(), false, false, time_req);
-                            logger.info("Sending ACK + Encoded Data to (" + dstAddress + ", " + dstPort + ")");
-                            Arrays.fill(dataBytes, (byte) 0);
+                            
                         }
                     }
                     responder.socket.send(new DatagramPacket(outBytes, outBytes.length, dstAddress, responder.routerPort));

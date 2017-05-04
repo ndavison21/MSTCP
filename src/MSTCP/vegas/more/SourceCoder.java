@@ -249,6 +249,7 @@ public class SourceCoder extends Thread {
             }
         }
     }
+    
     public int nextCoefficient() {
         return random.nextInt( (2 * Short.MAX_VALUE) + 1) - Short.MAX_VALUE;
     }

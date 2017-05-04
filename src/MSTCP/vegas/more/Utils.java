@@ -12,6 +12,8 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 public final class Utils {
+    public static Logger logger;
+    
     public static final int DATA_ENUM = 0;
     public static final int SYN_ENUM  = 1;
     public static final int FIN_ENUM  = 2;
@@ -23,11 +25,11 @@ public final class Utils {
     public static final boolean localhost    = true;  // get public or local IP
     public static final Random rand          = new Random();
     
-    public static final double p_smooth      = 0.1;   // smoothing factor for monitoring drop rate
+    public static final double p_smooth      = 0.05;   // smoothing factor for monitoring drop rate
 
     public static final int noOfPaths       = 2;  // number of paths available to each source
     public static final int noOfSources     = 2;  // number of sources available
-    public static final int noOfConnections = 1;  // number of connections the requester should start up
+    public static final int noOfConnections = 2;  // number of connections the requester should start up
     
     public static final int batchSize     = 16;   // to keep matrix sizes small we send blocks in smaller groups
     public static final int batchElements = 8;    // number of blocks to include in each request
@@ -97,15 +99,19 @@ public final class Utils {
 
         return address;
     }
-
+    
     public static Logger getLogger(String filename) {
+        return getLogger(filename, Level.ALL);
+    }
+
+    public static Logger getLogger(String filename, Level level) {
         Logger logger = Logger.getLogger(filename);
         try {
             FileHandler handler = new FileHandler("./logs/" + filename + ".log", 1048576, 1, true);
             handler.setFormatter(new SimpleFormatter());
             logger.setUseParentHandlers(false);
             logger.addHandler(handler);
-            logger.setLevel(Level.ALL);
+            logger.setLevel(level);
         } catch (SecurityException | IOException e) {
             System.err.println("MSTCPReceiver: Unable to Connect to Logger");
             e.printStackTrace();
