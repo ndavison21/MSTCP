@@ -32,6 +32,7 @@ public class MSTCPSocket {
                 }
                 
                 logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
                 System.exit(1);
             }
         }
@@ -54,9 +55,11 @@ public class MSTCPSocket {
                 }
             } catch (InterruptedException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
                 System.exit(1);
             } catch (IOException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
                 System.exit(1);
             }
         }
@@ -69,6 +72,7 @@ public class MSTCPSocket {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {
                     logger.log(Level.SEVERE, e.getMessage(), e);
+                    e.printStackTrace();
                     System.exit(1);
                 }
             }

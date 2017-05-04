@@ -80,6 +80,7 @@ public class MSTCPReceiverConnection extends Thread {
             } catch (Exception e) {
             	logger.warning(connectionID + ": SYNTimeout: Exception while trying to send SYN.");
             	logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
             	return;
             }
         }
@@ -153,6 +154,7 @@ public class MSTCPReceiverConnection extends Thread {
         } catch (Exception e) {
         	logger.warning(connectionID + ": Exception Received while Establishing Connection");
         	logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             return false;
         }
     }
@@ -187,6 +189,7 @@ public class MSTCPReceiverConnection extends Thread {
             } catch (Exception e) {
             	logger.warning(connectionID + ": Timeout: Exception while trying to send SYN");
             	logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
             }
         }
     }
@@ -274,6 +277,7 @@ public class MSTCPReceiverConnection extends Thread {
             } catch (Exception e) {
             	logger.warning(connectionID + ": InThread: Exception Encountered while Receiving Data.");
             	logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
             	return;
             } finally {
                 inSocket.close();
@@ -349,6 +353,7 @@ public class MSTCPReceiverConnection extends Thread {
             } catch (Exception e) {
                 logger.warning(connectionID + ": InThread: Exception Encountered while Receiving Data.");
                 logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
                 return;
             } finally {
                 outSocket.close();

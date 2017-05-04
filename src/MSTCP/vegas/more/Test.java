@@ -55,7 +55,7 @@ public class Test {
                 (new Thread() {
                     public void run() {
                         try {
-                            new MiddleForwarder(port1, 10, 0.01);
+                            new MiddleForwarder(port1, 0, 0.1);
                         } catch (SocketException e) {
                             e.printStackTrace();
                             System.exit(1);
@@ -67,7 +67,7 @@ public class Test {
                 (new Thread() {
                     public void run() {
                         try {
-                            new MiddleForwarder(port2, 30, 0.1);
+                            new MiddleForwarder(port2, 0, 0.1);
                         } catch (SocketException e) {
                             e.printStackTrace();
                             System.exit(1);
@@ -81,7 +81,7 @@ public class Test {
                 (new Thread() {
                     public void run() {
                         try {
-                            new ResponderForwarder(port);
+                            new ResponderForwarder(port, Integer.MAX_VALUE);
                         } catch (SocketException e) {
                             e.printStackTrace();
                             System.exit(1);
@@ -95,7 +95,7 @@ public class Test {
             
             File logs = new File("./logs");
             
-            for(int k=0; k<1000; k++) {
+            for(int k=0; k<1; k++) {
             //for (String file: files) {
 
                 for(File log: logs.listFiles()) 

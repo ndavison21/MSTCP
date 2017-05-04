@@ -107,6 +107,7 @@ public class MSTCPReceiver {
         } catch (Exception e) {
             logger.warning("Exception Received while Establishing Connection");
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
         }
 
     }

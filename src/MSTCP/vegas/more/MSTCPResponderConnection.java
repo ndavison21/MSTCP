@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -57,6 +58,7 @@ public class MSTCPResponderConnection {
                         new DatagramPacket(finBytes, finBytes.length, InetAddress.getByName(responder.recvAddr), responder.routerPort));
             } catch (IOException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
                 System.exit(1);
             }
         }
@@ -68,8 +70,9 @@ public class MSTCPResponderConnection {
             tcpPacket.setSYN();
         if (fin)
             tcpPacket.setFIN();
-
-        tcpPacket.setACK(toAck.isEmpty() ? nextSeqNum : toAck.removeFirst());
+        
+        int ack = toAck.isEmpty() ? nextSeqNum : Collections.min(toAck);
+        tcpPacket.setACK(ack);
 
         tcpPacket.setTime_req(time_req);
         tcpPacket.setTime_ack();
@@ -77,7 +80,7 @@ public class MSTCPResponderConnection {
     }
 
     public MSTCPResponderConnection(TCPPacket syn, MSTCPResponder responder, int time_req, int recvPort) {
-        this.logger = responder.logger; // TODO: its own logger or prefix logging messages?
+        this.logger = responder.logger;
 
         try {
 
@@ -137,12 +140,13 @@ public class MSTCPResponderConnection {
                             stopTimer();
                             break;
                         } else { // normal request packet
-                            if (inPacket.getSeqNum() == nextSeqNum)
-                                nextSeqNum++;
-                            else if (inPacket.getSeqNum() > nextSeqNum) {
-                                toAck.add(inPacket.getSeqNum());
-                                nextSeqNum = inPacket.getSeqNum() + 1;
+                            if (inPacket.getSeqNum() > nextSeqNum) {
+                                for (int a=nextSeqNum; a<inPacket.getSeqNum(); a++)
+                                    toAck.add(a);
+                            } else if (toAck.contains(inPacket.getSeqNum())) {
+                                toAck.remove((Integer) inPacket.getSeqNum());
                             }
+                            nextSeqNum = Math.max(nextSeqNum, inPacket.getSeqNum() + 1);
     
                             logger.info("Received packet " + inPacket.getSeqNum());
     
@@ -181,6 +185,7 @@ public class MSTCPResponderConnection {
 
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             System.exit(1);
         } finally {
             try {
@@ -188,6 +193,7 @@ public class MSTCPResponderConnection {
                     raf.close();
             } catch (IOException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
                 System.exit(1);
             }
             logger.info("Completed connection.");

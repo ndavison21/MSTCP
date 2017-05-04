@@ -34,6 +34,7 @@ public class MSTCPForwarder {
             this.localhost = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             System.exit(1);
         }
         
@@ -82,6 +83,7 @@ public class MSTCPForwarder {
             }
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             System.exit(1);
         }
     }

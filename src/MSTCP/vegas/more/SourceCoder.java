@@ -40,6 +40,7 @@ public class SourceCoder extends Thread {
                 processPacket(receivedPackets.take());
         } catch (InterruptedException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             System.exit(1);
         }
     }

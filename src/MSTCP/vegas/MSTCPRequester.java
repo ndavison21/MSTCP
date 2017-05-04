@@ -83,6 +83,7 @@ public class MSTCPRequester {
             connectionToBlockQueue.put(new ConnectionToRequestMap(recvPort, nextBlock));
         } catch (InterruptedException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             System.exit(1);
         }
         return nextBlock++;

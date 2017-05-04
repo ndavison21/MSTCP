@@ -34,9 +34,12 @@ public class RequesterForwarder {
             this.localhost = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             System.exit(1);
         }
         
+        logger.info("Started RequesterForwarder on port " + recvPort);
+
         DatagramPacket data;
         try {
         
@@ -47,8 +50,35 @@ public class RequesterForwarder {
 
                 int nextPort;
                 if (tcpPacket.verifyChecksum()) { // if it's corrupted we may as well just drop now
+                    switch (tcpPacket.getDestPort()) { // TODO: delay and drop
+                        case 14000:
+                            nextPort = 14000;
+                            break;
+                        case 14001:
+                            nextPort = 14001;
+                            break;
+                        case 14002:
+                            nextPort = 14002;
+                            break;
+                        case 14003:
+                            nextPort = 14003;
+                            break;
+                        case 16000:
+                            nextPort = 15001;
+                            break;
+                        case 16001:
+                            nextPort = 15002;
+                            break;
+                        case 16002:
+                            nextPort = 15003;
+                            break;
+                        case 16003:
+                            nextPort = 15004;
+                            break;
+                        default:
+                            nextPort = tcpPacket.getDestPort();
+                    }
                     if (MOREPacket.getPacketType(tcpPacket.getData()) == MOREPacket.RETURN_PACKET) { // only interested in return packets
-                        nextPort = tcpPacket.getDestPort();
                         if (tcpPacket.isACK()) {
                             if (tcpPacket.isFIN()) { // if FIN+ACK
                                 flowBuffer.remove(MOREPacket.getFlowID(tcpPacket.getData())); // delete buffer
@@ -67,22 +97,6 @@ public class RequesterForwarder {
                             }
                         }
                     } else {
-                        switch (tcpPacket.getDestPort()) { // TODO: delay and drop
-                            case 16000:
-                                nextPort = 15001;
-                                break;
-                            case 16001:
-                                nextPort = 15002;
-                                break;
-                            case 16002:
-                                nextPort = 15003;
-                                break;
-                            case 16003:
-                                nextPort = 15004;
-                                break;
-                            default:
-                                nextPort = tcpPacket.getDestPort();
-                        }
                         
                         if (tcpPacket.isSYN() && tcpPacket.isACK()) { // if SYN+ACK
                             // initialise buffer for innovative packets
@@ -102,6 +116,7 @@ public class RequesterForwarder {
             }
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             System.exit(1);
         }
     }

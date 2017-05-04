@@ -57,6 +57,7 @@ public class MSTCPResponder {
                 socket.send(new DatagramPacket(finBytes, finBytes.length, InetAddress.getByName(srcInfo.address), srcInfo.port));
             } catch (IOException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
                 System.exit(1);
             }
         }
@@ -86,6 +87,7 @@ public class MSTCPResponder {
             logger.info("Starting MSTCPResponder on (" + InetAddress.getByName(srcInfo.address) + ", " + recvPort + ")");
         } catch (UnknownHostException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             System.exit(1);
         }
         
@@ -197,6 +199,7 @@ public class MSTCPResponder {
         
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             System.exit(1);
         }
         

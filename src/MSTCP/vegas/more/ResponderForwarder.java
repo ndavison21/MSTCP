@@ -17,6 +17,9 @@ public class ResponderForwarder {
     
     InetAddress localhost; // used for network emulation, in practice get destination address from IP layer
     
+    int packets = 0;
+    final int packetLimit;
+    
     private class FlowData { // class to store data and functionalilty for flow
         // final int flowID;
         final NetworkCoder networkCoder;
@@ -28,43 +31,69 @@ public class ResponderForwarder {
     }
     
     public ResponderForwarder(int recvPort) throws SocketException {
+        this(recvPort, Integer.MAX_VALUE);
+    }
+    
+    public ResponderForwarder(int recvPort, int packetLimit) throws SocketException {
         this.logger = Utils.getLogger(this.getClass().getName() + "_" + recvPort);
         this.socket = new MSTCPSocket(logger, recvPort);
+        this.packetLimit = packetLimit;
         try {
             this.localhost = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             System.exit(1);
         }
+        
+        logger.info("Started ResponderForwarder on port " + recvPort + " packet limit " + packetLimit);
         
         DatagramPacket data;
         try {
         
             for (;;) {
                 data = socket.receive(); // TODO: get from pcap
+                if (packets > packetLimit) {
+                    logger.info("Received more than " + packetLimit + " packets. Not processing any more.");
+                    continue;
+                } else {
+                    logger.info("Received " + packets + " packets");
+                }
                 TCPPacket tcpPacket = new TCPPacket(data.getData());
                 InetAddress destAddr = data.getAddress(); // TODO: get from IP layer
 
                 int nextPort;
-                if (tcpPacket.verifyChecksum()) { // if it's corrupted we may as well just drop now
+                if (tcpPacket.verifyChecksum()) { // if it's corrupted we may as well just drop now                        
+                    switch (tcpPacket.getDestPort()) { // TODO: delay and drop
+                        case 14000:
+                            nextPort = 15001;
+                            break;
+                        case 14001:
+                            nextPort = 15002;
+                            break;
+                        case 14002:
+                            nextPort = 15003;
+                            break;
+                        case 14003:
+                            nextPort = 15004;
+                            break;
+                        case 16000:
+                            nextPort = 16000;
+                            break;
+                        case 16001:
+                            nextPort = 16001;
+                            break;
+                        case 16002:
+                            nextPort = 16002;
+                            break;
+                        case 16003:
+                            nextPort = 16003;
+                            break;
+                        default:
+                            nextPort = tcpPacket.getDestPort();
+                    }
                     if (MOREPacket.getPacketType(tcpPacket.getData()) == MOREPacket.RETURN_PACKET) { // only interested in return packets
-                        
-                        switch (tcpPacket.getSrcPort()) { // TODO: delay and drop
-                            case 16000:
-                                nextPort = 15001;
-                                break;
-                            case 16001:
-                                nextPort = 15002;
-                                break;
-                            case 16002:
-                                nextPort = 15003;
-                                break;
-                            case 16003:
-                                nextPort = 15004;
-                                break;
-                            default:
-                                nextPort = tcpPacket.getDestPort();
-                        }
+
                         if (tcpPacket.isACK()) {
                             if (tcpPacket.isFIN()) { // if FIN+ACK
                                 flowBuffer.remove(MOREPacket.getFlowID(tcpPacket.getData())); // delete buffer
@@ -83,7 +112,7 @@ public class ResponderForwarder {
                             }
                         }
                     } else {
-                        nextPort = tcpPacket.getDestPort();
+                        packets++;
                         
                         if (tcpPacket.isSYN() && tcpPacket.isACK()) { // if SYN+ACK
                             // initialise buffer for innovative packets
@@ -103,6 +132,7 @@ public class ResponderForwarder {
             }
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             System.exit(1);
         }
     }

@@ -88,6 +88,7 @@ public class NetworkCoder {
             }
         } catch (InterruptedException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             System.exit(1);
         }
         

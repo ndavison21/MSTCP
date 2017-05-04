@@ -202,6 +202,7 @@ public class MSTCPSender {
         } catch (Exception e) {
             logger.warning(recvPort + ": Exception encountered.");
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             return;
         }
        

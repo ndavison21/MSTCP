@@ -23,11 +23,11 @@ public final class Utils {
     public static final boolean localhost    = true;  // get public or local IP
     public static final Random rand          = new Random();
     
-    public static final double p_smooth      = 0.2;   // smoothing factor for monitoring drop rate
+    public static final double p_smooth      = 0.1;   // smoothing factor for monitoring drop rate
 
     public static final int noOfPaths       = 2;  // number of paths available to each source
     public static final int noOfSources     = 2;  // number of sources available
-    public static final int noOfConnections = 4;  // number of connections the requester should start up
+    public static final int noOfConnections = 1;  // number of connections the requester should start up
     
     public static final int batchSize     = 16;   // to keep matrix sizes small we send blocks in smaller groups
     public static final int batchElements = 8;    // number of blocks to include in each request
@@ -46,10 +46,11 @@ public final class Utils {
     public static final int dataAttempts = 3;
     public static final int dataTimeout  = debug ? Integer.MAX_VALUE : 1000;
     public static final int finAttempts  = 3;
-    public static final int finTimeout   = debug ? Integer.MAX_VALUE : 500;
+    public static final int finTimeout   = debug ? Integer.MAX_VALUE : 200;
 
     // congestion control parameter TODO: understand what this represents
     public static final int total_alpha = 10;
+    public static final int gamma       = 5; // parameter for exiting slow starting
 
     public static String getIPAddress(Logger logger) {
         if (localhost)
@@ -65,6 +66,7 @@ public final class Utils {
             addr = in.readLine(); // gets the IP as a string
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             System.exit(1);
         }
 
@@ -89,6 +91,7 @@ public final class Utils {
             }
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             System.exit(1);
         }
 

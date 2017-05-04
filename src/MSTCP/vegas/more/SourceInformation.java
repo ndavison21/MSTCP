@@ -6,6 +6,7 @@ import java.util.HashMap;
 public class SourceInformation {
     String address;
     HashMap<Integer, Boolean> ports = new HashMap<Integer, Boolean>();
+    HashMap<Integer, Boolean> tried = new HashMap<Integer, Boolean>();
     byte connected = 0;
     
     public byte[] bytes() {
@@ -22,9 +23,9 @@ public class SourceInformation {
      
     public SourceInformation(String address, int[] ports) {
         this.address = address;
-        this.ports = new HashMap<Integer, Boolean>(ports.length);
         for (int port: ports) {
             this.ports.put(port, false);
+            this.tried.put(port, false);
         }
     }
     
@@ -35,8 +36,12 @@ public class SourceInformation {
         byte[] addr = new byte[bb.getInt()]; // length array returned by InetAddress.getBytes()
         bb.get(addr);
         this.address = new String(addr);
-        while (bb.remaining() > 1)
-            this.ports.put(bb.getInt(), bb.get() == 1);
+        while (bb.remaining() > 1) {
+            int port = bb.getInt();
+            byte connected = bb.get();
+            this.ports.put(port, connected == 1);
+            this.tried.put(port, connected == 1);
+        }
         this.connected = bb.get();
     }
     

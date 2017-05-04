@@ -7,7 +7,8 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,11 +26,12 @@ public class MSTCPRequesterConnection extends Thread {
     final InThread inThread;
     final OutThread outThread;
     
-    LinkedBlockingQueue<TCPPacket> sentRequests;
+    ConcurrentHashMap<Integer, TCPPacket> sentRequests;
     
     Timer timer;
     int synAttempts = 0;
     int dataAttempts = 0;
+    int finAttempts = 0;
     
     // rtt measurements
     int time_recv    = -1;
@@ -42,25 +44,26 @@ public class MSTCPRequesterConnection extends Thread {
     double diff      = -1; // difference of previous RTT to the base rtt (i.e. measure of congestion)
     
     // congestion control
-    boolean slowstart = false; // TODO: Implement slow start
-    int ssthresh      = Integer.MAX_VALUE;
-    int cwnd          = 2;
-    double cwnd_true  = 2.0;
-    double alpha      = 2;
-    double weight     = 0;
-    double q          = -1;
-    double queue_delay     = 0;
-    double backoff_factor  = -1;
+    boolean slowstart  = true; // TODO: Implement slow start
+    double ssthresh    = Integer.MAX_VALUE;
+    int cwnd           = 2;
+    double cwnd_true   = 2.0;
+    double alpha       = 2;
+    double weight      = 0;
+    double q           = -1;
+    double queue_delay = 0;
+    double backoff_factor   = -1;
     Double equilibrium_rate = 0.0;
     
     // tracking whether connection is still active
     public Bool active = new Bool(true);
+    // public Bool startup = new Bool(true);
     
     // calculating redundancy to send
     double p_drop = 1.0/3.0; // approximate at 1/3 to begin with
     
     // fast retransmit
-    LinkedBlockingQueue<Integer> toRetransmit; // sequence number of packets to retransmit
+    ConcurrentLinkedQueue<Integer> toRetransmit; // sequence number of packets to retransmit
     
     
     final Integer initialSeqNum = Utils.rand.nextInt(1000);
@@ -105,25 +108,32 @@ public class MSTCPRequesterConnection extends Thread {
     }
     
     public void sendFIN(boolean ack) {
-        int rpt = 1;
-        MOREPacket more = new MOREPacket(requester.mstcpInformation.flowID, MOREPacket.FORWARD_PACKET);
-        TCPPacket fin = new TCPPacket(recvPort, dstPort, nextSeqNum, cwnd, more.bytes());
-        fin.setFIN();
-        if (ack) {
-            rpt = 20; // send it a few times to make sure it gets there
-            fin.setACK(nextSeqNum);
-            logger.info("Received FIN + ACK. Sending ACK to (" + dstAddr + ", " + dstPort + ")");
-        } else {
-            logger.info("Sending FIN to (" + dstAddr + ", " + dstPort + ")");
-            setTimer(Utils.FIN_ENUM);
-        }
-        byte[] finBytes = fin.bytes();
-        
         try {
+            if (!ack && finAttempts > Utils.finAttempts) {
+                for (int i=0; i<20; i++)
+                    socket.send(new DatagramPacket(new byte[0], 0, requester.recvAddr, this.recvPort));
+                return;
+            }
+            int rpt = 1;
+            MOREPacket more = new MOREPacket(requester.mstcpInformation.flowID, MOREPacket.FORWARD_PACKET);
+            TCPPacket fin = new TCPPacket(recvPort, dstPort, nextSeqNum, cwnd, more.bytes());
+            fin.setFIN();
+            if (ack) {
+                rpt = 20; // send it a few times to make sure it gets there
+                fin.setACK(nextSeqNum);
+                logger.info("Received FIN + ACK. Sending ACK to (" + dstAddr + ", " + dstPort + ")");
+            } else {
+                logger.info("Sending FIN to (" + dstAddr + ", " + dstPort + ")");
+                setTimer(Utils.FIN_ENUM);
+                finAttempts++;
+            }
+            byte[] finBytes = fin.bytes();
+        
             for(int i=0; i<rpt; i++)
                 socket.send(new DatagramPacket(finBytes, finBytes.length, dstAddr, routerPort));
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             System.exit(1);
         }
     }
@@ -141,16 +151,33 @@ public class MSTCPRequesterConnection extends Thread {
             
             sendFIN(false);
             
+            boolean ack = false;
             for (;;) {
                 inPkt = socket.receive();
+                
+                synchronized(requester.total_rate) {
+                    requester.total_rate -= equilibrium_rate;
+                    equilibrium_rate = 0.0;
+                    queue_delay = 0;
+                }
+                
+                if (inPkt.getData() != null && inPkt.getLength() == 0)
+                    break;
+                
                 in = new TCPPacket(inPkt.getData());
                 
-                if (in.verifyChecksum() && in.isACK() && in.getSeqNum() == nextSeqNum)
+                if (in.verifyChecksum() && in.isACK() && in.getSeqNum() == nextSeqNum) {
+                    ack = true;
                     break;
+                }
             }
             
             stopTimer();
-            sendFIN(true);
+            if (ack)
+                sendFIN(true);
+            
+//            active.b = false;
+//            active.notifyAll();
         
         } finally {
             synchronized(socket) {
@@ -170,67 +197,77 @@ public class MSTCPRequesterConnection extends Thread {
         }
     }
     
-    private boolean sendSYN() {
-        if (synAttempts > Utils.synAttempts) {
-            synchronized(active) {
-                logger.info("SYN limit reached. Giving up.");
-                active.b = false;
-                active.notifyAll();
-                return false;
-            }
-        }
-            
-        logger.info("Sending SYN " + synAttempts + " to (" + dstAddr.toString() + ", " + dstPort + ")");
-        TCPPacket synPacket = new TCPPacket(recvPort, dstPort, nextSeqNum, cwnd);
-        synPacket.setSYN();
-        
-        MSTCPInformation msInfo = requester.mstcpInformation;
-        msInfo.recvPort = this.recvPort;
-        synPacket.setData(msInfo.bytes());
-        synPacket.setTime_req();
-        
-        byte[] synBytes = synPacket.bytes();
+    private void sendSYN() {
         try {
+            if (synAttempts > Utils.synAttempts) {
+                    logger.info("SYN limit reached. Giving up.");
+                    socket.send(new DatagramPacket(new byte[]{0}, 0, requester.recvAddr, this.recvPort));
+                    return;
+            }
+                
+            logger.info("Sending SYN " + synAttempts + " to (" + dstAddr.toString() + ", " + dstPort + ")");
+            TCPPacket synPacket = new TCPPacket(recvPort, dstPort, nextSeqNum, cwnd);
+            synPacket.setSYN();
+            
+            MSTCPInformation msInfo = requester.mstcpInformation;
+            msInfo.recvPort = this.recvPort;
+            synPacket.setData(msInfo.bytes());
+            synPacket.setTime_req();
+            
+            byte[] synBytes = synPacket.bytes();
             socket.send(new DatagramPacket(synBytes, synBytes.length, dstAddr, routerPort));
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
-            return false;
+            e.printStackTrace();
+            System.exit(1);
         }
         synAttempts++;
-        setTimer(Utils.SYN_ENUM);
-        return true;
-        
+        setTimer(Utils.SYN_ENUM);        
     }
     
     private boolean establishConnection() {
         DatagramPacket inPkt;
+        boolean success = false;
         
-        if (sendSYN()) {
-            for (;;) {
-                inPkt = socket.receive();
-                
-                time_recv = (int) System.currentTimeMillis() % Integer.MAX_VALUE;
-                TCPPacket tcpPacket = new TCPPacket(inPkt.getData());
-                if (tcpPacket.verifyChecksum() && tcpPacket.isSYN() && tcpPacket.isACK() && tcpPacket.getACK() == initialSeqNum) {
-                    stopTimer();
-                    time_ack = time_recv - tcpPacket.getTime_ack();
-                    if (time_ack < 0)
-                        time_ack = time_recv + Integer.MAX_VALUE - tcpPacket.getTime_ack();
-                    base_rtt = time_ack + tcpPacket.getTime_req();
-                    logger.info("Received SYN + ACK. RTT: " + base_rtt);
-                    requester.mstcpInformation.update(new MSTCPInformation(tcpPacket.getData()));
-                    if (requester.sourceCoder == null) {
-                    	requester.sourceCoder = new SourceCoder(requester.logger, requester.mstcpInformation.fileSize);
-                    	
-                    	requester.nextBatchReqs = Math.min(Utils.batchSize, requester.sourceCoder.fileBlocks);
-                    }
-                    this.active.b = true;
-                    return true;
-                }
-                
+        sendSYN();
+        
+        for (;;) {
+            inPkt = socket.receive();
+            
+            time_recv = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
+            TCPPacket tcpPacket = new TCPPacket(inPkt.getData());
+            if (inPkt.getData() != null && inPkt.getLength() == 0) { // poison pill shutdown
+//                try {
+//                    socket.send(inPkt); // poison pill shutdown
+//                    this.active.b = false;
+//                } catch (IOException e) {
+//                    logger.log(Level.SEVERE, e.getMessage(), e);
+//                    e.printStackTrace();
+//                    System.exit(1);
+//                }
+                break;
             }
+            
+            if (tcpPacket.verifyChecksum() && tcpPacket.isSYN() && tcpPacket.isACK() && tcpPacket.getACK() == initialSeqNum) {
+                stopTimer();
+                time_ack = time_recv - tcpPacket.getTime_ack();
+                if (time_ack < 0)
+                    time_ack = time_recv + Integer.MAX_VALUE - tcpPacket.getTime_ack();
+                base_rtt = time_ack + tcpPacket.getTime_req();
+                logger.info("Received SYN + ACK. RTT: " + base_rtt);
+                requester.mstcpInformation.update(new MSTCPInformation(tcpPacket.getData()));
+                if (requester.sourceCoder == null) {
+                	requester.sourceCoder = new SourceCoder(requester.logger, requester.mstcpInformation.fileSize);
+                	
+                	requester.nextBatchReqs = Math.min(Utils.batchSize, requester.sourceCoder.fileBlocks);
+                }
+                success = true;
+                break;
+            }
+            
         }
-        return false;
+        
+        return success;
     }
     
     /**
@@ -238,43 +275,52 @@ public class MSTCPRequesterConnection extends Thread {
      * @throws InterruptedException 
      */
     
-    private void retransmit() throws InterruptedException {
-        TCPPacket req = null;
-        synchronized (sentRequests) {
-            req = sentRequests.take();
-            if (toRetransmit.contains(req.getSeqNum()) || req == null)
-                return;
-            else
-                toRetransmit.put(req.getSeqNum());
-        }
+    private void retransmit(Integer seqNum) throws InterruptedException {
+        if (toRetransmit.contains(seqNum))
+            return;
+        else
+            toRetransmit.add(seqNum);
         
-        logger.info("Retransmitting packet " + req.getSeqNum());
+        logger.info("Retransmitting packet " + seqNum);
         synchronized (equilibrium_rate) {
-            equilibrium_rate = 0.0;
-            queue_delay = 0;
+            synchronized(requester.total_rate) {
+                requester.total_rate -= equilibrium_rate;
+                equilibrium_rate = 0.0;
+                queue_delay = 0;
+            }
         }
-        initialSeqNum.notifyAll();
+        synchronized (initialSeqNum) {
+            initialSeqNum.notifyAll();
+        }
     }
     
     private void goBackN() {
         if (dataAttempts > Utils.dataAttempts) {
-            logger.info("Data limit reached. Giving up.");
-            active.b = false;
-            active.notifyAll();
+            synchronized(active) {
+                logger.info("Data limit reached. Giving up.");
+                active.b = false;
+                active.notifyAll();
+            }
             return;
         }
         
         logger.info("Data Time Out. Resending all packets.");
 
         synchronized (equilibrium_rate) {
-            equilibrium_rate = 0.0;
-            queue_delay = 0;
+            synchronized(requester.total_rate) {
+                requester.total_rate -= equilibrium_rate;
+                equilibrium_rate = 0.0;
+                queue_delay = 0;
+            }
         }
         
         toRetransmit.clear();
         sentRequests.clear();   
         
         synchronized(initialSeqNum) {
+            cwnd_true = 2;
+            cwnd = (int) cwnd_true;
+            slowstart = true;
             rttSeqNum = nextSeqNum + cwnd;
             sampled_num = 0;
             sampled_rtt = 0;
@@ -282,6 +328,7 @@ public class MSTCPRequesterConnection extends Thread {
             nextSeqNum = base;
             initialSeqNum.notifyAll();
         }
+        //setTimer(Utils.DATA_ENUM);
         dataAttempts++;
     }
     
@@ -297,9 +344,9 @@ public class MSTCPRequesterConnection extends Thread {
             
             try {
                 for (;;) {
-                    logger.info("Waiting for next ACK + Data");
+//                    logger.info("Waiting for next ACK + Data");
                     data = socket.receive();
-                    if (this.isInterrupted())
+                    if (this.isInterrupted() || data == null)
                         return;
                     time_recv = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
                     
@@ -311,20 +358,41 @@ public class MSTCPRequesterConnection extends Thread {
                     if (tcpPacket.verifyChecksum() && tcpPacket.isACK() && base <= tcpPacket.getSeqNum()) { // if packet is corrupted there's not much we can do...
                         dataAttempts = 0;
                         double mult = 1.0;
-                        if (tcpPacket.getACK() < tcpPacket.getSeqNum()) { // duplicate ACK, may need to retransmit
-                            double timeout = Utils.debug ? Integer.MAX_VALUE : sentRequests.peek().getTime_req() + (2 * rtt);
-                            if (timeout < 0)
-                                timeout = (2 * rtt) - (Integer.MAX_VALUE - sentRequests.peek().getTime_req());
-                            if ((System.currentTimeMillis() % Integer.MAX_VALUE) > timeout) {
-                                int losses = tcpPacket.getSeqNum() - tcpPacket.getACK();
-                                mult = Math.pow(1.0 - Utils.p_smooth, losses);
-                                retransmit();
+                        
+                        
+                        if (tcpPacket.getACK() < tcpPacket.getSeqNum() || tcpPacket.getSeqNum() > base) {
+                            int retransmit;
+                            if (tcpPacket.getACK() < tcpPacket.getSeqNum()) {
+                                retransmit = tcpPacket.getACK();
+                            } else {
+                                retransmit = base;
                             }
+                            double timeout = false ? Integer.MAX_VALUE : sentRequests.get(retransmit).getTime_req() + (2 * rtt);
+                            if (timeout < 0)
+                                timeout = (2 * rtt) - (Integer.MAX_VALUE - sentRequests.get(retransmit).getTime_req());
+                            
+                            if ((System.currentTimeMillis() % Integer.MAX_VALUE) > timeout) {
+                                mult = 1.0 - Utils.p_smooth;
+                                retransmit(retransmit);
+                            }
+                                
+                        }
+                        
+                        
+                        if (tcpPacket.getSeqNum() == base) { // packet received in order
+                            base = tcpPacket.getACK();
                         }
 
-                        p_drop = ( p_drop * mult * (1 - Utils.p_smooth) ) + (1 - mult);
-                        
                         sentRequests.remove(tcpPacket);
+                        if (base == nextSeqNum)
+                            stopTimer(); // no outstanding requests so stop timer
+                        else
+                            setTimer(Utils.DATA_ENUM); // otherwise start waiting for next response
+
+                        
+                        p_drop = ( p_drop * mult * (1 - Utils.p_smooth) ) + (1 - mult);
+                        p_drop = Math.min(1, p_drop);
+                        System.out.println(p_drop);
                         
                         time_ack = time_recv - tcpPacket.getTime_ack();
                         if (time_ack < 0)
@@ -341,40 +409,50 @@ public class MSTCPRequesterConnection extends Thread {
                             if (tcpPacket.getSeqNum() == rttSeqNum) { // end of a round: do congestion control
                                 // average RTT on the last round
                                 rtt = ((double) sampled_rtt) / sampled_num;
-                                diff = cwnd_true * ( ( rtt - base_rtt ) / rtt );
-                                
-                                // tweak weights and alphas
-                                if (diff >= alpha) {
-                                    synchronized (requester.total_rate) {
-                                        requester.total_rate -= equilibrium_rate;
-                                        synchronized (equilibrium_rate) {
-                                            equilibrium_rate = cwnd_true / rtt;
+                                diff = cwnd_true * ((rtt - base_rtt) / rtt);
+                                                                
+                                if (slowstart) {
+                                    cwnd_true += sampled_num;
+                                    if (cwnd_true >= ssthresh || diff > Utils.gamma) {
+                                        logger.info("Entering Congestion Avoidance Phase.");
+                                        slowstart = false;
+                                        if (diff > Utils.gamma)
+                                            ssthresh = cwnd_true - 1;
+                                        else
+                                            cwnd_true = ssthresh;
+                                    }
+                                } else {
+                                    // tweak weights and alphas
+                                    if (diff >= alpha) {
+                                        synchronized (requester.total_rate) {
+                                            requester.total_rate -= equilibrium_rate;
+                                            synchronized (equilibrium_rate) {
+                                                equilibrium_rate = cwnd_true / rtt;
+                                            }
+                                            requester.total_rate += equilibrium_rate;
                                         }
-                                        requester.total_rate += equilibrium_rate;
+                                        
+                                        requester.adjust_weights();
+                                        alpha = Math.max(2, weight * requester.total_alpha);
                                     }
                                     
-                                    requester.adjust_weights();
-                                    alpha = weight * requester.total_alpha;
-                                    if (alpha < 2) // lower bound
-                                        alpha = 2;
-                                }
-                                
-                                // window adjustment
-                                if (diff < alpha)
-                                    cwnd_true++;
-                                else
-                                    cwnd_true--;
-                                
-                                // try to drain queues if needed
-                                q = rtt - base_rtt;
-                                synchronized (equilibrium_rate) {
-                                    if (queue_delay == 0 || queue_delay > q)
-                                        queue_delay = q;
+                                    // window adjustment
+                                    if (diff < alpha)
+                                        cwnd_true++;
+                                    else if (diff > alpha)
+                                        cwnd_true--;
                                     
-                                    if (q > 2 * queue_delay) {
-                                        backoff_factor = 0.5 * (base_rtt / rtt);
-                                        cwnd_true = cwnd_true * backoff_factor;
-                                        queue_delay = 0;
+                                    // try to drain queues if needed
+                                    q = rtt - base_rtt;
+                                    synchronized (equilibrium_rate) {
+                                        if (queue_delay == 0 || queue_delay > q)
+                                            queue_delay = q;
+                                        
+                                        if (q >= 2 * queue_delay) {
+                                            backoff_factor = 0.5 * (base_rtt / rtt);
+                                            cwnd_true = cwnd_true * backoff_factor;
+                                            queue_delay = 0;
+                                        }
                                     }
                                 }
                                 
@@ -390,16 +468,10 @@ public class MSTCPRequesterConnection extends Thread {
                                 sampled_num = 0;
                                 sampled_rtt = 0;
                             }
-                        
-                            base = tcpPacket.getACK();
-                            if (base == nextSeqNum)
-                                stopTimer(); // no outstanding requests so stop timer
-                            else
-                                setTimer(Utils.DATA_ENUM); // otherwise start waiting for next response
                             initialSeqNum.notifyAll();
                         }
                         
-                        logger.info("Received Block from (" + dstAddr + ", " + dstPort + ")");
+                        logger.info("Received Batch from (" + dstAddr + ", " + dstPort + ")");
                         // pass data to receiver
                         if (!requester.transfer_complete)
                             requester.sourceCoder.receivedPackets.put(new MOREPacket(tcpPacket.getData()));
@@ -413,6 +485,7 @@ public class MSTCPRequesterConnection extends Thread {
                 }
             } catch (InterruptedException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
                 System.exit(1);
             }
         }
@@ -451,27 +524,31 @@ public class MSTCPRequesterConnection extends Thread {
                     
                     MOREPacket more = new MOREPacket(requester.mstcpInformation.flowID, MOREPacket.FORWARD_PACKET, batch, codeVector);;
                     
-                    int seqNum = (toRetransmit.isEmpty() ? nextSeqNum : toRetransmit.take());
+                    int seqNum = (toRetransmit.isEmpty() ? nextSeqNum : toRetransmit.poll());
                     
                     tcpRequest = new TCPPacket(recvPort, dstPort, seqNum, cwnd);
                     tcpRequest.setData(more.bytes());
-                    if (nextSeqNum == initialSeqNum) {
+                    if (nextSeqNum == base) {
                         setTimer(Utils.DATA_ENUM);
-                        tcpRequest.setACK(initialSeqNum);
+                        if (nextSeqNum == initialSeqNum)
+                            tcpRequest.setACK(initialSeqNum);
                     }
                     tcpRequest.setTime_req();
-                    sentRequests.add(tcpRequest);
+                    sentRequests.put(tcpRequest.getSeqNum(), tcpRequest);
                     
                     logger.info("Sending request for batch " + batch + " to (" + dstAddr + ", " + dstPort + ")");
                     request = tcpRequest.bytes();
-                    synchronized(initialSeqNum) {
-                        nextSeqNum++;
+                    if (seqNum == nextSeqNum) {
+                        synchronized(initialSeqNum) {
+                            nextSeqNum++;
+                        }
                     }
 
                     socket.send(new DatagramPacket(request, request.length, dstAddr, routerPort));
                 }
             } catch(IOException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
                 System.exit(1);
             } catch (InterruptedException e) {
                 logger.log(Level.WARNING, "OutThread Interrupted. " + e.getMessage(), e);
@@ -485,11 +562,21 @@ public class MSTCPRequesterConnection extends Thread {
      * Main Methods
      */
     public void run() {
-        if (establishConnection()) {
-            inThread.start();
-            outThread.start();
-        } else
-            logger.warning("Unable to Start Connection to (" + dstAddr.toString() + ", " + dstPort + ")");
+        //synchronized(startup) {
+            if (establishConnection()) {
+                inThread.start();
+                outThread.start();
+            } else {
+                logger.warning("Unable to Start Connection to (" + dstAddr.toString() + ", " + dstPort + ")");
+                synchronized(active) {
+                    active.b = false;
+                    active.notifyAll();
+                }
+            }
+            
+//            startup.b = false;
+//            startup.notifyAll();
+//        }
     }
     
     public MSTCPRequesterConnection(String addr, int recvPort, int dstPort, MSTCPRequester requester, boolean ms_join) throws UnknownHostException, SocketException {
@@ -505,8 +592,8 @@ public class MSTCPRequesterConnection extends Thread {
         this.requester = requester;
         this.socket = new MSTCPSocket(logger, recvPort);
         
-        this.sentRequests = new LinkedBlockingQueue<TCPPacket>();
-        this.toRetransmit = new LinkedBlockingQueue<Integer>();
+        this.sentRequests = new ConcurrentHashMap<Integer, TCPPacket>();
+        this.toRetransmit = new ConcurrentLinkedQueue<Integer>();
         
         this.inThread = new InThread();
         this.outThread = new OutThread();

@@ -45,11 +45,13 @@ public class MSTCPRequester {
         this.mstcpInformation = new MSTCPInformation(this.recvAddr.getAddress(), recvPort, filename, (new Random()).nextInt());
         this.connections = new Vector<ConnectionHandler>(Utils.noOfSources);
         
+        int routerPort = 15001;
+        
         // Starting first connections
         logger.info("Starting first connection (" + InetAddress.getByName(dstAddr) + ", " + dstPort + ")");
-        MSTCPRequesterConnection conn = new MSTCPRequesterConnection(dstAddr, nextRecvPort++, dstPort, this, false);
+        MSTCPRequesterConnection conn = new MSTCPRequesterConnection(dstAddr, nextRecvPort++, dstPort, routerPort, this, false);
         // networkCoder = new NetworkCoder(logger, mstcpInformation.fileSize, true); TODO: create here rather than in connection
-        connections.addElement(new ConnectionHandler(recvPort, this, conn));
+        connections.addElement(new ConnectionHandler(recvPort, this, conn, routerPort++));
         
         // Start connections with other sources
         synchronized(mstcpInformation) {
@@ -60,8 +62,8 @@ public class MSTCPRequester {
                     for (int port: s.ports.keySet()) {
                         if (!s.ports.get(port)) {
                             logger.info("Connecting to " + s.address + " on port " + port);
-                            conn = new MSTCPRequesterConnection(s.address, nextRecvPort++, port, this, true);
-                            connections.add(new ConnectionHandler(recvPort, this, conn));
+                            conn = new MSTCPRequesterConnection(s.address, nextRecvPort++, port,  routerPort, this, true);
+                            connections.add(new ConnectionHandler(recvPort, this, conn, routerPort++));
                             s.ports.put(port, true);
                             s.connected++;
                             break;
@@ -131,73 +133,96 @@ public class MSTCPRequester {
         MSTCPRequesterConnection conn;
         MSTCPRequester requester;
         boolean closed = false;
+        int routerPort;
         
         public void run() {
             try {
                 for (;;) {
                     synchronized(conn.active) {
-                        while (conn.active.b)
+                        while (!closed && conn.active.b) {
+                            logger.info("Active is True. Waiting.");
                             conn.active.wait();
+                        }
                     }
                     
                     if (closed)
                         break;
                     
                     synchronized(mstcpInformation) {
-                        String prevAddr = conn.dstAddr.toString();
+                        String prevAddr = conn.dstAddr.getHostAddress();
                         int prevPort = conn.dstPort;
+                        
+                        SourceInformation newSource = null;
+                        int newPort = prevPort;
+                        boolean tried = true;
+                        
+                        conn.close();
+                        
                         for (SourceInformation s: mstcpInformation.sources) {
                             if (s.connected < Utils.noOfPaths && s.connected < s.ports.size()) {
-                                for (int port: s.ports.keySet()) {
-                                    if (!s.ports.get(port)) {
-                                        logger.info("Connecting to " + s.address + " on port " + port);
-                                        conn = new MSTCPRequesterConnection(s.address, conn.recvPort, port, requester, true);
-                                        s.ports.put(port, true);
-                                        s.connected++;
-                                        break;
+                                for (int p: s.ports.keySet()) {
+                                    if (s.address.equals(prevAddr) && s.ports.get(prevPort)) { // mark previous as disconnected
+                                        s.ports.put(prevPort, false);
+                                        s.connected--;
+                                    }
+                                    if (tried && !s.ports.get(p)) {
+                                        newSource = s;
+                                        newPort = p;
+                                        tried = s.tried.get(p);
                                     }
                                 }
-                                break;
                             }
                         }
                         
-                        
-                        
-                        for (SourceInformation s: mstcpInformation.sources) {
-                            if (s.address.equals(prevAddr)) {
-                                s.ports.put(prevPort, false);
-                                s.connected--;
-                                break;
-                            }
-                        }
+                        logger.info("Connecting to " + newSource.address + " on port " + newPort);
+                        if (routerPort == prevPort)
+                            routerPort = newPort;
+                        conn = new MSTCPRequesterConnection(newSource.address, conn.recvPort, newPort, routerPort, requester, true);
+                        newSource.ports.put(newPort, true);
+                        newSource.tried.put(newPort, true);
+                        newSource.connected++;
                     }
                 }
                 
+                logger.info("Closed connection handler");
+                
             } catch(InterruptedException | UnknownHostException | SocketException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
                 System.exit(1);
             }
         }
         
         public void close() {
-            this.closed = true;
-            String addr = conn.dstAddr.toString();
-            int port = conn.dstPort;
-            conn.close();
-            synchronized (mstcpInformation) {
-                for (SourceInformation s: mstcpInformation.sources) {
-                    if (s.address.equals(addr)) {
-                        s.ports.put(port, false);
-                        s.connected--;
-                        break;
+            logger.info("Closing Connection Handler.");
+            synchronized (conn.active) {
+                this.closed = true;
+                String addr = conn.dstAddr.toString();
+                int port = conn.dstPort;
+                conn.close();
+                synchronized (mstcpInformation) {
+                    for (SourceInformation s: mstcpInformation.sources) {
+                        if (s.address.equals(addr)) {
+                            s.ports.put(port, false);
+                            s.connected--;
+                            break;
+                        }
                     }
                 }
+                conn.active.b = false;
+                conn.active.notifyAll();
             }
+            
         }
         
-        public ConnectionHandler(int recvPort, MSTCPRequester requester,  MSTCPRequesterConnection conn) {
+//        public ConnectionHandler(int recvPort, MSTCPRequester requester,  MSTCPRequesterConnection conn) {
+//            this(recvPort, requester,  conn, recvPort);
+//        }
+        
+        public ConnectionHandler(int recvPort, MSTCPRequester requester,  MSTCPRequesterConnection conn, int routerPort) {
             this.requester = requester;
             this.conn = conn;
+            this.routerPort = routerPort;
             this.start();
         }
     }
@@ -276,15 +301,11 @@ public class MSTCPRequester {
 
 
     public synchronized void adjust_weights() {
-        for (ConnectionHandler c: this.connections)
-            if (c.conn.equilibrium_rate != 0)
-                c.conn.weight = c.conn.equilibrium_rate / total_rate;
+        synchronized(total_rate) {
+            for (ConnectionHandler c: this.connections)
+                if (c.conn.equilibrium_rate != 0 && c.conn.active.b)
+                    c.conn.weight = c.conn.equilibrium_rate / total_rate;
+        }
     }
     
-    
-    public static void main(String[] args) throws InterruptedException, IOException {
-        System.out.println("Note: Setup is for Triangle Network with PC-1 requesting from PC-2 and PC-3");
-        System.out.println("Args: <filename>");
-        new MSTCPRequester("192.168.1.1", "192.168.2.1", 14000, 16000, "./", args[0]);
-    }
 }

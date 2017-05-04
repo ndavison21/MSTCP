@@ -117,6 +117,7 @@ public class MSTCPRequesterConnection extends Thread {
                 socket.send(new DatagramPacket(finBytes, finBytes.length, dstAddr, dstPort));
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             System.exit(1);
         }
     }
@@ -175,6 +176,7 @@ public class MSTCPRequesterConnection extends Thread {
             socket.send(new DatagramPacket(synBytes, synBytes.length, dstAddr, dstPort));
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             return false;
         }
         synAttempts++;
@@ -237,6 +239,7 @@ public class MSTCPRequesterConnection extends Thread {
                 retransmit();
             } catch (InterruptedException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
                 System.exit(1);
             }
         }
@@ -350,6 +353,7 @@ public class MSTCPRequesterConnection extends Thread {
                 }
             } catch (InterruptedException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
                 System.exit(1);
             }
         }
@@ -401,6 +405,7 @@ public class MSTCPRequesterConnection extends Thread {
                 }
             } catch(IOException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
                 System.exit(1);
             } catch (InterruptedException e) {
                 logger.log(Level.WARNING, "OutThread Interrupted. " + e.getMessage(), e);

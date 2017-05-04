@@ -53,6 +53,7 @@ public final class Utils {
             addr = in.readLine(); // gets the IP as a string
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
             System.exit(1);
         }
 
@@ -73,6 +74,7 @@ public final class Utils {
                 Thread.sleep(latency + rand.nextInt(latency_variance) - latency_variance / 2);
             } catch (InterruptedException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
                 System.exit(1);
             }
         }

@@ -18,6 +18,8 @@ public class MSTCPSocket {
     private final int delay;
     private final double p_drop;
     
+    boolean droppedPrev = false;
+    
     private LinkedBlockingQueue<DatagramPacket> inBuffer = new LinkedBlockingQueue<DatagramPacket>();
     private LinkedBlockingQueue<DatagramPacket> outBuffer = new LinkedBlockingQueue<DatagramPacket>();
 
@@ -28,19 +30,21 @@ public class MSTCPSocket {
                 for (;;) {
                     DatagramPacket d = new DatagramPacket(new byte[Utils.pktSize], Utils.pktSize);
                     inSocket.receive(d);
-                    if (Utils.rand.nextDouble() < p_drop){
+                    if (!droppedPrev && Utils.rand.nextDouble() < p_drop){
                         logger.info("Packet Dropped");
+                        droppedPrev = true;
                         continue;
                     }
-                    Thread.sleep(delay);
+                    droppedPrev = false;
                     inBuffer.add(d);
                 }
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException e) {
                 if (e instanceof SocketException && inSocket.isClosed()) {
                     return;
                 }
                 
                 logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
                 System.exit(1);
             }
         }
@@ -53,7 +57,7 @@ public class MSTCPSocket {
             try {
                 for (;;) {
                     d = outBuffer.take();
-                    if (d.getData()[0] == -1 && d.getLength() == 0) { // 'poison pill' shutdown
+                    if (d.getData() != null && d.getLength() < d.getData().length && d.getData()[0] == -1) { // 'poison pill' shutdown
                         synchronized(outBuffer) {
                             outBuffer.clear();
                             outBuffer.notifyAll();
@@ -64,9 +68,11 @@ public class MSTCPSocket {
                 }
             } catch (InterruptedException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
                 System.exit(1);
             } catch (IOException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
                 System.exit(1);
             }
         }
@@ -81,6 +87,7 @@ public class MSTCPSocket {
                 super.interrupt();
             } catch (InterruptedException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
+                e.printStackTrace();
                 System.exit(1);
             }
         }
@@ -121,6 +128,7 @@ public class MSTCPSocket {
         DatagramPacket d = null;
         try {
             d = inBuffer.take();
+            Thread.sleep(delay);
         } catch (InterruptedException e) {
             logger.warning("Socket Interrupted");
         }
