@@ -112,7 +112,7 @@ public class MOREPacket {
         this.dataLength   = bb.getShort();
         this.codeVector = new CodeVectorElement[this.vectorLength];
         for (short i=0; i<this.vectorLength; i++)
-            this.codeVector[i] = new CodeVectorElement(bb.getShort(), bb.getInt());
+            this.codeVector[i] = new CodeVectorElement(bb.getInt(), bb.getShort());
         if (packetType == 1) {
             byte[] encodedDataBytes = new byte[dataLength];
             bb.get(encodedDataBytes);

@@ -100,14 +100,16 @@ public final class Utils {
         return address;
     }
     
+    
+    
     public static Logger getLogger(String filename) {
-        return getLogger(filename, Level.ALL);
+        return getLogger(filename, "", Level.OFF);
     }
 
-    public static Logger getLogger(String filename, Level level) {
+    public static Logger getLogger(String filename, String path, Level level) {
         Logger logger = Logger.getLogger(filename);
         try {
-            FileHandler handler = new FileHandler("./logs/" + filename + ".log", 1048576, 1, true);
+            FileHandler handler = new FileHandler("./logs/" + path + filename + ".log", 1048576, 1, true);
             handler.setFormatter(new SimpleFormatter());
             logger.setUseParentHandlers(false);
             logger.addHandler(handler);

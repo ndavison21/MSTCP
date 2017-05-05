@@ -15,11 +15,7 @@ public class Test {
         try {
             System.out.println("Starting Test.");
             
-            // String[] files = new String[]{"hello.txt", "hello_800.txt", "hello_repeat.txt", "hello_repeat_repeat.txt", "me.jpg"};
-            //String file = "hello_repeat_repeat.txt";
-            String file = "me.jpg";
-            
-            final Vector<SourceInformation> sources = new Vector<SourceInformation>();
+            final Vector<SourceInformation> sources = new Vector<SourceInformation>(2);
             sources.add(new SourceInformation("127.0.0.1", new int[] {16000, 16001}));
             sources.add(new SourceInformation("127.0.0.2", new int[] {16002, 16003}));
             
@@ -56,7 +52,7 @@ public class Test {
                 (new Thread() {
                     public void run() {
                         try {
-                            new MiddleForwarder(port1, 10, 0.01);
+                            new MiddleForwarder(port1, 3, 0.01);
                         } catch (SocketException e) {
                             e.printStackTrace();
                             System.exit(1);
@@ -68,7 +64,7 @@ public class Test {
                 (new Thread() {
                     public void run() {
                         try {
-                            new MiddleForwarder(port2, 30, 0.1);
+                            new MiddleForwarder(port2, 10, 0.1);
                         } catch (SocketException e) {
                             e.printStackTrace();
                             System.exit(1);
@@ -94,19 +90,36 @@ public class Test {
             
             TimeUnit.SECONDS.sleep(2);
             
+            String path = "./evaluation/data/throughput/s1_c2_b16";
+            
             File logs = new File("./logs");
             for(File log: logs.listFiles()) 
                 if (!log.isDirectory()) 
                     log.delete();
             
-            for(i=0; i<1000; i++) {
-                Utils.logger =  Utils.getLogger("experiment_" + i, Level.FINE);
+            logs = new File(path);
+            for(File log: logs.listFiles()) 
+                if (!log.isDirectory()) 
+                    log.delete();
+            
+            
+            // String[] files = new String[]{"hello.txt", "hello_800.txt", "hello_repeat.txt", "hello_repeat_repeat.txt", "me.jpg"};
+            //String file = "hello_repeat_repeat.txt";
+            String file = "gb.jpg";
+            
+            for(i=0; i<10; i++) {
+                Utils.logger =  Utils.getLogger("experiment_" + i, "." + path + "/", Level.FINE);
                 
                 System.out.println("#" + i + " Starting Transfer of " + file + ".");
                 
                 new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null), 14000, 16000, "./", file);
                 System.out.println("Transfer Complete.");
                 System.gc();
+                
+                for (SourceInformation s: sources) {
+                    for (int port: s.tried.keySet())
+                        s.tried.put(port, false);
+                }
                 
             }
             
