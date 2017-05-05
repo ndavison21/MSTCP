@@ -90,7 +90,7 @@ public class MSTCPRequesterConnection extends Thread {
         stopTimer();
         timer = new Timer(); // start a new one if necessary
         if (type == Utils.DATA_ENUM)
-            timer.schedule(new DataTimeout(),  Utils.dataTimeout);
+            timer.schedule(new DataTimeout(),  5*Utils.dataTimeout);
         else if (type == Utils.SYN_ENUM)
             timer.schedule(new SYNTimeout(), Utils.synTimeout);
         else if (type == Utils.FIN_ENUM)
@@ -141,6 +141,7 @@ public class MSTCPRequesterConnection extends Thread {
     public void close() {
         logger.info("Closing Connection to (" + dstAddr + ", " + dstPort + ")");
         
+        Utils.logger.fine(System.nanoTime() + " " + recvPort + " " + 0 + " " + 0 + " " + 0);
         inThread.interrupt();
         outThread.interrupt();
         stopTimer();
@@ -254,6 +255,7 @@ public class MSTCPRequesterConnection extends Thread {
                 if (time_ack < 0)
                     time_ack = time_recv + Integer.MAX_VALUE - tcpPacket.getTime_ack();
                 base_rtt = time_ack + tcpPacket.getTime_req();
+                rtt = base_rtt;
                 logger.info("Received SYN + ACK " + tcpPacket.getACK() + ". RTT: " + base_rtt);
                 requester.mstcpInformation.update(new MSTCPInformation(tcpPacket.getData()));
                 if (requester.sourceCoder == null) {
@@ -341,7 +343,7 @@ public class MSTCPRequesterConnection extends Thread {
     public class InThread extends Thread {
         public void run() {
             DatagramPacket data;
-            Utils.logger.fine(recvPort + ", " + cwnd + ", " + rtt + ", " + p_drop);
+            Utils.logger.fine(System.nanoTime() + " " + recvPort + " " + cwnd + " " + rtt + " " + p_drop);
             
             try {
                 for (;;) {
@@ -367,20 +369,18 @@ public class MSTCPRequesterConnection extends Thread {
                             } else {
                                 retransmit = base;
                             }
-                            double timeout = Integer.MAX_VALUE;
-                            try {
-                            timeout = Utils.debug ? Integer.MAX_VALUE : sentRequests.get(retransmit).getTime_req() + (2 * rtt);
-                            } catch (Exception e) {
-                                System.err.printf("%d %d\n", recvPort, retransmit);
-                                e.printStackTrace();
-                                System.exit(1);
-                            }
-                            if (timeout < 0)
-                                timeout = (2 * rtt) - (Integer.MAX_VALUE - sentRequests.get(retransmit).getTime_req());
-                            
-                            if ((System.currentTimeMillis() % Integer.MAX_VALUE) > timeout) {
-                                mult = 1.0 - Utils.p_smooth;
-                                retransmit(retransmit);
+                            if (sentRequests.containsKey(retransmit)) {
+                                double timeout = Utils.debug ? Integer.MAX_VALUE : sentRequests.get(retransmit).getTime_req() + ((Utils.gamma + 1) * rtt);
+                                if (timeout < 0)
+                                    timeout = (2 * rtt) - (Integer.MAX_VALUE - sentRequests.get(retransmit).getTime_req());
+                                
+                                if (time_recv > timeout) {
+                                    logger.info("Packet " + retransmit + " timed out. Sent " + sentRequests.get(retransmit).getTime_req() + " Received " + time_recv);
+                                    mult = 1.0 - Utils.p_smooth;
+                                    retransmit(retransmit);
+                                }
+                            } else {
+                                logger.info("Packet " + retransmit + " not in sent requests. Assuming is already scheduled for retransmit.");
                             }
                                 
                         }
@@ -391,7 +391,8 @@ public class MSTCPRequesterConnection extends Thread {
                         }
 
                         sentRequests.remove(tcpPacket);
-                        if (base == nextSeqNum)
+
+                        if (base == nextSeqNum && timer != null)
                             stopTimer(); // no outstanding requests so stop timer
                         else
                             setTimer(Utils.DATA_ENUM); // otherwise start waiting for next response
@@ -466,7 +467,7 @@ public class MSTCPRequesterConnection extends Thread {
                                     cwnd_true = 2;
                                 
                                 cwnd = (int) cwnd_true;
-                                Utils.logger.fine(recvPort + ", " + cwnd + ", " + rtt + ", " + p_drop);
+                                Utils.logger.fine(System.nanoTime() + " " + recvPort + " " + cwnd + " " + rtt + " " + p_drop);
                                 
                                 logger.info("Congestion Window is now " + cwnd + " (" + cwnd_true + ")");
                                 
@@ -484,11 +485,12 @@ public class MSTCPRequesterConnection extends Thread {
                             requester.sourceCoder.receivedPackets.put(new MOREPacket(tcpPacket.getData()));
                         }
                     } else {
-                        if (base <= tcpPacket.getSeqNum()) {
-                            logger.info("Received Packet Out of Order (seqNum " + tcpPacket.getSeqNum() + ", base " + base + ". Passing to Requester anyway.");
+                        if (base > tcpPacket.getSeqNum() && tcpPacket.getSeqNum() > initialSeqNum) {
+                            logger.info("Received Packet Out of Order (seqNum " + tcpPacket.getSeqNum() + ", base " + base + "). Passing to Requester anyway.");
                             requester.sourceCoder.receivedPackets.put(new MOREPacket(tcpPacket.getData()));
-                        } else
+                        } else {
                             logger.info("Received Corrputed Packet");
+                        }
                     }
                 }
             } catch (InterruptedException e) {

@@ -3,11 +3,11 @@ package MSTCP.vegas.more;
 import java.nio.ByteBuffer;
 
 public class CodeVectorElement {
-	private short block;
-	private int coefficient;
+	private int block;
+	private short coefficient;
 	private double innovCoefficient;
 	
-	public CodeVectorElement(short block, int coefficient) {
+	public CodeVectorElement(int block, short coefficient) {
 		this.block = block;
 		this.coefficient = coefficient;
 		this.innovCoefficient = coefficient;
@@ -15,12 +15,12 @@ public class CodeVectorElement {
 	
 	public CodeVectorElement(byte[] bytes) {
 		ByteBuffer bb = ByteBuffer.wrap(bytes);
-		this.block = bb.getShort();
-		this.coefficient = bb.getInt();
+		this.block = bb.getInt();
+		this.coefficient = bb.getShort();
 		this.innovCoefficient = this.coefficient;
 	}
 
-	public short getBlock() {
+	public int getBlock() {
 		return block;
 	}
 
@@ -28,11 +28,11 @@ public class CodeVectorElement {
 		return coefficient;
 	}
 	
-	public void setBlock(short block) {
+	public void setBlock(int block) {
         this.block = block;
     }
 
-    public void setCoefficient(int coefficeint) {
+    public void setCoefficient(short coefficeint) {
         this.coefficient = coefficeint;
         this.innovCoefficient = coefficient;
     }
@@ -42,14 +42,14 @@ public class CodeVectorElement {
     }
 
     public void setInnovCoefficient(double innovCoefficient) {
-        this.coefficient = (int) innovCoefficient;
+        this.coefficient = (short) innovCoefficient;
         this.innovCoefficient = innovCoefficient;
     }
 
     public byte[] bytes() {
 		ByteBuffer bb = ByteBuffer.allocate(6);
-		bb.putShort(block);
-		bb.putInt(coefficient);
+		bb.putInt(block);
+		bb.putShort(coefficient);
 		return bb.array();
 	}
     

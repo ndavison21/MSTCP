@@ -126,17 +126,17 @@ public class NetworkCoder {
             int batchSize = Math.min(Utils.batchSize, fileBlocks - preEncoded.getBatch() * Utils.batchSize);
             if (batchSize < 0)
                 batchSize = fileBlocks;
-            short baseBlock = (short) (preEncoded.getBatch() * Utils.batchSize);
+            int baseBlock = preEncoded.getBatch() * Utils.batchSize;
             
             CodeVectorElement[] prevCodeVector = preEncoded.getCodeVector();
             CodeVectorElement[] innovCodeVector = pktToAdd.getCodeVector();
             LinkedList<CodeVectorElement> newCodeVectorList = new LinkedList<CodeVectorElement>();
             
             short i=0, j=0, k=0;
-            short block;
-            int coefficient;
+            int block;
+            short coefficient;
             for (i=0; i<batchSize; i++) {
-                block = (short) (baseBlock + i);
+                block = baseBlock + i;
                 coefficient = 0; //prevCodeVector[i].getCoefficient() + innovCodeVector[i].getCoefficient();
                 if (j < prevCodeVector.length && prevCodeVector[j].getBlock() == block)
                     coefficient += prevCodeVector[j++].getCoefficient();

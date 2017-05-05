@@ -28,15 +28,30 @@ public class MSTCPSocket {
         public void run() {
             try {
                 for (;;) {
-                    DatagramPacket d = new DatagramPacket(new byte[Utils.pktSize], Utils.pktSize);
+                    final DatagramPacket d = new DatagramPacket(new byte[Utils.pktSize], Utils.pktSize);
                     inSocket.receive(d);
-                    if (!droppedPrev && Utils.rand.nextDouble() < p_drop){
-                        logger.info("Packet Dropped");
-                        droppedPrev = true;
-                        continue;
-                    }
-                    droppedPrev = false;
-                    inBuffer.add(d);
+                    
+//                    if (Utils.rand.nextDouble() < p_drop){
+//                        logger.info("Packet Dropped");
+//                        continue;
+//                    }
+//                    
+//                    if (delay > 0) {
+//                        (new Thread() {
+//                            public void run() {
+//                                try {
+//                                    Thread.sleep(delay);
+//                                } catch (InterruptedException e) {
+//                                    logger.log(Level.SEVERE, e.getMessage(), e);
+//                                    e.printStackTrace();
+//                                    System.exit(1);
+//                                }
+//                                inBuffer.add(d);
+//                            }
+//                        }).start();
+//                    } else {
+                        inBuffer.add(d);
+//                    }
                 }
             } catch (IOException e) {
                 if (e instanceof SocketException && inSocket.isClosed()) {
@@ -63,6 +78,15 @@ public class MSTCPSocket {
                             outBuffer.notifyAll();
                         }
                         return;
+                    }
+                    
+                    if (Utils.rand.nextDouble() < p_drop){
+                        logger.info("Packet Dropped");
+                        continue;
+                    }
+                    
+                    if (delay > 0) {
+                        Thread.sleep(delay / (outBuffer.size() + 1));
                     }
                     outSocket.send(d);
                 }
@@ -93,6 +117,7 @@ public class MSTCPSocket {
         }
     }
     
+    
     public MSTCPSocket(Logger logger, int port) throws SocketException { // connect to any free port
         this(logger, port, 0, 0);
     }
@@ -118,17 +143,13 @@ public class MSTCPSocket {
     }
 
     public void send(DatagramPacket d) throws IOException {
-//        if (!Utils.drop()) {
-//            logger.info("Packet Dropped.");
-            outBuffer.add(d);
-//        }
+        outBuffer.add(d);
     }
 
     public DatagramPacket receive() {
         DatagramPacket d = null;
         try {
             d = inBuffer.take();
-            Thread.sleep(delay);
         } catch (InterruptedException e) {
             logger.warning("Socket Interrupted");
         }

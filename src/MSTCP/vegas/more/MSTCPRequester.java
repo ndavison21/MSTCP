@@ -6,7 +6,6 @@ import java.io.RandomAccessFile;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
@@ -17,21 +16,23 @@ import java.util.logging.Logger;
 public class MSTCPRequester {
     final Logger logger;
     
-    Vector<ConnectionHandler> connections;    // active connections (TODO: Replace failed connections)
-    MSTCPInformation mstcpInformation;               // information about the MSTCP connections
+    Vector<ConnectionHandler> connections;  // active connections
+    MSTCPInformation mstcpInformation;      // information about the MSTCP connections
 
-    final InetAddress recvAddr;
-    int nextRecvPort;                                // next port on which we receive ACKs + Data
+    final InetAddress recvAddr; // local address
+    int nextRecvPort;           // next port to start a connection handler on
     
-    SourceCoder sourceCoder; // handles the decoding of packets. Initialised by first requester connection
+    SourceCoder sourceCoder; // handles the decoding of packets. Initialised by first requester connection (TODO: would be nice if it was initialised here rather than by the connection)
     
     final int total_alpha = Utils.total_alpha;
-    Double total_rate = 0.0;
+    Double total_rate = 0.0; // congestion control parameter (see wVegas paper)
     
     short prevReqBatch = 0; // previous batch requested (used when requesting dropped packets)
     short nextReqBatch = 0; // next batch to request
     int nextReqBlock   = 0; // first block of the new batch to request
     double nextBatchReqs = 0.0; // number of remaining requests to make for current batch (including redundancy for loss rate) 
+    
+    private HashMap<Short, Integer> batchRows = new HashMap<Short, Integer>(); // which row of the coding matrix we want to use next for each batch
     
     boolean transfer_complete = false;
 
@@ -49,7 +50,6 @@ public class MSTCPRequester {
         // Starting first connections
         logger.info("Starting first connection (" + InetAddress.getByName(dstAddr) + ", " + dstPort + ")");
         MSTCPRequesterConnection conn = new MSTCPRequesterConnection(dstAddr, nextRecvPort++, dstPort, routerPort, this, false);
-        // networkCoder = new NetworkCoder(logger, mstcpInformation.fileSize, true); TODO: create here rather than in connection
         connections.addElement(new ConnectionHandler(recvPort, this, conn, routerPort++));
         
         // Start connections with other sources
@@ -64,6 +64,7 @@ public class MSTCPRequester {
                             conn = new MSTCPRequesterConnection(s.address, nextRecvPort++, port,  routerPort, this, true);
                             connections.add(new ConnectionHandler(recvPort, this, conn, routerPort++));
                             s.ports.put(port, true);
+                            s.tried.put(port, true);
                             s.connected++;
                             break;
                         }
@@ -79,8 +80,8 @@ public class MSTCPRequester {
         RandomAccessFile raf = new RandomAccessFile(file, "rw");
         
         /** COMPARING BLOCKS TO THE ORIGINAL **/
-        File original = new File(path + filename);
-        RandomAccessFile oraf = new RandomAccessFile(original, "r");
+//        File original = new File(path + filename);
+//        RandomAccessFile oraf = new RandomAccessFile(original, "r");
         /**************************************/
         
         // get decoded packets and write to file
@@ -93,14 +94,14 @@ public class MSTCPRequester {
             bytesWritten += block.data.length - 1;
             
             /** COMPARING BLOCKS TO THE ORIGINAL **/
-            if (Utils.decode) {
-                oraf.seek(block.block * Utils.blockSize);
-                byte[] obytes = new byte[block.data.length];
-                obytes[0] = 1;
-                oraf.read(obytes, 1, obytes.length - 1);
-                if (!Arrays.equals(block.data, obytes))
-                    System.out.println("Original is Different! Block " + block.block);
-            }
+//            if (Utils.decode) {
+//                oraf.seek(block.block * Utils.blockSize);
+//                byte[] obytes = new byte[block.data.length];
+//                obytes[0] = 1;
+//                oraf.read(obytes, 1, obytes.length - 1);
+//                if (!Arrays.equals(block.data, obytes))
+//                    System.out.println("Original is Different! Block " + block.block);
+//            }
             /**************************************/
             
 //            System.out.println("Block " + (block.block < 100 ? block.block < 10 ? "  " : " " : "") + block.block + " length " + block.data.length + " written " + bytesWritten + " bytes");
@@ -108,7 +109,7 @@ public class MSTCPRequester {
         
         logger.info("Closing Connections.");
         raf.close();
-        oraf.close();
+//        oraf.close();
         transfer_complete = true;
         for (ConnectionHandler c: connections) {
             c.close();
@@ -203,7 +204,7 @@ public class MSTCPRequester {
             logger.info("Closing Connection Handler.");
             synchronized (conn.active) {
                 this.closed = true;
-                String addr = conn.dstAddr.toString();
+                String addr = conn.dstAddr.getHostAddress();
                 int port = conn.dstPort;
                 conn.close();
                 synchronized (mstcpInformation) {
@@ -221,9 +222,6 @@ public class MSTCPRequester {
             
         }
         
-//        public ConnectionHandler(int recvPort, MSTCPRequester requester,  MSTCPRequesterConnection conn) {
-//            this(recvPort, requester,  conn, recvPort);
-//        }
         
         public ConnectionHandler(int recvPort, MSTCPRequester requester,  MSTCPRequesterConnection conn, int routerPort) {
             this.requester = requester;
@@ -233,7 +231,6 @@ public class MSTCPRequester {
         }
     }
     
-    private HashMap<Short, Integer> batchRows = new HashMap<Short, Integer>();
     
     // called by connections, returns next needed block and records which connection it'll come on
     public synchronized CodeVectorElement[] codeVector(int recvPort, double p_drop) {
@@ -270,13 +267,14 @@ public class MSTCPRequester {
         
         prevReqBatch = batch;
             
-        logger.info("Request for batch " + batch + " on connection " + recvPort);
         int baseBlock = (batch == nextReqBatch ? nextReqBlock : batch * Utils.batchSize);
         
         Integer nextRow = batchRows.get(batch);
         nextRow = nextRow == null ? 0 : nextRow;
         batchRows.put(batch, nextRow + 1);
         byte[] coefficients = CodeMatrix.getRow(nextRow);
+        
+        logger.info("Request for batch " + batch + " row " + nextRow + " on connection " + recvPort);
         
 //        HashSet<Integer> blocks = new HashSet<Integer>();
 //        for (int i=0; i<Math.min(batchSize, Utils.batchElements); i++) {
@@ -295,7 +293,7 @@ public class MSTCPRequester {
         
         CodeVectorElement[] codeVector = new CodeVectorElement[batchSize];
         for (int i=0; i<codeVector.length; i++) {
-            codeVector[i] = new CodeVectorElement((short) (baseBlock + i), coefficients[i]);
+            codeVector[i] = new CodeVectorElement(baseBlock + i, coefficients[i]);
         }
         
         

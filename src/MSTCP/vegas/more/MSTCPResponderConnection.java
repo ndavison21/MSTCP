@@ -95,6 +95,7 @@ public class MSTCPResponderConnection {
             for (SourceInformation s : mstcpInfo.sources) { // set this sender to connected
                 if (s.address == responder.recvAddr) {
                     s.ports.put(recvPort, true);
+                    s.tried.put(recvPort, true);
                     s.connected++;
                 }
             }
@@ -160,24 +161,29 @@ public class MSTCPResponderConnection {
                                 MOREPacket more = new MOREPacket(inPacket.getData());
                                 CodeVectorElement[] codeVector = more.getCodeVector();
                                 BigInteger encodedData = BigInteger.ZERO;
-                                for (CodeVectorElement c : codeVector) {
-                                    if (c.getBlock() == -1 || c.getCoefficient() == 0)
-                                        continue;
-//                                    logger.info("Block " + c.getBlock() + " with coefficient " + c.getCoefficient());
-                                    raf.seek(c.getBlock() * Utils.blockSize);
-                                    if ((c.getBlock() + 1L) * Utils.blockSize > raf.length())
-                                        dataBytes = new byte[(int) (raf.length() - (c.getBlock() * Utils.blockSize)) + 1];
-                                    else if (dataBytes.length != Utils.transferSize)
-                                        dataBytes = new byte[Utils.transferSize];
-                                    dataBytes[0] = 1;
-                                    raf.read(dataBytes, 1, dataBytes.length - 1);
-                                    data = new BigInteger(dataBytes);       
-                                    data = data.multiply(BigInteger.valueOf(c.getCoefficient()));
-                                    encodedData = encodedData.add(data);
+
+                                if (Utils.decode) {
+                                    for (CodeVectorElement c : codeVector) {
+                                        if (c.getBlock() == -1 || c.getCoefficient() == 0)
+                                            continue;
+    //                                    logger.info("Block " + c.getBlock() + " with coefficient " + c.getCoefficient());
+                                        raf.seek(c.getBlock() * Utils.blockSize);
+                                        if ((c.getBlock() + 1L) * Utils.blockSize > raf.length())
+                                            dataBytes = new byte[(int) (raf.length() - (c.getBlock() * Utils.blockSize)) + 1];
+                                        else if (dataBytes.length != Utils.transferSize)
+                                            dataBytes = new byte[Utils.transferSize];
+                                        dataBytes[0] = 1;
+                                        raf.read(dataBytes, 1, dataBytes.length - 1);
+                                        data = new BigInteger(dataBytes);       
+                                        data = data.multiply(BigInteger.valueOf(c.getCoefficient()));
+                                        encodedData = encodedData.add(data);
+                                    }
+                                    more.setEncodedData(encodedData);
+                                } else {
+                                    more.setEncodedData(new byte[800]);
                                 }
         
                                 more.setPacketType(MOREPacket.RETURN_PACKET);
-                                more.setEncodedData(encodedData);
                                 outBytes = generateTCPPacket(inPacket.getSeqNum(), more.bytes(), false, false, time_req);
                                 logger.info("Sending ACK " + (toAck.isEmpty() ? nextSeqNum : Collections.min(toAck)) + " + Encoded Data to (" + dstAddress + ", " + dstPort + ")");
                                 Arrays.fill(dataBytes, (byte) 0);
@@ -190,6 +196,13 @@ public class MSTCPResponderConnection {
                     logger.info("Received Corrupted Packet");
                 }
 
+            }
+            
+            for (SourceInformation s : mstcpInfo.sources) { // set this sender to connected
+                if (s.address == responder.recvAddr) {
+                    s.ports.put(recvPort, false);
+                    s.connected--;
+                }
             }
 
         } catch (IOException e) {

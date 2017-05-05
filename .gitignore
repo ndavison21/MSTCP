@@ -5,3 +5,6 @@ bin/logs/*
 bin/received_*
 .classpath
 *.bin
+gb.jpg
+received_gb.jpg
+evaluation/data/*
