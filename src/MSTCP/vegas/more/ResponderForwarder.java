@@ -121,6 +121,8 @@ public class ResponderForwarder {
                             logger.info("Received SYN+ACK for flow " + flowID + ". Initialising.");
                             if (!flowBuffer.containsKey(flowID))
                                 flowBuffer.put(flowID, new FlowData(flowID, fileSize));
+                        } else {
+                            logger.info("Received Packet. Forwarding to " + nextPort);
                         }
                     } 
 

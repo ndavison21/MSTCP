@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.HashSet;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -60,7 +61,7 @@ public class MSTCPRequesterConnection extends Thread {
     // public Bool startup = new Bool(true);
     
     // calculating redundancy to send
-    double p_drop = 1.0/3.0; // approximate at 1/3 to begin with
+    double p_drop = 33.0/100; // approximate starting value
     
     // fast retransmit
     ConcurrentLinkedQueue<Integer> toRetransmit; // sequence number of packets to retransmit
@@ -257,11 +258,13 @@ public class MSTCPRequesterConnection extends Thread {
                 base_rtt = time_ack + tcpPacket.getTime_req();
                 rtt = base_rtt;
                 logger.info("Received SYN + ACK " + tcpPacket.getACK() + ". RTT: " + base_rtt);
-                requester.mstcpInformation.update(new MSTCPInformation(tcpPacket.getData()));
-                if (requester.sourceCoder == null) {
-                	requester.sourceCoder = new SourceCoder(requester.logger, requester.mstcpInformation.fileSize);
-                	
-                	requester.nextBatchReqs = Math.min(Utils.batchSize, requester.sourceCoder.fileBlocks);
+                synchronized(requester.mstcpInformation) {
+                    requester.mstcpInformation.update(new MSTCPInformation(tcpPacket.getData()));
+                    if (requester.sourceCoder == null) {
+                    	requester.sourceCoder = new SourceCoder(requester.logger, requester.mstcpInformation.fileSize);
+                    	requester.mstcpInformation.notifyAll();
+                    	requester.nextBatchReqs = Math.min(Utils.batchSize, requester.sourceCoder.fileBlocks);
+                    }
                 }
                 success = true;
                 break;
@@ -277,13 +280,10 @@ public class MSTCPRequesterConnection extends Thread {
      * @throws InterruptedException 
      */
     
-    private void retransmit(Integer seqNum) throws InterruptedException {
-        if (toRetransmit.contains(seqNum))
-            return;
-        else
-            toRetransmit.add(seqNum);
+    private void retransmit(HashSet<Integer> seqNums) throws InterruptedException {
+        toRetransmit.addAll(seqNums);
+        logger.info("Retransmitting " + seqNums.size() + " packets starting from " + seqNums.iterator().next());
         
-        logger.info("Retransmitting packet " + seqNum);
         synchronized (equilibrium_rate) {
             synchronized(requester.total_rate) {
                 requester.total_rate -= equilibrium_rate;
@@ -299,6 +299,7 @@ public class MSTCPRequesterConnection extends Thread {
     private void goBackN() {
         if (dataAttempts > Utils.dataAttempts) {
             synchronized(active) {
+                System.out.printf("Data Limit reached for connection %d\n", recvPort);
                 logger.info("Data limit reached. Giving up.");
                 active.b = false;
                 active.notifyAll();
@@ -316,11 +317,16 @@ public class MSTCPRequesterConnection extends Thread {
             }
         }
         
+        double mult = Math.pow(1 - Utils.p_smooth, cwnd);
+        p_drop = ( p_drop * mult * (1 - Utils.p_smooth) ) + (1 - mult);
+        p_drop = Math.min(1, p_drop);
+        
         toRetransmit.clear();
         sentRequests.clear();   
         
         synchronized(initialSeqNum) {
-            cwnd_true = 2;
+            cwnd_true = 2 / (1 - p_drop);
+            cwnd_true = cwnd_true < 2 ? 2 : cwnd_true;
             cwnd = (int) cwnd_true;
             slowstart = true;
             rttSeqNum = nextSeqNum + cwnd;
@@ -330,6 +336,7 @@ public class MSTCPRequesterConnection extends Thread {
             nextSeqNum = base;
             initialSeqNum.notifyAll();
         }
+        System.out.printf("goBackN: p_drop %f cwnd %d\n", p_drop, cwnd);
         //setTimer(Utils.DATA_ENUM);
         dataAttempts++;
     }
@@ -358,6 +365,8 @@ public class MSTCPRequesterConnection extends Thread {
                     TCPPacket tcpPacket = new TCPPacket(data.getData());
                     
                     if (tcpPacket.verifyChecksum() && tcpPacket.isACK() && base <= tcpPacket.getSeqNum()) { // if packet is corrupted there's not much we can do...
+                        stopTimer(); // received a packet so haven't lost connection
+                        
                         dataAttempts = 0;
                         double mult = 1.0;
                         
@@ -369,33 +378,39 @@ public class MSTCPRequesterConnection extends Thread {
                             } else {
                                 retransmit = base;
                             }
-                            if (sentRequests.containsKey(retransmit)) {
-                                double timeout = Utils.debug ? Integer.MAX_VALUE : sentRequests.get(retransmit).getTime_req() + ((Utils.gamma + 1) * rtt);
-                                if (timeout < 0)
-                                    timeout = (2 * rtt) - (Integer.MAX_VALUE - sentRequests.get(retransmit).getTime_req());
-                                
-                                if (time_recv > timeout) {
-                                    logger.info("Packet " + retransmit + " timed out. Sent " + sentRequests.get(retransmit).getTime_req() + " Received " + time_recv);
-                                    mult = 1.0 - Utils.p_smooth;
-                                    retransmit(retransmit);
+
+                            HashSet<Integer> timedout = new HashSet<Integer>();
+                            for (; retransmit<tcpPacket.getSeqNum(); retransmit++) {
+                                if (sentRequests.containsKey(retransmit)) {
+                                    double timeout = Utils.debug ? Integer.MAX_VALUE : sentRequests.get(retransmit).getTime_req() + (2 * rtt);
+                                    if (timeout < 0)
+                                        timeout = (2 * rtt) - (Integer.MAX_VALUE - sentRequests.get(retransmit).getTime_req());
+                                    
+                                    if (time_recv > timeout) {
+                                        logger.info("Packet " + retransmit + " timed out. Sent " + sentRequests.get(retransmit).getTime_req() + " Received " + time_recv);
+                                        mult *= 1.0 - Utils.p_smooth;
+                                        timedout.add(retransmit);
+                                        sentRequests.remove(retransmit);
+                                    }
+                                } else {
+                                    logger.info("Packet " + retransmit + " not in sent requests. Assuming is already scheduled for retransmit.");
                                 }
-                            } else {
-                                logger.info("Packet " + retransmit + " not in sent requests. Assuming is already scheduled for retransmit.");
                             }
+                            if (!timedout.isEmpty())
+                                retransmit(timedout);
                                 
                         }
+                        
+
+                        if (base != nextSeqNum) // if there are outstanding packets
+                            setTimer(Utils.DATA_ENUM); //start waiting for next response
                         
                         
                         if (tcpPacket.getSeqNum() == base) { // packet received in order
                             base = tcpPacket.getACK();
                         }
-
+                        
                         sentRequests.remove(tcpPacket);
-
-                        if (base == nextSeqNum && timer != null)
-                            stopTimer(); // no outstanding requests so stop timer
-                        else
-                            setTimer(Utils.DATA_ENUM); // otherwise start waiting for next response
 
                         
                         p_drop = ( p_drop * mult * (1 - Utils.p_smooth) ) + (1 - mult); // a single ACK may represent multiple losses

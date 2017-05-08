@@ -18,21 +18,22 @@ public final class Utils {
     public static final int SYN_ENUM  = 1;
     public static final int FIN_ENUM  = 2;
     
-    public static final boolean debug  = false; // turn off timeouts so can step through with debug mode
-    public static final boolean decode = false; // perform decoding of packets at received
-    public static final boolean recode = false; // perform recoding of packets in the network
+    
+    public static final boolean logging = false; // whether to do logging
+    public static final boolean debug   = false; // turn off timeouts so can step through with debug mode
+    public static final boolean decode  = false; // perform decoding of packets at received
+    public static final boolean recode  = false; // perform recoding of packets in the network
 
     public static final boolean localhost    = true;  // get public or local IP
     public static final Random rand          = new Random();
     
     public static final double p_smooth      = 0.05;   // smoothing factor for monitoring drop rate
 
-    public static final int noOfPaths       = 2;  // number of paths available to each source
-    public static final int noOfSources     = 2;  // number of sources available
-    public static final int noOfConnections = 2;  // number of connections the requester should start up
+    public static int noOfPaths       = 2;  // number of paths available to each source
+    public static int noOfSources     = 2;  // number of sources available
+    public static int noOfConnections = 2;  // number of connections the requester should start up
     
-    public static final int batchSize     = 16;   // to keep matrix sizes small we send blocks in smaller groups
-    public static final int batchElements = 8;    // number of blocks to include in each request
+    public static int batchSize     = 16;   // to keep matrix sizes small we send blocks in smaller groups
     public static final int pktSize       = 1000; // 1000 Bytes total (Header 28 bytes, Block 972 bytes)
     public static final int tcpSize       = 28;   // TCP Header no options
     public static final int moreSize      = 10;   // MORE Header with no code vector or data
@@ -45,7 +46,7 @@ public final class Utils {
     // retransmit parameters
     public static final int synAttempts  = 30;
     public static final int synTimeout   = debug ? Integer.MAX_VALUE : 500;
-    public static final int dataAttempts = 3;
+    public static final int dataAttempts = Integer.MAX_VALUE;
     public static final int dataTimeout  = debug ? Integer.MAX_VALUE : 1000;
     public static final int finAttempts  = 3;
     public static final int finTimeout   = debug ? Integer.MAX_VALUE : 200;
@@ -103,13 +104,17 @@ public final class Utils {
     
     
     public static Logger getLogger(String filename) {
-        return getLogger(filename, "", Level.OFF);
+        return getLogger(filename, "", Utils.logging ? Level.ALL: Level.OFF );
+    }
+    
+    public static Logger getLogger(String filename, String path, Level level) {
+        return getLogger(filename, path, level, 1048576);
     }
 
-    public static Logger getLogger(String filename, String path, Level level) {
+    public static Logger getLogger(String filename, String path, Level level, int limit) {
         Logger logger = Logger.getLogger(filename);
         try {
-            FileHandler handler = new FileHandler("./logs/" + path + filename + ".log", 1048576, 1, true);
+            FileHandler handler = new FileHandler("./logs/" + path + filename + ".log", limit, 1, true);
             handler.setFormatter(new SimpleFormatter());
             logger.setUseParentHandlers(false);
             logger.addHandler(handler);

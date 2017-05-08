@@ -87,6 +87,8 @@ public class SourceCoder extends Thread {
                         }
                     }).start();
                 }
+            } else {
+                logger.info("Received uninnovative packet for batch " + batch);
             }
         }
     }
@@ -250,7 +252,12 @@ public class SourceCoder extends Thread {
         }
     }
     
-    public int nextCoefficient() {
-        return random.nextInt( (2 * Short.MAX_VALUE) + 1) - Short.MAX_VALUE;
+    public byte[] nextRow(int row, int batchSize) {
+        if (row < 256)
+            return CodeMatrix.getRow(row);
+        byte[] coefficients = new byte[batchSize];
+        for (int i=0; i<batchSize; i++)
+            coefficients[i] = (byte) (random.nextInt(2 * Byte.MAX_VALUE) - Byte.MAX_VALUE);
+        return coefficients;
     }
 }

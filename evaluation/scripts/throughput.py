@@ -1,5 +1,6 @@
 import pylab as plt
 import numpy as np
+import os
 
 exp = 10
 
@@ -15,7 +16,8 @@ colours = dict()
 
 
 for i in range(0, exp):
-    filename = '../data/throughput/s1_c2_b16/experiment_{}.log'.format(i)
+    filename = os.path.abspath('C:/Users/Nathanael/workspace/MSTCP with Coding/bin/evaluation/data/throughput/s1_c2_b16/experiment_{}.log'.format(i))
+    
     print filename + '\n'
     start = 0
 
@@ -51,8 +53,8 @@ for i in range(0, exp):
         elements = sorted(throughput_all[port].items())
         x,y = zip(*elements)
         c = colours[port]
-        plt.plot(x, y, color=next(c))
+        plt.semilogy(x, y, color=next(c))
 
-plt.savefig('../visualisation/throughput/s1_c2_b16.pdf')
+plt.savefig('../visualisation/throughput/s1_c2_b16_log.pdf')
 plt.close()
 

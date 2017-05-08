@@ -96,17 +96,16 @@ public class RequesterForwarder {
                                 
                             }
                         }
+                    } else if (tcpPacket.isSYN() && tcpPacket.isACK()) { // if SYN+ACK
+                        // initialise buffer for innovative packets
+                        int flowID = MSTCPInformation.getFlowID(tcpPacket.getData());
+                        long fileSize = MSTCPInformation.getFileSize(tcpPacket.getData());
+                        logger.info("Received SYN+ACK for flow " + flowID + ". Initialising.");
+                        if (!flowBuffer.containsKey(flowID))
+                            flowBuffer.put(flowID, new FlowData(flowID, fileSize));
                     } else {
-                        
-                        if (tcpPacket.isSYN() && tcpPacket.isACK()) { // if SYN+ACK
-                            // initialise buffer for innovative packets
-                            int flowID = MSTCPInformation.getFlowID(tcpPacket.getData());
-                            long fileSize = MSTCPInformation.getFileSize(tcpPacket.getData());
-                            logger.info("Received SYN+ACK for flow " + flowID + ". Initialising.");
-                            if (!flowBuffer.containsKey(flowID))
-                                flowBuffer.put(flowID, new FlowData(flowID, fileSize));
-                        }
-                    } 
+                        logger.info("Received Packet. Forwarding to " + nextPort);
+                    }
 
                     
                     byte[] tcpBytes = tcpPacket.bytes();

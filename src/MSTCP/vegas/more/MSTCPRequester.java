@@ -45,15 +45,17 @@ public class MSTCPRequester {
         this.mstcpInformation = new MSTCPInformation(this.recvAddr.getAddress(), recvPort, filename, (new Random()).nextInt());
         this.connections = new Vector<ConnectionHandler>(Utils.noOfSources);
         
-        int routerPort = 15001;
+        int routerPort = 15000;
         
         // Starting first connections
         logger.info("Starting first connection (" + InetAddress.getByName(dstAddr) + ", " + dstPort + ")");
         MSTCPRequesterConnection conn = new MSTCPRequesterConnection(dstAddr, nextRecvPort++, dstPort, routerPort, this, false);
-        connections.addElement(new ConnectionHandler(recvPort, this, conn, routerPort++));
+        connections.addElement(new ConnectionHandler(recvPort, this, conn, routerPort));
         
         // Start connections with other sources
         synchronized(mstcpInformation) {
+            while(mstcpInformation.sources == null)
+                mstcpInformation.wait();
             for (SourceInformation s: mstcpInformation.sources) {
                 if (connections.size() >= Utils.noOfConnections)
                     break;
@@ -62,7 +64,7 @@ public class MSTCPRequester {
                         if (!s.ports.get(port)) {
                             logger.info("Connecting to " + s.address + " on port " + port);
                             conn = new MSTCPRequesterConnection(s.address, nextRecvPort++, port,  routerPort, this, true);
-                            connections.add(new ConnectionHandler(recvPort, this, conn, routerPort++));
+                            connections.add(new ConnectionHandler(recvPort, this, conn, routerPort));
                             s.ports.put(port, true);
                             s.tried.put(port, true);
                             s.connected++;
@@ -272,38 +274,20 @@ public class MSTCPRequester {
         Integer nextRow = batchRows.get(batch);
         nextRow = nextRow == null ? 0 : nextRow;
         batchRows.put(batch, nextRow + 1);
-        byte[] coefficients = CodeMatrix.getRow(nextRow);
+        byte[] coefficients = sourceCoder.nextRow(nextRow, batchSize);
         
         logger.info("Request for batch " + batch + " row " + nextRow + " on connection " + recvPort);
-        
-//        HashSet<Integer> blocks = new HashSet<Integer>();
-//        for (int i=0; i<Math.min(batchSize, Utils.batchElements); i++) {
-//            int block = batchSize < Utils.batchElements ? i : sourceCoder.random.nextInt(batchSize);
-//            while (blocks.contains(block))
-//                block = sourceCoder.random.nextInt(batchSize);
-//            blocks.add(block);
-//        }
-//        
-//        CodeVectorElement[] codeVector = new CodeVectorElement[blocks.size()];
-//        for (int i=0; i<codeVector.length; i++) {
-//            int block = Collections.min(blocks);
-//            blocks.remove(block);
-//            codeVector[i] = new CodeVectorElement((short) (baseBlock + block), sourceCoder.nextCoefficient());
-//        }
         
         CodeVectorElement[] codeVector = new CodeVectorElement[batchSize];
         for (int i=0; i<codeVector.length; i++) {
             codeVector[i] = new CodeVectorElement(baseBlock + i, coefficients[i]);
         }
         
-        
-        
-            
         if (batch == nextReqBatch) {
-            nextBatchReqs += 1.5 * ((1.0 / (1.0 - p_drop)) - 1.0); // redundancy
-            nextBatchReqs -= 1; // packet sent
-            
-            if (nextBatchReqs < 0.5) {
+            if (nextRow < batchSize) {
+                nextBatchReqs += 1.5 * ((1.0 / (1.0 - p_drop)) - 1.0); // redundancy
+    
+            } else if (nextBatchReqs < 0.5 || sourceCoder.decodedBatches.contains(batch)) {
                 nextReqBatch++;
                 nextReqBlock+= batchSize;
                 batchSize = Math.min(Utils.batchSize, sourceCoder.fileBlocks - nextReqBatch * Utils.batchSize);
@@ -312,6 +296,8 @@ public class MSTCPRequester {
                 nextBatchReqs = nextBatchReqs < 0 ? batchSize : nextBatchReqs + batchSize; // preserve redundancy built up
             }
         }
+        nextBatchReqs -= 1; // packet sent
+        
         return codeVector;
     }
 

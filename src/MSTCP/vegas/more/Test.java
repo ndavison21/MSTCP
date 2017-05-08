@@ -52,7 +52,8 @@ public class Test {
                 (new Thread() {
                     public void run() {
                         try {
-                            new MiddleForwarder(port1, 3, 0.01);
+                            //new MiddleForwarder(port1, 3, 0.01);
+                            new MiddleForwarder(port1, 0, 0.683772);//292893);
                         } catch (SocketException e) {
                             e.printStackTrace();
                             System.exit(1);
@@ -64,7 +65,8 @@ public class Test {
                 (new Thread() {
                     public void run() {
                         try {
-                            new MiddleForwarder(port2, 10, 0.1);
+                            //new MiddleForwarder(port2, 10, 0.1);
+                            new MiddleForwarder(port2, 0, 0.683772);
                         } catch (SocketException e) {
                             e.printStackTrace();
                             System.exit(1);
@@ -104,16 +106,17 @@ public class Test {
             
             
             // String[] files = new String[]{"hello.txt", "hello_800.txt", "hello_repeat.txt", "hello_repeat_repeat.txt", "me.jpg"};
-            //String file = "hello_repeat_repeat.txt";
-            String file = "gb.jpg";
+            String file = "hello_repeat_repeat.txt";
+            //String file = "gb.jpg";
             
-            for(i=0; i<10; i++) {
+            for(i=0; i<1; i++) {
                 Utils.logger =  Utils.getLogger("experiment_" + i, "." + path + "/", Level.FINE);
                 
-                System.out.println("#" + i + " Starting Transfer of " + file + ".");
+                long start = System.currentTimeMillis();
+                System.out.println("#" + i + " Starting Transfer of " + file + ". Started at " + start);
                 
                 new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null), 14000, 16000, "./", file);
-                System.out.println("Transfer Complete.");
+                System.out.println("Transfer Complete. Took " + (System.currentTimeMillis() - start) + "ms");
                 System.gc();
                 
                 for (SourceInformation s: sources) {
