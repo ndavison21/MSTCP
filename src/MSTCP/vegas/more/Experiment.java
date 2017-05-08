@@ -17,7 +17,7 @@ public class Experiment {
         Utils.batchSize = Integer.parseInt(args[i++]);
         
         int experiment = Integer.parseInt(args[i++]);
-        String path = String.format("../evaluation/data/throughput/s%d_p%d_c%d_b%d/", Utils.noOfSources, Utils.noOfPaths, Utils.noOfConnections, Utils.batchSize);
+        String path = String.format("../../evaluation/data/timing/s%d_p%d_c%d_b%d/", Utils.noOfSources, Utils.noOfPaths, Utils.noOfConnections, Utils.batchSize);
         
         /** Removing Previous Log Files **/
         File logs = new File("./logs");
@@ -60,32 +60,18 @@ public class Experiment {
         /** Middle Routers **/
         routerPort = 15001;
         for (SourceInformation source: sources) {
-            boolean wifi = true;
             for (int j=0; j<source.ports.size(); j++) {
                 final int midRouterPort = routerPort++;
-                if (wifi)
-                    (new Thread() {
-                        public void run() {
-                            try {
-                                new MiddleForwarder(midRouterPort, 5, 0.00501256);
-                            } catch (SocketException e) {
-                                e.printStackTrace();
-                                System.exit(1);
-                            }
+                (new Thread() {
+                    public void run() {
+                        try {
+                            new MiddleForwarder(midRouterPort, 20, 0.00501256);
+                        } catch (SocketException e) {
+                            e.printStackTrace();
+                            System.exit(1);
                         }
-                    }).start();
-                else
-                    (new Thread() {
-                        public void run() {
-                            try {
-                                new MiddleForwarder(midRouterPort, 10, 0.0253206);
-                            } catch (SocketException e) {
-                                e.printStackTrace();
-                                System.exit(1);
-                            }
-                        }
-                    }).start();
-                wifi = !wifi;
+                    }
+                }).start();
             }
         }
         
