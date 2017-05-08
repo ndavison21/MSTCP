@@ -142,7 +142,7 @@ public class MSTCPRequesterConnection extends Thread {
     public void close() {
         logger.info("Closing Connection to (" + dstAddr + ", " + dstPort + ")");
         
-        Utils.logger.fine(System.nanoTime() + " " + recvPort + " " + 0 + " " + 0 + " " + 0);
+        Utils.logger.fine(System.nanoTime() + " " + recvPort + " " + 0 + " " + 0 + " " + 0 + " " + 0);
         inThread.interrupt();
         outThread.interrupt();
         stopTimer();
@@ -350,7 +350,7 @@ public class MSTCPRequesterConnection extends Thread {
     public class InThread extends Thread {
         public void run() {
             DatagramPacket data;
-            Utils.logger.fine(System.nanoTime() + " " + recvPort + " " + cwnd + " " + rtt + " " + p_drop);
+            Utils.logger.fine(System.nanoTime() + " " + recvPort + " " + cwnd + " " + rtt + " " + p_drop + " " + 0);
             
             try {
                 for (;;) {
@@ -482,7 +482,7 @@ public class MSTCPRequesterConnection extends Thread {
                                     cwnd_true = 2;
                                 
                                 cwnd = (int) cwnd_true;
-                                Utils.logger.fine(System.nanoTime() + " " + recvPort + " " + cwnd + " " + rtt + " " + p_drop);
+                                Utils.logger.fine(System.nanoTime() + " " + recvPort + " " + cwnd + " " + rtt + " " + p_drop + " " + rttSeqNum);
                                 
                                 logger.info("Congestion Window is now " + cwnd + " (" + cwnd_true + ")");
                                 

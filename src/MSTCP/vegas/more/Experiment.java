@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.Vector;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 
 public class Experiment {
@@ -16,7 +17,7 @@ public class Experiment {
         Utils.batchSize = Integer.parseInt(args[i++]);
         
         int experiment = Integer.parseInt(args[i++]);
-        String path = String.format("../../evaluation/data/throughput/s%d_p%d_c%d_b%d/", Utils.noOfSources, Utils.noOfPaths, Utils.noOfConnections, Utils.batchSize);
+        String path = String.format("../evaluation/data/throughput/s%d_p%d_c%d_b%d/", Utils.noOfSources, Utils.noOfPaths, Utils.noOfConnections, Utils.batchSize);
         
         /** Removing Previous Log Files **/
         File logs = new File("./logs");
@@ -123,7 +124,10 @@ public class Experiment {
         new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null), 14000, 16000, "./", file);
         System.out.println("Transfer Complete. Took " + (System.currentTimeMillis() - start) + "ms");
         
+        for (Handler handler: Utils.logger.getHandlers())
+            handler.close();
         
+        System.exit(1);
         
     }
 }
