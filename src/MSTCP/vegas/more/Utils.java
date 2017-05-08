@@ -19,7 +19,7 @@ public final class Utils {
     public static final int FIN_ENUM  = 2;
     
     
-    public static final boolean logging = false; // whether to do logging
+    public static final boolean logging = true; // whether to do logging
     public static final boolean debug   = false; // turn off timeouts so can step through with debug mode
     public static final boolean decode  = false; // perform decoding of packets at received
     public static final boolean recode  = false; // perform recoding of packets in the network
@@ -27,7 +27,7 @@ public final class Utils {
     public static final boolean localhost    = true;  // get public or local IP
     public static final Random rand          = new Random();
     
-    public static final double p_smooth      = 0.05;   // smoothing factor for monitoring drop rate
+    public static final double p_smooth      = 0.0001;   // smoothing factor for monitoring drop rate
 
     public static int noOfPaths       = 2;  // number of paths available to each source
     public static int noOfSources     = 2;  // number of sources available
