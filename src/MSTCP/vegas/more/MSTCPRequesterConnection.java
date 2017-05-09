@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -331,15 +332,15 @@ public class MSTCPRequesterConnection extends Thread {
             cwnd_true = cwnd_true < 2 ? 2 : cwnd_true;
             cwnd = (int) cwnd_true;
             slowstart = true;
-            rttSeqNum = nextSeqNum + cwnd;
             sampled_num = 0;
             sampled_rtt = 0;
             
             nextSeqNum = base;
+            rttSeqNum = nextSeqNum + cwnd;
             initialSeqNum.notifyAll();
         }
         System.out.printf("goBackN: p_drop %f cwnd %d\n", p_drop, cwnd);
-        //setTimer(Utils.DATA_ENUM);
+
         dataAttempts++;
     }
     
@@ -352,7 +353,7 @@ public class MSTCPRequesterConnection extends Thread {
     public class InThread extends Thread {
         public void run() {
             DatagramPacket data;
-            Utils.logger.fine(System.nanoTime() + " " + recvPort + " " + cwnd + " " + rtt + " " + p_drop + " " + 0);
+            Utils.logger.fine(System.nanoTime() + " " + recvPort + " " + cwnd + " " + rtt + " " + p_drop + " " + rttSeqNum);
             
             try {
                 for (;;) {
@@ -406,13 +407,12 @@ public class MSTCPRequesterConnection extends Thread {
 
                         if (base != nextSeqNum) // if there are outstanding packets
                             setTimer(Utils.DATA_ENUM); //start waiting for next response
-                        
-                        
+
+                        sentRequests.remove(tcpPacket.getSeqNum());
                         if (tcpPacket.getSeqNum() == base) { // packet received in order
-                            base = tcpPacket.getACK();
+                            base = Collections.min(sentRequests.keySet());
                         }
                         
-                        sentRequests.remove(tcpPacket);
 
                         
                         p_drop = ( p_drop * mult * (1 - Utils.p_smooth) ) + (1 - mult); // a single ACK may represent multiple losses
@@ -432,7 +432,7 @@ public class MSTCPRequesterConnection extends Thread {
                             sampled_num++;
                             sampled_rtt += pkt_rtt;
                         
-                            if (tcpPacket.getSeqNum() == rttSeqNum) { // end of a round: do congestion control
+                            if (tcpPacket.getSeqNum() >= rttSeqNum) { // end of a round: do congestion control
                                 // average RTT on the last round
                                 rtt = ((double) sampled_rtt) / sampled_num;
                                 diff = cwnd_true * ((rtt - base_rtt) / rtt);
@@ -486,12 +486,12 @@ public class MSTCPRequesterConnection extends Thread {
                                     cwnd_true = 2;
                                 
                                 cwnd = (int) cwnd_true;
-                                Utils.logger.fine(System.nanoTime() + " " + recvPort + " " + cwnd + " " + rtt + " " + p_drop + " " + rttSeqNum);
                                 
                                 logger.info("Congestion Window is now " + cwnd + " (" + cwnd_true + ")");
                                 
                                 // prepare for next round
                                 rttSeqNum = nextSeqNum + cwnd;
+                                Utils.logger.fine(System.nanoTime() + " " + recvPort + " " + cwnd + " " + rtt + " " + p_drop + " " + rttSeqNum);
                                 sampled_num = 0;
                                 sampled_rtt = 0;
                             }
