@@ -22,7 +22,7 @@ public class Experiment {
         if (Utils.packetLimit == -1)
             Utils.packetLimit = Integer.MAX_VALUE;
         
-        DecimalFormat df = new DecimalFormat("#.00");
+        DecimalFormat df = new DecimalFormat("0.00");
         int experiment = Integer.parseInt(args[i++]);
         String path = String.format("../../evaluation/data/timing/s%d_p%d_c%d_b%d_p%s/", Utils.noOfSources, Utils.noOfPaths, Utils.noOfConnections, Utils.batchSize, df.format(Utils.p_drop));
         
