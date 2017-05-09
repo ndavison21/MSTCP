@@ -28,11 +28,13 @@ public class Experiment {
         DecimalFormat df = new DecimalFormat("0.00");
         String path = String.format("../../evaluation/data/%s/s%d_p%d_c%d_b%d_p%s/", directory, Utils.noOfSources, Utils.noOfPaths, Utils.noOfConnections, Utils.batchSize, df.format(p));
         
-        // x + (1-x)x = p_drop
-        Utils.p_drop = (1.0/2.0) * (2 - Math.sqrt(4 - (4 * p)));
-        if (Utils.p_drop <= 0 || Utils.p_drop >= 1)
-            Utils.p_drop = (1.0/2.0) * (2 + Math.sqrt(4 - (4 * p)));
-        System.out.println(Utils.p_drop);
+        if (p <= 0)
+            Utils.p_drop = 0;
+        else {
+            Utils.p_drop = (1.0/2.0) * (2 - Math.sqrt(4 - (4 * p)));
+            if (Utils.p_drop <= 0 || Utils.p_drop >= 1)
+                Utils.p_drop = (1.0/2.0) * (2 + Math.sqrt(4 - (4 * p)));
+        }
         
         /** Removing Previous Log Files **/
         File logs = new File("./logs");

@@ -7,6 +7,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -410,7 +411,11 @@ public class MSTCPRequesterConnection extends Thread {
 
                         sentRequests.remove(tcpPacket.getSeqNum());
                         if (tcpPacket.getSeqNum() == base) { // packet received in order
-                            base = Collections.min(sentRequests.keySet());
+                            Set<Integer> sentSeqNums = sentRequests.keySet();
+                            if (sentSeqNums.size() > 0)
+                                base = Collections.min(sentSeqNums);
+                            else
+                                base = tcpPacket.getACK();
                         }
                         
 
