@@ -10,7 +10,7 @@ BATCH_SIZE=1
 P_DROP=0.0
 
 echo "P_DROP Experiments: TCP (BASELINE)"
-for P_DROP in {0..0.5..0.01}
+for P_DROP in $(seq 0 0.01 0.5)
 do
     path="../evaluation/data/timing/s${SOURCES}_p${PATHS}_c${CONNECTIONS}_b${BATCH_SIZE}_p${P_DROP}/"
     echo $path
@@ -29,7 +29,7 @@ BATCH_SIZE=1
 P_DROP=0.0
 
 echo "P_DROP Experiments: MSMPTCP (1 Source, 2 Paths)"
-for P_DROP in {0..0.5..0.01}
+for P_DROP in $(seq 0 0.01 0.5)
 do
     path="../evaluation/data/timing/s${SOURCES}_p${PATHS}_c${CONNECTIONS}_b${BATCH_SIZE}_p${P_DROP}/"
     echo $path
@@ -48,7 +48,7 @@ BATCH_SIZE=1
 P_DROP=0.0
 
 echo "P_DROP Experiments: MSMPTCP (2 Sources, 2 Paths)"
-for P_DROP in {0..0.5..0.01}
+for P_DROP in $(seq 0 0.01 0.5)
 do
     path="../evaluation/data/timing/s${SOURCES}_p${PATHS}_c${CONNECTIONS}_b${BATCH_SIZE}_p${P_DROP}/"
     echo $path
@@ -68,7 +68,7 @@ BATCH_SIZE=16
 P_DROP=0.0
 
 echo "P_DROP Experiments: TCP with Network Coding (Batch Size 16)"
-for P_DROP in {0..0.5..0.01}
+for P_DROP in $(seq 0 0.01 0.5)
 do
     path="../evaluation/data/timing/s${SOURCES}_p${PATHS}_c${CONNECTIONS}_b${BATCH_SIZE}_p${P_DROP}/"
     echo $path
@@ -87,7 +87,7 @@ BATCH_SIZE=16
 P_DROP=0.0
 
 echo "P_DROP Experiments: MSMPTCP with Network Coding (1 Source, 2 Paths, Batch Size 16)"
-for P_DROP in {0..0.5..0.01}
+for P_DROP in $(seq 0 0.01 0.5)
 do
     path="../evaluation/data/timing/s${SOURCES}_p${PATHS}_c${CONNECTIONS}_b${BATCH_SIZE}_p${P_DROP}/"
     echo $path
@@ -106,7 +106,7 @@ BATCH_SIZE=16
 P_DROP=0.0
 
 echo "P_DROP Experiments: MSMPTCP with Network Coding (2 Sources, 2 Paths, Batch Size 16)"
-for P_DROP in {0..0.5..0.01}
+for P_DROP in $(seq 0 0.01 0.5)
 do
     path="../evaluation/data/timing/s${SOURCES}_p${PATHS}_c${CONNECTIONS}_b${BATCH_SIZE}_p${P_DROP}/"
     echo $path
