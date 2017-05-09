@@ -166,7 +166,7 @@ public class MSTCPResponderConnection {
                                     for (CodeVectorElement c : codeVector) {
                                         if (c.getBlock() == -1 || c.getCoefficient() == 0)
                                             continue;
-    //                                    logger.info("Block " + c.getBlock() + " with coefficient " + c.getCoefficient());
+                                        logger.info("Block " + c.getBlock() + " with coefficient " + c.getCoefficient());
                                         raf.seek(c.getBlock() * Utils.blockSize);
                                         if ((c.getBlock() + 1L) * Utils.blockSize > raf.length())
                                             dataBytes = new byte[(int) (raf.length() - (c.getBlock() * Utils.blockSize)) + 1];

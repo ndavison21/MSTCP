@@ -38,7 +38,7 @@ public final class Utils {
     public static int batchSize     = 16;   // to keep matrix sizes small we send blocks in smaller groups
     public static final int pktSize       = 1000; // 1000 Bytes total (Header 28 bytes, Block 972 bytes)
     public static final int tcpSize       = 28;   // TCP Header no options
-    public static final int moreSize      = 10;   // MORE Header with no code vector or data
+    public static final int moreSize      = 12;   // MORE Header with no code vector or data
     public static final int blockSize     = 800;  // size of data blocks
     public static final int transferSize  = blockSize + 1; // we prefix a byte to avoid bytes being dropped when converting to BigInteger
     public static final int maxVectorSize = pktSize - (tcpSize + moreSize + blockSize); // maximum size of code vector in bytes
@@ -48,7 +48,7 @@ public final class Utils {
     // retransmit parameters
     public static final int synAttempts  = 30;
     public static final int synTimeout   = debug ? Integer.MAX_VALUE : 500;
-    public static final int dataAttempts = Integer.MAX_VALUE;
+    public static final int dataAttempts = 3;
     public static final int dataTimeout  = debug ? Integer.MAX_VALUE : 1000;
     public static final int finAttempts  = 3;
     public static final int finTimeout   = debug ? Integer.MAX_VALUE : 200;

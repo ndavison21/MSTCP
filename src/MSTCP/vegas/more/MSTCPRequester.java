@@ -27,12 +27,12 @@ public class MSTCPRequester {
     final int total_alpha = Utils.total_alpha;
     Double total_rate = 0.0; // congestion control parameter (see wVegas paper)
     
-    short prevReqBatch = 0; // previous batch requested (used when requesting dropped packets)
-    short nextReqBatch = 0; // next batch to request
+    int prevReqBatch = 0; // previous batch requested (used when requesting dropped packets)
+    int nextReqBatch = 0; // next batch to request
     int nextReqBlock   = 0; // first block of the new batch to request
     double nextBatchReqs = 0.0; // number of remaining requests to make for current batch (including redundancy for loss rate) 
     
-    private HashMap<Short, Integer> batchRows = new HashMap<Short, Integer>(); // which row of the coding matrix we want to use next for each batch
+    private HashMap<Integer, Integer> batchRows = new HashMap<Integer, Integer>(); // which row of the coding matrix we want to use next for each batch
     
     boolean transfer_complete = false;
 
@@ -175,15 +175,7 @@ public class MSTCPRequester {
                                 }
                             }
                         }
-                        
-                        try {
                         logger.info("Connecting to " + newSource.address + " on port " + newPort);
-                        } catch (Exception e) {
-                            System.err.printf("%d\n", prevPort);
-                            e.printStackTrace();
-                            System.exit(1);
-                            
-                        }
                         if (routerPort == prevPort)
                             routerPort = newPort;
                         conn = new MSTCPRequesterConnection(newSource.address, conn.recvPort, newPort, routerPort, requester, true);
@@ -236,12 +228,12 @@ public class MSTCPRequester {
     
     // called by connections, returns next needed block and records which connection it'll come on
     public synchronized CodeVectorElement[] codeVector(int recvPort, double p_drop) {
-        short batch = nextReqBatch;
+        int batch = nextReqBatch;
         int batchSize = -1;
         
         if (batch >= sourceCoder.fileBatches) { // have we made requests for all batches
             boolean complete = true;
-            for (short i=0; i < sourceCoder.fileBatches; i++) { // find any batches for which we need to repeat requests
+            for (int i=0; i < sourceCoder.fileBatches; i++) { // find any batches for which we need to repeat requests
                 if (sourceCoder.decodedBatches.contains(i))
                     continue;
                 batchSize = Math.min(Utils.batchSize, sourceCoder.fileBlocks - i * Utils.batchSize);

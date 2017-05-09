@@ -21,9 +21,9 @@ public class SourceCoder extends Thread {
     LinkedBlockingQueue<DecodedBlock> decodedBlocks = new LinkedBlockingQueue<DecodedBlock>(); // pass decoded packets to the requester
 
     
-    HashMap<Short, double[][]> innovChecker = new HashMap<Short, double[][]>(); // maps batches to their innovative checker matrices
-    HashMap<Short, Vector<MOREPacket>> packetBuffer = new HashMap<Short, Vector<MOREPacket>>(); // maps batches to packets
-    HashSet<Short> decodedBatches = new HashSet<Short>(); // maintains set of batches which have been (or are being) decoded
+    HashMap<Integer, double[][]> innovChecker = new HashMap<Integer, double[][]>(); // maps batches to their innovative checker matrices
+    HashMap<Integer, Vector<MOREPacket>> packetBuffer = new HashMap<Integer, Vector<MOREPacket>>(); // maps batches to packets
+    HashSet<Integer> decodedBatches = new HashSet<Integer>(); // maintains set of batches which have been (or are being) decoded
     
     Random random = new Random();
     
@@ -47,7 +47,7 @@ public class SourceCoder extends Thread {
     
     public void processPacket(MOREPacket more) {
         CodeVectorElement[] codeVector = more.getCodeVector();
-        final short batch = more.getBatch(); // the batch this packet belongs to
+        final int batch = more.getBatch(); // the batch this packet belongs to
         int baseBlock = batch * Utils.batchSize;
         
         int batchSize = Math.min(Utils.batchSize, fileBlocks - batch * Utils.batchSize);
@@ -56,8 +56,14 @@ public class SourceCoder extends Thread {
 
         // building coefficients array
         double[] coefficients = new double[batchSize];
+        try {
         for (CodeVectorElement c: codeVector) {
             coefficients[c.getBlock() - baseBlock] = c.getInnovCoefficient();
+        }
+        } catch(Exception e) {
+            e.printStackTrace();
+            logger.log(Level.SEVERE, e.getMessage(), e);
+            System.exit(1);
         }
         
         double[][] innovMatrix = innovChecker.get(batch);
@@ -93,7 +99,7 @@ public class SourceCoder extends Thread {
         }
     }
     
-    private boolean canDecode(short batch) { // do we have enough DoFs to decode the batch
+    private boolean canDecode(int batch) { // do we have enough DoFs to decode the batch
         int batchSize = Math.min(Utils.batchSize, fileBlocks - batch * Utils.batchSize);
         if (batchSize < 0)
             batchSize = fileBlocks;
@@ -103,7 +109,7 @@ public class SourceCoder extends Thread {
     }
     
     
-    public void decode(short batch) {
+    public void decode(int batch) {
         logger.info("Decoding Batch " + batch);
         Vector<MOREPacket> batchBuffer = packetBuffer.remove(batch);
         int batchSize = Math.min(Utils.batchSize, fileBlocks - batch * Utils.batchSize);

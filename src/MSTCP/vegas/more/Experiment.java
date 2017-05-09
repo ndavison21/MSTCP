@@ -12,25 +12,27 @@ public class Experiment {
     public static void main(String[] args) throws InterruptedException, IOException {
         /** Configuring Experiment Parameters **/
         int i = 0;
+        String directory = args[i++];
         Utils.noOfSources = Integer.parseInt(args[i++]);
         Utils.noOfPaths = Integer.parseInt(args[i++]);
         Utils.noOfConnections = Integer.parseInt(args[i++]);
         Utils.batchSize = Integer.parseInt(args[i++]);
         Utils.p_drop = Double.parseDouble(args[i++]);
         Utils.packetLimit = Integer.parseInt(args[i++]);
+        int experiment = Integer.parseInt(args[i++]);
+        String file = args.length > i ? args[i++] : "gb.jpg";
         
         if (Utils.packetLimit == -1)
             Utils.packetLimit = Integer.MAX_VALUE;
         
         DecimalFormat df = new DecimalFormat("0.00");
-        int experiment = Integer.parseInt(args[i++]);
-        String path = String.format("../../evaluation/data/timing/s%d_p%d_c%d_b%d_p%s/", Utils.noOfSources, Utils.noOfPaths, Utils.noOfConnections, Utils.batchSize, df.format(Utils.p_drop));
+        String path = String.format("../evaluation/data/%s/s%d_p%d_c%d_b%d_p%s/", directory, Utils.noOfSources, Utils.noOfPaths, Utils.noOfConnections, Utils.batchSize, df.format(Utils.p_drop));
         
         /** Removing Previous Log Files **/
         File logs = new File("./logs");
-        for(File file: logs.listFiles()) 
-            if (!file.isDirectory()) 
-                file.delete();
+        for(File log: logs.listFiles()) 
+            if (!log.isDirectory()) 
+                log.delete();
         
         File res = new File("./logs/" + path + "#" + experiment + ".log");
         if (res.exists())
@@ -111,7 +113,6 @@ public class Experiment {
         }
         
         
-        String file = "gb.jpg";
         long start = System.currentTimeMillis();
         System.out.println("#" + experiment + " Starting Transfer of " + file + ". Started at " + start);
         new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null), 14000, 16000, "./", file);

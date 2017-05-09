@@ -320,6 +320,8 @@ public class MSTCPRequesterConnection extends Thread {
         double mult = Math.pow(1 - Utils.p_smooth, cwnd);
         p_drop = ( p_drop * mult * (1 - Utils.p_smooth) ) + (1 - mult);
         p_drop = Math.min(1, p_drop);
+        if (p_drop < 0.002)
+            p_drop = 0;
         
         toRetransmit.clear();
         sentRequests.clear();   
@@ -545,7 +547,7 @@ public class MSTCPRequesterConnection extends Thread {
                         return;
                     }
                     
-                    short batch = (short) (codeVector[0].getBlock() / Utils.batchSize);
+                    int batch = codeVector[0].getBlock() / Utils.batchSize;
                     
                     MOREPacket more = new MOREPacket(requester.mstcpInformation.flowID, MOREPacket.FORWARD_PACKET, batch, codeVector);;
                     

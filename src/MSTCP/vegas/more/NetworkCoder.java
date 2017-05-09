@@ -16,9 +16,9 @@ public class NetworkCoder {
     
     Bool preEncoding = new Bool(false);
     
-    HashMap<Short, double[][]> innovChecker = new HashMap<Short, double[][]>(); // maps batches to their innovative checker matrices
-    HashMap<Short, Vector<MOREPacket>> packetBuffer = new HashMap<Short, Vector<MOREPacket>>(); // maps batches to packets
-    HashMap<Short, MOREPacket> preEncodedPackets = new HashMap<Short, MOREPacket>(); // maps batches to their pre-encoded packet
+    HashMap<Integer, double[][]> innovChecker = new HashMap<Integer, double[][]>(); // maps batches to their innovative checker matrices
+    HashMap<Integer, Vector<MOREPacket>> packetBuffer = new HashMap<Integer, Vector<MOREPacket>>(); // maps batches to packets
+    HashMap<Integer, MOREPacket> preEncodedPackets = new HashMap<Integer, MOREPacket>(); // maps batches to their pre-encoded packet
 
     Random random = new Random();
     
@@ -31,7 +31,7 @@ public class NetworkCoder {
     public MOREPacket processPacket(final MOREPacket more) {
            
         CodeVectorElement[] codeVector = more.getCodeVector();
-        short batch = more.getBatch(); // the batch this packet belongs to
+        int batch = more.getBatch(); // the batch this packet belongs to
         int baseBlock = batch * Utils.batchSize;
         
         int batchSize = Math.min(Utils.batchSize, fileBlocks - batch * Utils.batchSize);
@@ -95,7 +95,7 @@ public class NetworkCoder {
         return toSend;
     }
     
-    private void generatePreEncodedPacket(short batch) {
+    private void generatePreEncodedPacket(int batch) {
         synchronized(preEncoding) {
             preEncodedPackets.remove(batch);
             
