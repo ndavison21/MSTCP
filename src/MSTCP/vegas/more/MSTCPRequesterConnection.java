@@ -417,6 +417,8 @@ public class MSTCPRequesterConnection extends Thread {
                         
                         p_drop = ( p_drop * mult * (1 - Utils.p_smooth) ) + (1 - mult); // a single ACK may represent multiple losses
                         p_drop = Math.min(1, p_drop);
+                        if (p_drop < 0.002)
+                            p_drop = 0;
                         
                         time_ack = time_recv - tcpPacket.getTime_ack();
                         if (time_ack < 0)

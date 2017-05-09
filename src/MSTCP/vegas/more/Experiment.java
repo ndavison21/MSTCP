@@ -26,7 +26,7 @@ public class Experiment {
             Utils.packetLimit = Integer.MAX_VALUE;
         
         DecimalFormat df = new DecimalFormat("0.00");
-        String path = String.format("../evaluation/data/%s/s%d_p%d_c%d_b%d_p%s/", directory, Utils.noOfSources, Utils.noOfPaths, Utils.noOfConnections, Utils.batchSize, df.format(Utils.p_drop));
+        String path = String.format("../../evaluation/data/%s/s%d_p%d_c%d_b%d_p%s/", directory, Utils.noOfSources, Utils.noOfPaths, Utils.noOfConnections, Utils.batchSize, df.format(Utils.p_drop));
         
         /** Removing Previous Log Files **/
         File logs = new File("./logs");

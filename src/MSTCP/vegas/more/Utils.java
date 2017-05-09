@@ -19,7 +19,7 @@ public final class Utils {
     public static final int FIN_ENUM  = 2;
     
     
-    public static final boolean logging = true; // whether to do logging
+    public static final boolean logging = false; // whether to do logging
     public static final boolean debug   = false; // turn off timeouts so can step through with debug mode
     public static final boolean decode  = false; // perform decoding of packets at received
     public static final boolean recode  = false; // perform recoding of packets in the network
