@@ -3,6 +3,7 @@ package MSTCP.vegas.more;
 import java.io.File;
 import java.io.IOException;
 import java.net.SocketException;
+import java.text.DecimalFormat;
 import java.util.Vector;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -21,8 +22,9 @@ public class Experiment {
         if (Utils.packetLimit == -1)
             Utils.packetLimit = Integer.MAX_VALUE;
         
+        DecimalFormat df = new DecimalFormat("#.00");
         int experiment = Integer.parseInt(args[i++]);
-        String path = String.format("../../evaluation/data/timing/s%d_p%d_c%d_b%d_p%f/", Utils.noOfSources, Utils.noOfPaths, Utils.noOfConnections, Utils.batchSize, Utils.p_drop);
+        String path = String.format("../../evaluation/data/timing/s%d_p%d_c%d_b%d_p%s/", Utils.noOfSources, Utils.noOfPaths, Utils.noOfConnections, Utils.batchSize, df.format(Utils.p_drop));
         
         /** Removing Previous Log Files **/
         File logs = new File("./logs");
