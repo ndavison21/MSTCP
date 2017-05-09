@@ -61,7 +61,7 @@ public class MSTCPRequesterConnection extends Thread {
     // public Bool startup = new Bool(true);
     
     // calculating redundancy to send
-    double p_drop = 33.0/100; // approximate starting value
+    double p_drop = 1.0/100; // approximate starting value
     
     // fast retransmit
     ConcurrentLinkedQueue<Integer> toRetransmit; // sequence number of packets to retransmit

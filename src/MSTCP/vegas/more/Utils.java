@@ -32,6 +32,8 @@ public final class Utils {
     public static int noOfPaths       = 2;  // number of paths available to each source
     public static int noOfSources     = 2;  // number of sources available
     public static int noOfConnections = 2;  // number of connections the requester should start up
+    public static double p_drop       = 0.00501256; // drop rate (over 2 legs gives 0.01)
+    public static int packetLimit     = Integer.MAX_VALUE;
     
     public static int batchSize     = 16;   // to keep matrix sizes small we send blocks in smaller groups
     public static final int pktSize       = 1000; // 1000 Bytes total (Header 28 bytes, Block 972 bytes)

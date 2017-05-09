@@ -15,9 +15,14 @@ public class Experiment {
         Utils.noOfPaths = Integer.parseInt(args[i++]);
         Utils.noOfConnections = Integer.parseInt(args[i++]);
         Utils.batchSize = Integer.parseInt(args[i++]);
+        Utils.p_drop = Double.parseDouble(args[i++]);
+        Utils.packetLimit = Integer.parseInt(args[i++]);
+        
+        if (Utils.packetLimit == -1)
+            Utils.packetLimit = Integer.MAX_VALUE;
         
         int experiment = Integer.parseInt(args[i++]);
-        String path = String.format("../../evaluation/data/timing/s%d_p%d_c%d_b%d/", Utils.noOfSources, Utils.noOfPaths, Utils.noOfConnections, Utils.batchSize);
+        String path = String.format("../../evaluation/data/timing/s%d_p%d_c%d_b%d_p%f/", Utils.noOfSources, Utils.noOfPaths, Utils.noOfConnections, Utils.batchSize, Utils.p_drop);
         
         /** Removing Previous Log Files **/
         File logs = new File("./logs");
@@ -65,7 +70,7 @@ public class Experiment {
                 (new Thread() {
                     public void run() {
                         try {
-                            new MiddleForwarder(midRouterPort, 20, 0.00501256);
+                            new MiddleForwarder(midRouterPort, 20, Utils.p_drop);
                         } catch (SocketException e) {
                             e.printStackTrace();
                             System.exit(1);
@@ -83,7 +88,7 @@ public class Experiment {
             (new Thread() {
                 public void run() {
                     try {
-                        new ResponderForwarder(resRouterPort, Integer.MAX_VALUE);
+                        new ResponderForwarder(resRouterPort, resRouterPort == 15005 ? Utils.packetLimit : Integer.MAX_VALUE);
                     } catch (SocketException e) {
                         e.printStackTrace();
                         System.exit(1);
