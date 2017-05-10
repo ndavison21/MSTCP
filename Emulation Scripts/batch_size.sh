@@ -11,7 +11,7 @@ SOURCES=2
 PATHS=2
 CONNECTIONS=4
 
-for BATCH_SIZE in 2 4 8 128 256
+for BATCH_SIZE in 1 2 4 8 16 64 128 256
 do
     for P_DROP in $(seq 0 0.01 0.2)
     do

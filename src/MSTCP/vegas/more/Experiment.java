@@ -52,6 +52,7 @@ public class Experiment {
         int sourcePort  = 16000;
         final Vector<SourceInformation> sources  = new Vector<SourceInformation>(Utils.noOfSources);
         for (i=1; i<=Utils.noOfSources; i++) {
+            sourcePort = 16000 + (i-1) * 2;
             int[] ports = new int[Utils.noOfPaths];
             for (int j=0; j<Utils.noOfPaths; j++) {
                 ports[j] = sourcePort++;
@@ -78,7 +79,7 @@ public class Experiment {
         routerPort = 15001;
         for (SourceInformation source: sources) {
             for (int j=0; j<source.ports.size(); j++) {
-                final int midRouterPort = routerPort++;
+                final int midRouterPort = routerPort + j;
                 (new Thread() {
                     public void run() {
                         try {
@@ -90,6 +91,7 @@ public class Experiment {
                     }
                 }).start();
             }
+            routerPort += 2;
         }
         
         /** Responder Routers and Responders **/

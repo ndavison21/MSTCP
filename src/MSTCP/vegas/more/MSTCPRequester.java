@@ -161,12 +161,12 @@ public class MSTCPRequester {
                         conn.close();
                         
                         for (SourceInformation s: mstcpInformation.sources) {
+                            if (s.address.equals(prevAddr) && s.ports.get(prevPort)) {
+                                s.ports.put(prevPort, false);
+                                s.connected--;
+                            }
                             if (s.connected < Utils.noOfPaths && s.connected < s.ports.size()) {
                                 for (int p: s.ports.keySet()) {
-                                    if (s.address.equals(prevAddr) && s.ports.get(prevPort)) { // mark previous as disconnected
-                                        s.ports.put(prevPort, false);
-                                        s.connected--;
-                                    }
                                     if (tried && !s.ports.get(p)) {
                                         newSource = s;
                                         newPort = p;
