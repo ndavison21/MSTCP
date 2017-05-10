@@ -8,7 +8,7 @@ FILE="me.jpg"
 P_DROP=0.05
 PACKET_LIMIT=300
 
-for SOURCES in 1 2
+for SOURCES in 2
 do
     for PATHS in 1 2
     do
