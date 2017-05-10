@@ -14,7 +14,7 @@ do
     do
         for CONNECTIONS in 1 2
         do
-            if ["$CONNECTIONS" -lt "$(($SOURCES * $PATHS))"]
+            if [ "$CONNECTIONS" -lt "$(($SOURCES * $PATHS))" ]
             then
                 for BATCH_SIZE in 1 16 64
                 do
@@ -22,7 +22,7 @@ do
                     echo $path
                     rm -r $path
                     mkdir -p $path
-                    for i in {0..0}
+                    for i in {0..9}
                     do
                         java -Djava.util.logging.SimpleFormatter.format='%5$s%6$s%n' MSTCP.vegas.more.Experiment $DIRECTORY $SOURCES $PATHS $CONNECTIONS $BATCH_SIZE $P_DROP $PACKET_LIMIT $i $FILE
                     done    
