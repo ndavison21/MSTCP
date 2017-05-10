@@ -272,7 +272,7 @@ public class MSTCPRequester {
         
         CodeVectorElement[] codeVector = new CodeVectorElement[batchSize];
         for (int i=0; i<codeVector.length; i++) {
-            codeVector[i] = new CodeVectorElement(baseBlock + i, coefficients[i]);
+            codeVector[i] = new CodeVectorElement(baseBlock + i, i < coefficients.length ? coefficients[i] : sourceCoder.nextCoefficient());
         }
         
         if (batch == nextReqBatch) {

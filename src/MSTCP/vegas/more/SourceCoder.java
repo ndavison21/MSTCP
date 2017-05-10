@@ -258,6 +258,10 @@ public class SourceCoder extends Thread {
         }
     }
     
+    public byte nextCoefficient() {
+        return (byte) (random.nextInt(2 * Byte.MAX_VALUE) - Byte.MAX_VALUE);
+    }
+    
     public byte[] nextRow(int row, int batchSize) {
         if (row < 256)
             return CodeMatrix.getRow(row);
