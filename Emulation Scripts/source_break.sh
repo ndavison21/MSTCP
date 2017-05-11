@@ -7,7 +7,7 @@ DIRECTORY="break"
 FILE="me.jpg"
 P_DROP=0.05
 PACKET_LIMIT=300
-SOURCES = 2
+SOURCESq=2
 
 for PATHS in 1 2
 do

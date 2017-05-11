@@ -122,8 +122,7 @@ public class MOREPacket {
     }
     
     public byte[] bytes() {
-    	byte[] encodedDataBytes = (encodedData == null ? new byte[0] : encodedData.toByteArray());
-        ByteBuffer bb = ByteBuffer.allocate(BASE_SIZE + 4*vectorLength + encodedDataBytes.length);
+        ByteBuffer bb = ByteBuffer.allocate(Utils.moreSize + 6*vectorLength + dataLength);
 
         bb.putInt(flowID);
         bb.putShort(packetType);
