@@ -36,12 +36,13 @@ public final class Utils {
     public static int packetLimit     = Integer.MAX_VALUE;
     
     public static int batchSize     = 16;   // to keep matrix sizes small we send blocks in smaller groups
-    public static final int pktSize       = 1000; // 1000 Bytes total (Header 28 bytes, Block 972 bytes)
+    public static int pktSize() {
+        return Utils.batchSize*6 + Utils.tcpSize + Utils.moreSize + Utils.transferSize;
+    }
     public static final int tcpSize       = 28;   // TCP Header no options
     public static final int moreSize      = 14;   // MORE Header with no code vector or data
     public static final int blockSize     = 800;  // size of data blocks
     public static final int transferSize  = blockSize + 1; // we prefix a byte to avoid bytes being dropped when converting to BigInteger
-    public static final int maxVectorSize = pktSize - (tcpSize + moreSize + blockSize); // maximum size of code vector in bytes
     public static final int precision     = 2000; // number of decimal places to calculate to  (must be greater than log10(2 ^ blockSize) )
     
 

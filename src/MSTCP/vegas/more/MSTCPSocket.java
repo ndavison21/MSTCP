@@ -28,7 +28,7 @@ public class MSTCPSocket {
         public void run() {
             try {
                 for (;;) {
-                    final DatagramPacket d = new DatagramPacket(new byte[Utils.pktSize], Utils.pktSize);
+                    final DatagramPacket d = new DatagramPacket(new byte[Utils.pktSize()], Utils.pktSize());
                     inSocket.receive(d);
                     
 //                    if (Utils.rand.nextDouble() < p_drop){

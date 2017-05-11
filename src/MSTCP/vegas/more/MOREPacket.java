@@ -131,8 +131,12 @@ public class MOREPacket {
         bb.putShort(dataLength);
         for (short i=0; i<vectorLength; i++)
             bb.put(codeVector[i].bytes());
-        if (encodedData != null)
+        if (encodedData != null) {
+//            byte[] encodedDataBytes = encodedData.toByteArray();
+//            for (int i=encodedDataBytes.length; i<dataLength; i++)
+//                bb.put((byte) 0);
             bb.put(encodedData.toByteArray());
+        }
         
         return bb.array();
     }
