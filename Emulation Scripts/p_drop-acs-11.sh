@@ -7,7 +7,7 @@ DIRECTORY="timing"
 FILE="gb.jpg"
 PACKET_LIMIT=-1
 
-PDROP=0.01
+P_DROP=0.01
 
 for SOURCES in 1 2
 do
