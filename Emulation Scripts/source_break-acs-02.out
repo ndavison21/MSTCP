@@ -1,0 +1,276 @@
+../evaluation/data/break/s2_p1_c1_b64_p0.05/
+#0 Starting Transfer of me.jpg. Started at 1494494754693
+goBackN: p_drop 0.019247 cwnd 2
+goBackN: p_drop 0.019441 cwnd 2
+goBackN: p_drop 0.019635 cwnd 2
+goBackN: p_drop 0.019830 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 27383ms
+#1 Starting Transfer of me.jpg. Started at 1494494782555
+goBackN: p_drop 0.021899 cwnd 2
+goBackN: p_drop 0.022092 cwnd 2
+goBackN: p_drop 0.022285 cwnd 2
+goBackN: p_drop 0.022479 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 27210ms
+#2 Starting Transfer of me.jpg. Started at 1494494810249
+goBackN: p_drop 0.021929 cwnd 2
+goBackN: p_drop 0.022123 cwnd 2
+goBackN: p_drop 0.022316 cwnd 2
+goBackN: p_drop 0.022509 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 27399ms
+#3 Starting Transfer of me.jpg. Started at 1494494838130
+goBackN: p_drop 0.015125 cwnd 2
+goBackN: p_drop 0.015321 cwnd 2
+goBackN: p_drop 0.015516 cwnd 2
+goBackN: p_drop 0.015712 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 27288ms
+#4 Starting Transfer of me.jpg. Started at 1494494865894
+goBackN: p_drop 0.022410 cwnd 2
+goBackN: p_drop 0.022603 cwnd 2
+goBackN: p_drop 0.022797 cwnd 2
+goBackN: p_drop 0.022990 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 27347ms
+#5 Starting Transfer of me.jpg. Started at 1494494893730
+goBackN: p_drop 0.021224 cwnd 2
+goBackN: p_drop 0.021418 cwnd 2
+goBackN: p_drop 0.021612 cwnd 2
+goBackN: p_drop 0.021805 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 27294ms
+#6 Starting Transfer of me.jpg. Started at 1494494921516
+goBackN: p_drop 0.021412 cwnd 2
+goBackN: p_drop 0.021605 cwnd 2
+goBackN: p_drop 0.021799 cwnd 2
+goBackN: p_drop 0.021992 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 27475ms
+#7 Starting Transfer of me.jpg. Started at 1494494949480
+goBackN: p_drop 0.014447 cwnd 2
+goBackN: p_drop 0.014643 cwnd 2
+goBackN: p_drop 0.014839 cwnd 2
+goBackN: p_drop 0.015034 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 27189ms
+#8 Starting Transfer of me.jpg. Started at 1494494977156
+goBackN: p_drop 0.021738 cwnd 2
+goBackN: p_drop 0.021932 cwnd 2
+goBackN: p_drop 0.022125 cwnd 2
+goBackN: p_drop 0.022318 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 27211ms
+#9 Starting Transfer of me.jpg. Started at 1494495004846
+goBackN: p_drop 0.020034 cwnd 2
+goBackN: p_drop 0.020228 cwnd 2
+goBackN: p_drop 0.020422 cwnd 2
+goBackN: p_drop 0.020616 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 27831ms
+../evaluation/data/break/s2_p2_c1_b64_p0.05/
+rm: cannot remove ‘../evaluation/data/break/s2_p2_c1_b64_p0.05/’: No such file or directory
+#0 Starting Transfer of me.jpg. Started at 1494495033177
+goBackN: p_drop 0.020628 cwnd 2
+goBackN: p_drop 0.020822 cwnd 2
+goBackN: p_drop 0.021015 cwnd 2
+goBackN: p_drop 0.021209 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 43666ms
+#1 Starting Transfer of me.jpg. Started at 1494495077353
+goBackN: p_drop 0.021018 cwnd 2
+goBackN: p_drop 0.021212 cwnd 2
+goBackN: p_drop 0.021405 cwnd 2
+goBackN: p_drop 0.021599 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 43655ms
+#2 Starting Transfer of me.jpg. Started at 1494495121511
+goBackN: p_drop 0.021118 cwnd 2
+goBackN: p_drop 0.021312 cwnd 2
+goBackN: p_drop 0.021505 cwnd 2
+goBackN: p_drop 0.021699 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 43603ms
+#3 Starting Transfer of me.jpg. Started at 1494495165631
+goBackN: p_drop 0.021114 cwnd 2
+goBackN: p_drop 0.021308 cwnd 2
+goBackN: p_drop 0.021501 cwnd 2
+goBackN: p_drop 0.021695 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 43643ms
+#4 Starting Transfer of me.jpg. Started at 1494495209768
+goBackN: p_drop 0.015519 cwnd 2
+goBackN: p_drop 0.015714 cwnd 2
+goBackN: p_drop 0.015909 cwnd 2
+goBackN: p_drop 0.016105 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 43656ms
+#5 Starting Transfer of me.jpg. Started at 1494495253916
+goBackN: p_drop 0.021026 cwnd 2
+goBackN: p_drop 0.021220 cwnd 2
+goBackN: p_drop 0.021413 cwnd 2
+goBackN: p_drop 0.021607 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 43522ms
+#6 Starting Transfer of me.jpg. Started at 1494495297938
+goBackN: p_drop 0.021817 cwnd 2
+goBackN: p_drop 0.022010 cwnd 2
+goBackN: p_drop 0.022203 cwnd 2
+goBackN: p_drop 0.022397 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 43507ms
+#7 Starting Transfer of me.jpg. Started at 1494495341930
+goBackN: p_drop 0.022095 cwnd 2
+goBackN: p_drop 0.022288 cwnd 2
+goBackN: p_drop 0.022481 cwnd 2
+goBackN: p_drop 0.022675 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 43584ms
+#8 Starting Transfer of me.jpg. Started at 1494495386024
+goBackN: p_drop 0.014635 cwnd 2
+goBackN: p_drop 0.014831 cwnd 2
+goBackN: p_drop 0.015026 cwnd 2
+goBackN: p_drop 0.015222 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 43590ms
+#9 Starting Transfer of me.jpg. Started at 1494495430091
+goBackN: p_drop 0.019950 cwnd 2
+goBackN: p_drop 0.020144 cwnd 2
+goBackN: p_drop 0.020338 cwnd 2
+goBackN: p_drop 0.020532 cwnd 2
+Data Limit reached for connection 14000
+Transfer Complete. Took 44044ms
+../evaluation/data/break/s2_p2_c2_b64_p0.05/
+rm: cannot remove ‘../evaluation/data/break/s2_p2_c2_b64_p0.05/’: No such file or directory
+#0 Starting Transfer of me.jpg. Started at 1494495474655
+goBackN: p_drop 0.020132 cwnd 2
+goBackN: p_drop 0.020062 cwnd 2
+goBackN: p_drop 0.020326 cwnd 2
+goBackN: p_drop 0.020256 cwnd 2
+goBackN: p_drop 0.020520 cwnd 2
+goBackN: p_drop 0.020450 cwnd 2
+goBackN: p_drop 0.020714 cwnd 2
+goBackN: p_drop 0.020644 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+Transfer Complete. Took 27959ms
+#1 Starting Transfer of me.jpg. Started at 1494495503122
+goBackN: p_drop 0.014581 cwnd 2
+goBackN: p_drop 0.020894 cwnd 2
+goBackN: p_drop 0.014776 cwnd 2
+goBackN: p_drop 0.021088 cwnd 2
+goBackN: p_drop 0.014972 cwnd 2
+goBackN: p_drop 0.021281 cwnd 2
+goBackN: p_drop 0.015167 cwnd 2
+goBackN: p_drop 0.021475 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+Transfer Complete. Took 27921ms
+#2 Starting Transfer of me.jpg. Started at 1494495531546
+goBackN: p_drop 0.020988 cwnd 2
+goBackN: p_drop 0.020478 cwnd 2
+goBackN: p_drop 0.021181 cwnd 2
+goBackN: p_drop 0.020672 cwnd 2
+goBackN: p_drop 0.021375 cwnd 2
+goBackN: p_drop 0.020866 cwnd 2
+goBackN: p_drop 0.021568 cwnd 2
+goBackN: p_drop 0.021060 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+Transfer Complete. Took 27914ms
+#3 Starting Transfer of me.jpg. Started at 1494495559963
+goBackN: p_drop 0.014831 cwnd 2
+goBackN: p_drop 0.021134 cwnd 2
+goBackN: p_drop 0.015027 cwnd 2
+goBackN: p_drop 0.021328 cwnd 2
+goBackN: p_drop 0.015222 cwnd 2
+goBackN: p_drop 0.021521 cwnd 2
+goBackN: p_drop 0.015418 cwnd 2
+goBackN: p_drop 0.021715 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+Transfer Complete. Took 27967ms
+#4 Starting Transfer of me.jpg. Started at 1494495588426
+goBackN: p_drop 0.014620 cwnd 2
+goBackN: p_drop 0.014965 cwnd 2
+goBackN: p_drop 0.014816 cwnd 2
+goBackN: p_drop 0.015160 cwnd 2
+goBackN: p_drop 0.015011 cwnd 2
+goBackN: p_drop 0.015356 cwnd 2
+goBackN: p_drop 0.015207 cwnd 2
+goBackN: p_drop 0.015551 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+Transfer Complete. Took 28199ms
+#5 Starting Transfer of me.jpg. Started at 1494495617120
+goBackN: p_drop 0.020720 cwnd 2
+goBackN: p_drop 0.019374 cwnd 2
+goBackN: p_drop 0.020914 cwnd 2
+goBackN: p_drop 0.019568 cwnd 2
+goBackN: p_drop 0.021108 cwnd 2
+goBackN: p_drop 0.019762 cwnd 2
+goBackN: p_drop 0.021301 cwnd 2
+goBackN: p_drop 0.019956 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+java.lang.InterruptedException
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireInterruptibly(AbstractQueuedSynchronizer.java:1219)
+	at java.util.concurrent.locks.ReentrantLock.lockInterruptibly(ReentrantLock.java:340)
+	at java.util.concurrent.LinkedBlockingQueue.put(LinkedBlockingQueue.java:338)
+	at MSTCP.vegas.more.MSTCPRequesterConnection$InThread.run(MSTCPRequesterConnection.java:509)
+#6 Starting Transfer of me.jpg. Started at 1494495645534
+goBackN: p_drop 0.020768 cwnd 2
+goBackN: p_drop 0.014329 cwnd 2
+goBackN: p_drop 0.020962 cwnd 2
+goBackN: p_drop 0.014525 cwnd 2
+goBackN: p_drop 0.021155 cwnd 2
+goBackN: p_drop 0.014721 cwnd 2
+goBackN: p_drop 0.021349 cwnd 2
+goBackN: p_drop 0.014916 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+Exception in thread "Thread-344" java.lang.IllegalStateException: Timer already cancelled.
+	at java.util.Timer.sched(Timer.java:397)
+	at java.util.Timer.schedule(Timer.java:193)
+	at MSTCP.vegas.more.MSTCPRequesterConnection.setTimer(MSTCPRequesterConnection.java:96)
+	at MSTCP.vegas.more.MSTCPRequesterConnection.access$700(MSTCPRequesterConnection.java:19)
+	at MSTCP.vegas.more.MSTCPRequesterConnection$InThread.run(MSTCPRequesterConnection.java:410)
+Transfer Complete. Took 28663ms
+#7 Starting Transfer of me.jpg. Started at 1494495674713
+goBackN: p_drop 0.020225 cwnd 2
+goBackN: p_drop 0.013573 cwnd 2
+goBackN: p_drop 0.020419 cwnd 2
+goBackN: p_drop 0.013768 cwnd 2
+goBackN: p_drop 0.020613 cwnd 2
+goBackN: p_drop 0.013964 cwnd 2
+goBackN: p_drop 0.020807 cwnd 2
+goBackN: p_drop 0.014160 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+Transfer Complete. Took 28019ms
+#8 Starting Transfer of me.jpg. Started at 1494495703229
+goBackN: p_drop 0.014642 cwnd 2
+goBackN: p_drop 0.019947 cwnd 2
+goBackN: p_drop 0.014838 cwnd 2
+goBackN: p_drop 0.020141 cwnd 2
+goBackN: p_drop 0.015033 cwnd 2
+goBackN: p_drop 0.020335 cwnd 2
+goBackN: p_drop 0.015229 cwnd 2
+goBackN: p_drop 0.020529 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+Transfer Complete. Took 28142ms
+#9 Starting Transfer of me.jpg. Started at 1494495731862
+goBackN: p_drop 0.020900 cwnd 2
+goBackN: p_drop 0.019978 cwnd 2
+goBackN: p_drop 0.021094 cwnd 2
+goBackN: p_drop 0.020172 cwnd 2
+goBackN: p_drop 0.021288 cwnd 2
+goBackN: p_drop 0.020365 cwnd 2
+goBackN: p_drop 0.021481 cwnd 2
+goBackN: p_drop 0.020559 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+Transfer Complete. Took 27924ms
+We Done Here.
