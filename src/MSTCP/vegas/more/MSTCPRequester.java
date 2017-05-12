@@ -56,7 +56,11 @@ public class MSTCPRequester {
         synchronized(mstcpInformation) {
             while(mstcpInformation.sources == null)
                 mstcpInformation.wait();
+            int i = 0;
             for (SourceInformation s: mstcpInformation.sources) {
+                nextRecvPort = recvPort + i*2;
+                nextRecvPort += (nextRecvPort == recvPort ? 1 : 0);
+                i++;
                 if (connections.size() >= Utils.noOfConnections)
                     break;
                 if (s.connected < Utils.noOfPaths && s.connected < s.ports.size()) {
