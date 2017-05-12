@@ -51,7 +51,7 @@ public final class Utils {
     public static final int synAttempts  = 30;
     public static final int synTimeout   = debug ? Integer.MAX_VALUE : 500;
     public static final int dataAttempts = 3;
-    public static final int dataTimeout  = debug ? Integer.MAX_VALUE : 1000;
+    public static final int dataTimeout  = debug ? Integer.MAX_VALUE : 500;
     public static final int finAttempts  = 3;
     public static final int finTimeout   = debug ? Integer.MAX_VALUE : 200;
 
