@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 /**
  * VM ARGUMENT: -Djava.util.logging.SimpleFormatter.format="%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n"
@@ -80,7 +79,7 @@ public class Test {
                 (new Thread() {
                     public void run() {
                         try {
-                            new ResponderForwarder(port, Integer.MAX_VALUE);
+                            new ResponderForwarder(port);
                         } catch (SocketException e) {
                             e.printStackTrace();
                             System.exit(1);

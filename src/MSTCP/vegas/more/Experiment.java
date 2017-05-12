@@ -103,7 +103,7 @@ public class Experiment {
             (new Thread() {
                 public void run() {
                     try {
-                        new ResponderForwarder(resRouterPort, resRouterPort == 15005 ? Utils.packetLimit : Integer.MAX_VALUE);
+                        new ResponderForwarder(resRouterPort, resRouterPort == 15005 ? Utils.packetLimit : Integer.MAX_VALUE, Utils.packetLimit == Integer.MAX_VALUE ? Integer.MAX_VALUE : 10000+Utils.packetLimit);
                     } catch (SocketException e) {
                         e.printStackTrace();
                         System.exit(1);
