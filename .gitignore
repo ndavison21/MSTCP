@@ -7,4 +7,4 @@ bin/received_*
 *.bin
 gb.jpg
 received_gb.jpg
-
+*.out

@@ -13,7 +13,7 @@ CONNECTIONS=2
 
 for BATCH_SIZE in 1 2 4 8 16 64 128 256
 do
-    for P_DROP in $(seq 0 0.01 0.2)
+    for P_DROP in $(seq 0 0.01 0.05)
     do
         path="../evaluation/data/${DIRECTORY}/s${SOURCES}_p${PATHS}_c${CONNECTIONS}_b${BATCH_SIZE}_p${P_DROP}/"
         echo $path
