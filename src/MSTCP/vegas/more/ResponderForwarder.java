@@ -54,7 +54,7 @@ public class ResponderForwarder {
         try {
         
             for (;;) {
-                data = socket.receive(); // TODO: get from pcap
+                data = socket.receive();
                 
                 if (packets > terminate) {
                     logger.info("Received more than " + terminate + " packets. Exiting.");
