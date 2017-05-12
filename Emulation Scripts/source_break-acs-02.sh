@@ -15,7 +15,7 @@ for PATHS in 1 2
 do
     for CONNECTIONS in 1 2 4
     do
-        if [ "$CONNECTIONS" -lt "$(($SOURCES * $PATHS))"]
+        if [ "$CONNECTIONS" -lt "$(($SOURCES * $PATHS))" ]
         then
             if [ "$PATHS" -le "$CONNECTIONS"]
             then
