@@ -34,16 +34,21 @@ public class MSTCPResponderConnection {
     RandomAccessFile raf;
 
     Timer timer;
+    Bool timer_monitor = new Bool(false);
 
     private void stopTimer() {
-        if (timer != null)
-            timer.cancel();
+        synchronized(timer_monitor) {
+            if (timer != null)
+                timer.cancel();
+        }
     }
 
     private void setTimer() {
         stopTimer();
-        timer = new Timer();
-        timer.schedule(new FINACKTimeout(), Utils.finTimeout);
+        synchronized(timer_monitor) {
+            timer = new Timer();
+            timer.schedule(new FINACKTimeout(), Utils.finTimeout);
+        }
     }
 
     private class FINACKTimeout extends TimerTask {
