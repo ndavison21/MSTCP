@@ -1,236 +1,3259 @@
-../evaluation/data/break/s2_p2_c4_b1_p0.05/
-rm: cannot remove ‘../evaluation/data/break/s2_p2_c4_b1_p0.05/’: No such file or directory
-#0 Starting Transfer of me.jpg. Started at 1494585107749
-Transfer Complete. Took 2980ms
-#1 Starting Transfer of me.jpg. Started at 1494585111226
-Transfer Complete. Took 2962ms
-#2 Starting Transfer of me.jpg. Started at 1494585114699
-Transfer Complete. Took 2845ms
-#3 Starting Transfer of me.jpg. Started at 1494585118051
-Transfer Complete. Took 2962ms
-#4 Starting Transfer of me.jpg. Started at 1494585121532
-Transfer Complete. Took 3402ms
-#5 Starting Transfer of me.jpg. Started at 1494585125441
-Transfer Complete. Took 3045ms
-#6 Starting Transfer of me.jpg. Started at 1494585128983
-Transfer Complete. Took 3267ms
-#7 Starting Transfer of me.jpg. Started at 1494585132748
-Transfer Complete. Took 3174ms
-#8 Starting Transfer of me.jpg. Started at 1494585136431
-Transfer Complete. Took 2896ms
-#9 Starting Transfer of me.jpg. Started at 1494585139826
-Transfer Complete. Took 2873ms
-#10 Starting Transfer of me.jpg. Started at 1494585143200
-Transfer Complete. Took 2830ms
-#11 Starting Transfer of me.jpg. Started at 1494585146539
-Transfer Complete. Took 3105ms
-#12 Starting Transfer of me.jpg. Started at 1494585150158
-Transfer Complete. Took 2937ms
-#13 Starting Transfer of me.jpg. Started at 1494585153592
-Transfer Complete. Took 3238ms
-#14 Starting Transfer of me.jpg. Started at 1494585157331
-Transfer Complete. Took 2772ms
-#15 Starting Transfer of me.jpg. Started at 1494585160606
-Transfer Complete. Took 2939ms
-#16 Starting Transfer of me.jpg. Started at 1494585164057
-Exception in thread "Thread-53" java.lang.IllegalStateException: Timer already cancelled.
-	at java.util.Timer.sched(Timer.java:397)
-	at java.util.Timer.schedule(Timer.java:193)
-	at MSTCP.vegas.more.MSTCPRequesterConnection.setTimer(MSTCPRequesterConnection.java:96)
-	at MSTCP.vegas.more.MSTCPRequesterConnection.access$700(MSTCPRequesterConnection.java:19)
-	at MSTCP.vegas.more.MSTCPRequesterConnection$InThread.run(MSTCPRequesterConnection.java:410)
-Transfer Complete. Took 3017ms
-#17 Starting Transfer of me.jpg. Started at 1494585167567
-Transfer Complete. Took 2866ms
-#18 Starting Transfer of me.jpg. Started at 1494585170933
-Transfer Complete. Took 3610ms
-#19 Starting Transfer of me.jpg. Started at 1494585175047
-Transfer Complete. Took 3151ms
-#20 Starting Transfer of me.jpg. Started at 1494585178693
-Transfer Complete. Took 2914ms
-#21 Starting Transfer of me.jpg. Started at 1494585182106
-Transfer Complete. Took 3051ms
-#22 Starting Transfer of me.jpg. Started at 1494585185675
-Transfer Complete. Took 2904ms
-#23 Starting Transfer of me.jpg. Started at 1494585189077
-Transfer Complete. Took 3130ms
-#24 Starting Transfer of me.jpg. Started at 1494585192719
-Transfer Complete. Took 2850ms
-#25 Starting Transfer of me.jpg. Started at 1494585196069
-Transfer Complete. Took 2849ms
-#26 Starting Transfer of me.jpg. Started at 1494585199437
-Transfer Complete. Took 3274ms
-#27 Starting Transfer of me.jpg. Started at 1494585203211
-Transfer Complete. Took 2780ms
-#28 Starting Transfer of me.jpg. Started at 1494585206496
-Transfer Complete. Took 2919ms
-#29 Starting Transfer of me.jpg. Started at 1494585209934
-Transfer Complete. Took 2865ms
-#30 Starting Transfer of me.jpg. Started at 1494585213302
-Transfer Complete. Took 3026ms
-#31 Starting Transfer of me.jpg. Started at 1494585216820
-Transfer Complete. Took 3479ms
-#32 Starting Transfer of me.jpg. Started at 1494585220802
-Transfer Complete. Took 2906ms
-#33 Starting Transfer of me.jpg. Started at 1494585224210
-Transfer Complete. Took 2979ms
-#34 Starting Transfer of me.jpg. Started at 1494585227689
-Transfer Complete. Took 2961ms
-#35 Starting Transfer of me.jpg. Started at 1494585231146
-Transfer Complete. Took 3761ms
-#36 Starting Transfer of me.jpg. Started at 1494585235419
-Transfer Complete. Took 3475ms
-#37 Starting Transfer of me.jpg. Started at 1494585239395
-Transfer Complete. Took 3041ms
-#38 Starting Transfer of me.jpg. Started at 1494585242952
-Transfer Complete. Took 3041ms
-#39 Starting Transfer of me.jpg. Started at 1494585246510
-Transfer Complete. Took 3318ms
-#40 Starting Transfer of me.jpg. Started at 1494585250321
-Transfer Complete. Took 2915ms
-#41 Starting Transfer of me.jpg. Started at 1494585253735
-Transfer Complete. Took 2924ms
-#42 Starting Transfer of me.jpg. Started at 1494585257160
-Transfer Complete. Took 3201ms
-#43 Starting Transfer of me.jpg. Started at 1494585260860
-goBackN: p_drop 0.010197 cwnd 2
+../evaluation/data/break/s2_p1_c1_b1_p0.05/
+#0 Starting Transfer of gb.jpg. Started at 1494598954375
+goBackN: p_drop 0.014450 cwnd 2
+goBackN: p_drop 0.014645 cwnd 2
+goBackN: p_drop 0.014841 cwnd 2
+goBackN: p_drop 0.015036 cwnd 2
+Data Limit reached for connection 14000
+#1 Starting Transfer of gb.jpg. Started at 1494598990951
+goBackN: p_drop 0.019559 cwnd 2
+goBackN: p_drop 0.019753 cwnd 2
+goBackN: p_drop 0.019947 cwnd 2
+goBackN: p_drop 0.020141 cwnd 2
+Data Limit reached for connection 14000
+#2 Starting Transfer of gb.jpg. Started at 1494599024744
+goBackN: p_drop 0.014351 cwnd 2
+goBackN: p_drop 0.014546 cwnd 2
+goBackN: p_drop 0.014742 cwnd 2
+goBackN: p_drop 0.014937 cwnd 2
+Data Limit reached for connection 14000
+#3 Starting Transfer of gb.jpg. Started at 1494599058748
+goBackN: p_drop 0.018971 cwnd 2
+goBackN: p_drop 0.019166 cwnd 2
+goBackN: p_drop 0.019360 cwnd 2
 goBackN: p_drop 0.019554 cwnd 2
-goBackN: p_drop 0.020552 cwnd 2
-Transfer Complete. Took 8317ms
-#44 Starting Transfer of me.jpg. Started at 1494585269667
-Transfer Complete. Took 3110ms
-#45 Starting Transfer of me.jpg. Started at 1494585273275
-Transfer Complete. Took 3338ms
-#46 Starting Transfer of me.jpg. Started at 1494585277117
-Transfer Complete. Took 3299ms
-#47 Starting Transfer of me.jpg. Started at 1494585280915
-Transfer Complete. Took 3812ms
-#48 Starting Transfer of me.jpg. Started at 1494585285228
-Transfer Complete. Took 2863ms
-#49 Starting Transfer of me.jpg. Started at 1494585288593
-Transfer Complete. Took 3068ms
-#50 Starting Transfer of me.jpg. Started at 1494585292159
-Transfer Complete. Took 2828ms
-#51 Starting Transfer of me.jpg. Started at 1494585295482
-Transfer Complete. Took 3045ms
-#52 Starting Transfer of me.jpg. Started at 1494585299019
-Transfer Complete. Took 3659ms
-#53 Starting Transfer of me.jpg. Started at 1494585303177
-Transfer Complete. Took 3860ms
-#54 Starting Transfer of me.jpg. Started at 1494585307536
-Transfer Complete. Took 2795ms
-#55 Starting Transfer of me.jpg. Started at 1494585310828
-Transfer Complete. Took 3074ms
-#56 Starting Transfer of me.jpg. Started at 1494585314406
-Transfer Complete. Took 2935ms
-#57 Starting Transfer of me.jpg. Started at 1494585317847
-Transfer Complete. Took 3058ms
-#58 Starting Transfer of me.jpg. Started at 1494585321404
-Transfer Complete. Took 2848ms
-#59 Starting Transfer of me.jpg. Started at 1494585324759
-Transfer Complete. Took 2906ms
-#60 Starting Transfer of me.jpg. Started at 1494585328161
-Transfer Complete. Took 2957ms
-#61 Starting Transfer of me.jpg. Started at 1494585331608
-Transfer Complete. Took 3062ms
-#62 Starting Transfer of me.jpg. Started at 1494585335172
-Transfer Complete. Took 3037ms
-#63 Starting Transfer of me.jpg. Started at 1494585338710
-Transfer Complete. Took 3117ms
-#64 Starting Transfer of me.jpg. Started at 1494585342327
-Transfer Complete. Took 2635ms
-#65 Starting Transfer of me.jpg. Started at 1494585345471
-Exception in thread "Thread-53" java.lang.IllegalStateException: Timer already cancelled.
-	at java.util.Timer.sched(Timer.java:397)
-	at java.util.Timer.schedule(Timer.java:193)
-	at MSTCP.vegas.more.MSTCPRequesterConnection.setTimer(MSTCPRequesterConnection.java:96)
-	at MSTCP.vegas.more.MSTCPRequesterConnection.access$700(MSTCPRequesterConnection.java:19)
-	at MSTCP.vegas.more.MSTCPRequesterConnection$InThread.run(MSTCPRequesterConnection.java:410)
-Transfer Complete. Took 3178ms
-#66 Starting Transfer of me.jpg. Started at 1494585349146
-Transfer Complete. Took 2775ms
-#67 Starting Transfer of me.jpg. Started at 1494585352411
-Transfer Complete. Took 3058ms
-#68 Starting Transfer of me.jpg. Started at 1494585355981
-Transfer Complete. Took 2558ms
-#69 Starting Transfer of me.jpg. Started at 1494585359035
-Transfer Complete. Took 2871ms
-#70 Starting Transfer of me.jpg. Started at 1494585362429
-Transfer Complete. Took 2883ms
-#71 Starting Transfer of me.jpg. Started at 1494585365814
-Exception in thread "Thread-53" java.lang.IllegalStateException: Timer already cancelled.
-	at java.util.Timer.sched(Timer.java:397)
-	at java.util.Timer.schedule(Timer.java:193)
-	at MSTCP.vegas.more.MSTCPRequesterConnection.setTimer(MSTCPRequesterConnection.java:96)
-	at MSTCP.vegas.more.MSTCPRequesterConnection.access$700(MSTCPRequesterConnection.java:19)
-	at MSTCP.vegas.more.MSTCPRequesterConnection$InThread.run(MSTCPRequesterConnection.java:410)
-Transfer Complete. Took 3057ms
-#72 Starting Transfer of me.jpg. Started at 1494585369379
-Transfer Complete. Took 3182ms
-#73 Starting Transfer of me.jpg. Started at 1494585373058
-Transfer Complete. Took 2855ms
-#74 Starting Transfer of me.jpg. Started at 1494585376416
-Transfer Complete. Took 2822ms
-#75 Starting Transfer of me.jpg. Started at 1494585379737
-Transfer Complete. Took 2777ms
-#76 Starting Transfer of me.jpg. Started at 1494585383017
-Transfer Complete. Took 2950ms
-#77 Starting Transfer of me.jpg. Started at 1494585386467
-Transfer Complete. Took 2898ms
-#78 Starting Transfer of me.jpg. Started at 1494585389861
-Transfer Complete. Took 2944ms
-#79 Starting Transfer of me.jpg. Started at 1494585393305
-Transfer Complete. Took 2970ms
-#80 Starting Transfer of me.jpg. Started at 1494585396779
-goBackN: p_drop 0.020318 cwnd 2
-goBackN: p_drop 0.020366 cwnd 2
-goBackN: p_drop 0.020512 cwnd 2
-goBackN: p_drop 0.020560 cwnd 2
-goBackN: p_drop 0.020706 cwnd 2
-goBackN: p_drop 0.020754 cwnd 2
-goBackN: p_drop 0.020900 cwnd 2
-goBackN: p_drop 0.020947 cwnd 2
+Data Limit reached for connection 14000
+#4 Starting Transfer of gb.jpg. Started at 1494599092740
+goBackN: p_drop 0.014346 cwnd 2
+goBackN: p_drop 0.014542 cwnd 2
+goBackN: p_drop 0.014737 cwnd 2
+goBackN: p_drop 0.014933 cwnd 2
+Data Limit reached for connection 14000
+#5 Starting Transfer of gb.jpg. Started at 1494599129809
+goBackN: p_drop 0.014155 cwnd 2
+goBackN: p_drop 0.014351 cwnd 2
+goBackN: p_drop 0.014547 cwnd 2
+goBackN: p_drop 0.014742 cwnd 2
+Data Limit reached for connection 14000
+#6 Starting Transfer of gb.jpg. Started at 1494599160360
+goBackN: p_drop 0.019364 cwnd 2
+goBackN: p_drop 0.019558 cwnd 2
+goBackN: p_drop 0.019752 cwnd 2
+goBackN: p_drop 0.019946 cwnd 2
+Data Limit reached for connection 14000
+#7 Starting Transfer of gb.jpg. Started at 1494599196459
+goBackN: p_drop 0.014838 cwnd 2
+goBackN: p_drop 0.015033 cwnd 2
+goBackN: p_drop 0.015229 cwnd 2
+goBackN: p_drop 0.015424 cwnd 2
+Data Limit reached for connection 14000
+#8 Starting Transfer of gb.jpg. Started at 1494599222392
+goBackN: p_drop 0.014547 cwnd 2
+goBackN: p_drop 0.014743 cwnd 2
+goBackN: p_drop 0.014938 cwnd 2
+goBackN: p_drop 0.015134 cwnd 2
+Data Limit reached for connection 14000
+#9 Starting Transfer of gb.jpg. Started at 1494599255752
+goBackN: p_drop 0.014641 cwnd 2
+goBackN: p_drop 0.014836 cwnd 2
+goBackN: p_drop 0.015032 cwnd 2
+goBackN: p_drop 0.015227 cwnd 2
+Data Limit reached for connection 14000
+#10 Starting Transfer of gb.jpg. Started at 1494599291975
+goBackN: p_drop 0.014350 cwnd 2
+goBackN: p_drop 0.014546 cwnd 2
+goBackN: p_drop 0.014742 cwnd 2
+goBackN: p_drop 0.014937 cwnd 2
+Data Limit reached for connection 14000
+#11 Starting Transfer of gb.jpg. Started at 1494599328583
+goBackN: p_drop 0.014446 cwnd 2
+goBackN: p_drop 0.014641 cwnd 2
+goBackN: p_drop 0.014837 cwnd 2
+goBackN: p_drop 0.015032 cwnd 2
+Data Limit reached for connection 14000
+#12 Starting Transfer of gb.jpg. Started at 1494599361079
+goBackN: p_drop 0.014447 cwnd 2
+goBackN: p_drop 0.014643 cwnd 2
+goBackN: p_drop 0.014838 cwnd 2
+goBackN: p_drop 0.015034 cwnd 2
+Data Limit reached for connection 14000
+#13 Starting Transfer of gb.jpg. Started at 1494599397301
+goBackN: p_drop 0.014648 cwnd 2
+goBackN: p_drop 0.014843 cwnd 2
+goBackN: p_drop 0.015039 cwnd 2
+goBackN: p_drop 0.015234 cwnd 2
+Data Limit reached for connection 14000
+#14 Starting Transfer of gb.jpg. Started at 1494599433167
+goBackN: p_drop 0.014347 cwnd 2
+goBackN: p_drop 0.014543 cwnd 2
+goBackN: p_drop 0.014739 cwnd 2
+goBackN: p_drop 0.014934 cwnd 2
+Data Limit reached for connection 14000
+#15 Starting Transfer of gb.jpg. Started at 1494599467569
+goBackN: p_drop 0.014645 cwnd 2
+goBackN: p_drop 0.014840 cwnd 2
+goBackN: p_drop 0.015036 cwnd 2
+goBackN: p_drop 0.015231 cwnd 2
+Data Limit reached for connection 14000
+#16 Starting Transfer of gb.jpg. Started at 1494599503956
+goBackN: p_drop 0.014744 cwnd 2
+goBackN: p_drop 0.014939 cwnd 2
+goBackN: p_drop 0.015135 cwnd 2
+goBackN: p_drop 0.015330 cwnd 2
+Data Limit reached for connection 14000
+#17 Starting Transfer of gb.jpg. Started at 1494599532773
+goBackN: p_drop 0.014447 cwnd 2
+goBackN: p_drop 0.014642 cwnd 2
+goBackN: p_drop 0.014838 cwnd 2
+goBackN: p_drop 0.015033 cwnd 2
+Data Limit reached for connection 14000
+#18 Starting Transfer of gb.jpg. Started at 1494599569092
+goBackN: p_drop 0.014547 cwnd 2
+goBackN: p_drop 0.014743 cwnd 2
+goBackN: p_drop 0.014939 cwnd 2
+goBackN: p_drop 0.015134 cwnd 2
+Data Limit reached for connection 14000
+#19 Starting Transfer of gb.jpg. Started at 1494599606270
+goBackN: p_drop 0.014649 cwnd 2
+goBackN: p_drop 0.014845 cwnd 2
+goBackN: p_drop 0.015040 cwnd 2
+goBackN: p_drop 0.015236 cwnd 2
+Data Limit reached for connection 14000
+#20 Starting Transfer of gb.jpg. Started at 1494599644822
+goBackN: p_drop 0.014546 cwnd 2
+goBackN: p_drop 0.014742 cwnd 2
+goBackN: p_drop 0.014938 cwnd 2
+goBackN: p_drop 0.015133 cwnd 2
+Data Limit reached for connection 14000
+#21 Starting Transfer of gb.jpg. Started at 1494599679552
+goBackN: p_drop 0.018773 cwnd 2
+goBackN: p_drop 0.018968 cwnd 2
+goBackN: p_drop 0.019162 cwnd 2
+goBackN: p_drop 0.019356 cwnd 2
+Data Limit reached for connection 14000
+#22 Starting Transfer of gb.jpg. Started at 1494599711221
+goBackN: p_drop 0.014447 cwnd 2
+goBackN: p_drop 0.014642 cwnd 2
+goBackN: p_drop 0.014838 cwnd 2
+goBackN: p_drop 0.015033 cwnd 2
+Data Limit reached for connection 14000
+#23 Starting Transfer of gb.jpg. Started at 1494599747775
+goBackN: p_drop 0.014944 cwnd 2
+goBackN: p_drop 0.015140 cwnd 2
+goBackN: p_drop 0.015335 cwnd 2
+goBackN: p_drop 0.015531 cwnd 2
+Data Limit reached for connection 14000
+#24 Starting Transfer of gb.jpg. Started at 1494599785214
+goBackN: p_drop 0.014841 cwnd 2
+goBackN: p_drop 0.015037 cwnd 2
+goBackN: p_drop 0.015232 cwnd 2
+goBackN: p_drop 0.015428 cwnd 2
+Data Limit reached for connection 14000
+#25 Starting Transfer of gb.jpg. Started at 1494599815965
+goBackN: p_drop 0.014547 cwnd 2
+goBackN: p_drop 0.014743 cwnd 2
+goBackN: p_drop 0.014939 cwnd 2
+goBackN: p_drop 0.015134 cwnd 2
+Data Limit reached for connection 14000
+#26 Starting Transfer of gb.jpg. Started at 1494599844784
+goBackN: p_drop 0.019754 cwnd 2
+goBackN: p_drop 0.019948 cwnd 2
+goBackN: p_drop 0.020142 cwnd 2
+goBackN: p_drop 0.020336 cwnd 2
+Data Limit reached for connection 14000
+#27 Starting Transfer of gb.jpg. Started at 1494599885753
+goBackN: p_drop 0.014943 cwnd 2
+goBackN: p_drop 0.015138 cwnd 2
+goBackN: p_drop 0.015334 cwnd 2
+goBackN: p_drop 0.015529 cwnd 2
+Data Limit reached for connection 14000
+#28 Starting Transfer of gb.jpg. Started at 1494599919868
+goBackN: p_drop 0.019754 cwnd 2
+goBackN: p_drop 0.019948 cwnd 2
+goBackN: p_drop 0.020142 cwnd 2
+goBackN: p_drop 0.020336 cwnd 2
+Data Limit reached for connection 14000
+#29 Starting Transfer of gb.jpg. Started at 1494599953146
+goBackN: p_drop 0.014544 cwnd 2
+goBackN: p_drop 0.014740 cwnd 2
+goBackN: p_drop 0.014935 cwnd 2
+goBackN: p_drop 0.015131 cwnd 2
+Data Limit reached for connection 14000
+#30 Starting Transfer of gb.jpg. Started at 1494599989311
+goBackN: p_drop 0.014448 cwnd 2
+goBackN: p_drop 0.014643 cwnd 2
+goBackN: p_drop 0.014839 cwnd 2
+goBackN: p_drop 0.015034 cwnd 2
+Data Limit reached for connection 14000
+#31 Starting Transfer of gb.jpg. Started at 1494600024111
+goBackN: p_drop 0.014447 cwnd 2
+goBackN: p_drop 0.014642 cwnd 2
+goBackN: p_drop 0.014838 cwnd 2
+goBackN: p_drop 0.015033 cwnd 2
+Data Limit reached for connection 14000
+#32 Starting Transfer of gb.jpg. Started at 1494600058351
+goBackN: p_drop 0.014743 cwnd 2
+goBackN: p_drop 0.014939 cwnd 2
+goBackN: p_drop 0.015134 cwnd 2
+goBackN: p_drop 0.015330 cwnd 2
+Data Limit reached for connection 14000
+#33 Starting Transfer of gb.jpg. Started at 1494600087837
+goBackN: p_drop 0.014745 cwnd 2
+goBackN: p_drop 0.014941 cwnd 2
+goBackN: p_drop 0.015136 cwnd 2
+goBackN: p_drop 0.015332 cwnd 2
+Data Limit reached for connection 14000
+#34 Starting Transfer of gb.jpg. Started at 1494600122296
+goBackN: p_drop 0.014840 cwnd 2
+goBackN: p_drop 0.015036 cwnd 2
+goBackN: p_drop 0.015231 cwnd 2
+goBackN: p_drop 0.015427 cwnd 2
+Data Limit reached for connection 14000
+#35 Starting Transfer of gb.jpg. Started at 1494600159695
+goBackN: p_drop 0.014450 cwnd 2
+goBackN: p_drop 0.014646 cwnd 2
+goBackN: p_drop 0.014841 cwnd 2
+goBackN: p_drop 0.015037 cwnd 2
+Data Limit reached for connection 14000
+#36 Starting Transfer of gb.jpg. Started at 1494600194331
+goBackN: p_drop 0.014452 cwnd 2
+goBackN: p_drop 0.014648 cwnd 2
+goBackN: p_drop 0.014843 cwnd 2
+goBackN: p_drop 0.015039 cwnd 2
+Data Limit reached for connection 14000
+#37 Starting Transfer of gb.jpg. Started at 1494600222648
+goBackN: p_drop 0.014450 cwnd 2
+goBackN: p_drop 0.014645 cwnd 2
+goBackN: p_drop 0.014841 cwnd 2
+goBackN: p_drop 0.015036 cwnd 2
+Data Limit reached for connection 14000
+#38 Starting Transfer of gb.jpg. Started at 1494600259835
+goBackN: p_drop 0.014645 cwnd 2
+goBackN: p_drop 0.014841 cwnd 2
+goBackN: p_drop 0.015037 cwnd 2
+goBackN: p_drop 0.015232 cwnd 2
+Data Limit reached for connection 14000
+#39 Starting Transfer of gb.jpg. Started at 1494600295216
+goBackN: p_drop 0.014549 cwnd 2
+goBackN: p_drop 0.014744 cwnd 2
+goBackN: p_drop 0.014940 cwnd 2
+goBackN: p_drop 0.015135 cwnd 2
+Data Limit reached for connection 14000
+#40 Starting Transfer of gb.jpg. Started at 1494600329546
+goBackN: p_drop 0.014448 cwnd 2
+goBackN: p_drop 0.014643 cwnd 2
+goBackN: p_drop 0.014839 cwnd 2
+goBackN: p_drop 0.015034 cwnd 2
+Data Limit reached for connection 14000
+#41 Starting Transfer of gb.jpg. Started at 1494600365322
+goBackN: p_drop 0.014842 cwnd 2
+goBackN: p_drop 0.015038 cwnd 2
+goBackN: p_drop 0.015233 cwnd 2
+goBackN: p_drop 0.015429 cwnd 2
+Data Limit reached for connection 14000
+#42 Starting Transfer of gb.jpg. Started at 1494600393563
+goBackN: p_drop 0.014840 cwnd 2
+goBackN: p_drop 0.015036 cwnd 2
+goBackN: p_drop 0.015231 cwnd 2
+goBackN: p_drop 0.015427 cwnd 2
+Data Limit reached for connection 14000
+#43 Starting Transfer of gb.jpg. Started at 1494600431476
+goBackN: p_drop 0.014447 cwnd 2
+goBackN: p_drop 0.014643 cwnd 2
+goBackN: p_drop 0.014838 cwnd 2
+goBackN: p_drop 0.015034 cwnd 2
+Data Limit reached for connection 14000
+#44 Starting Transfer of gb.jpg. Started at 1494600465749
+goBackN: p_drop 0.014349 cwnd 2
+goBackN: p_drop 0.014545 cwnd 2
+goBackN: p_drop 0.014741 cwnd 2
+goBackN: p_drop 0.014936 cwnd 2
+Data Limit reached for connection 14000
+#45 Starting Transfer of gb.jpg. Started at 1494600502638
+goBackN: p_drop 0.019460 cwnd 2
+goBackN: p_drop 0.019654 cwnd 2
+goBackN: p_drop 0.019848 cwnd 2
+goBackN: p_drop 0.020042 cwnd 2
+Data Limit reached for connection 14000
+#46 Starting Transfer of gb.jpg. Started at 1494600534326
+goBackN: p_drop 0.014839 cwnd 2
+goBackN: p_drop 0.015035 cwnd 2
+goBackN: p_drop 0.015230 cwnd 2
+goBackN: p_drop 0.015426 cwnd 2
+Data Limit reached for connection 14000
+#47 Starting Transfer of gb.jpg. Started at 1494600572713
+goBackN: p_drop 0.014447 cwnd 2
+goBackN: p_drop 0.014642 cwnd 2
+goBackN: p_drop 0.014838 cwnd 2
+goBackN: p_drop 0.015033 cwnd 2
+Data Limit reached for connection 14000
+#48 Starting Transfer of gb.jpg. Started at 1494600608360
+goBackN: p_drop 0.018190 cwnd 2
+goBackN: p_drop 0.018385 cwnd 2
+goBackN: p_drop 0.018579 cwnd 2
+goBackN: p_drop 0.018774 cwnd 2
+Data Limit reached for connection 14000
+#49 Starting Transfer of gb.jpg. Started at 1494600634253
+goBackN: p_drop 0.014450 cwnd 2
+goBackN: p_drop 0.014645 cwnd 2
+goBackN: p_drop 0.014841 cwnd 2
+goBackN: p_drop 0.015036 cwnd 2
+Data Limit reached for connection 14000
+#50 Starting Transfer of gb.jpg. Started at 1494600666295
+goBackN: p_drop 0.014548 cwnd 2
+goBackN: p_drop 0.014744 cwnd 2
+goBackN: p_drop 0.014939 cwnd 2
+goBackN: p_drop 0.015135 cwnd 2
+Data Limit reached for connection 14000
+#51 Starting Transfer of gb.jpg. Started at 1494600702088
+goBackN: p_drop 0.018682 cwnd 2
+goBackN: p_drop 0.018876 cwnd 2
+goBackN: p_drop 0.019070 cwnd 2
+goBackN: p_drop 0.019264 cwnd 2
+Data Limit reached for connection 14000
+#52 Starting Transfer of gb.jpg. Started at 1494600739490
+goBackN: p_drop 0.014554 cwnd 2
+goBackN: p_drop 0.014750 cwnd 2
+goBackN: p_drop 0.014946 cwnd 2
+goBackN: p_drop 0.015141 cwnd 2
+Data Limit reached for connection 14000
+#53 Starting Transfer of gb.jpg. Started at 1494600774109
+goBackN: p_drop 0.019168 cwnd 2
+goBackN: p_drop 0.019362 cwnd 2
+goBackN: p_drop 0.019556 cwnd 2
+goBackN: p_drop 0.019750 cwnd 2
+Data Limit reached for connection 14000
+#54 Starting Transfer of gb.jpg. Started at 1494600805576
+goBackN: p_drop 0.014452 cwnd 2
+goBackN: p_drop 0.014647 cwnd 2
+goBackN: p_drop 0.014843 cwnd 2
+goBackN: p_drop 0.015038 cwnd 2
+Data Limit reached for connection 14000
+#55 Starting Transfer of gb.jpg. Started at 1494600830851
+goBackN: p_drop 0.014546 cwnd 2
+goBackN: p_drop 0.014741 cwnd 2
+goBackN: p_drop 0.014937 cwnd 2
+goBackN: p_drop 0.015132 cwnd 2
+Data Limit reached for connection 14000
+#56 Starting Transfer of gb.jpg. Started at 1494600867802
+goBackN: p_drop 0.014449 cwnd 2
+goBackN: p_drop 0.014645 cwnd 2
+goBackN: p_drop 0.014840 cwnd 2
+goBackN: p_drop 0.015036 cwnd 2
+Data Limit reached for connection 14000
+#57 Starting Transfer of gb.jpg. Started at 1494600903713
+goBackN: p_drop 0.019755 cwnd 2
+goBackN: p_drop 0.019949 cwnd 2
+goBackN: p_drop 0.020143 cwnd 2
+goBackN: p_drop 0.020337 cwnd 2
+Data Limit reached for connection 14000
+#58 Starting Transfer of gb.jpg. Started at 1494600943931
+goBackN: p_drop 0.018086 cwnd 2
+goBackN: p_drop 0.018281 cwnd 2
+goBackN: p_drop 0.018475 cwnd 2
+goBackN: p_drop 0.018669 cwnd 2
+Data Limit reached for connection 14000
+#59 Starting Transfer of gb.jpg. Started at 1494600979969
+goBackN: p_drop 0.019265 cwnd 2
+goBackN: p_drop 0.019459 cwnd 2
+goBackN: p_drop 0.019653 cwnd 2
+goBackN: p_drop 0.019847 cwnd 2
+Data Limit reached for connection 14000
+#60 Starting Transfer of gb.jpg. Started at 1494601008700
+goBackN: p_drop 0.014446 cwnd 2
+goBackN: p_drop 0.014642 cwnd 2
+goBackN: p_drop 0.014837 cwnd 2
+goBackN: p_drop 0.015033 cwnd 2
+Data Limit reached for connection 14000
+#61 Starting Transfer of gb.jpg. Started at 1494601044283
+goBackN: p_drop 0.019363 cwnd 2
+goBackN: p_drop 0.019557 cwnd 2
+goBackN: p_drop 0.019751 cwnd 2
+goBackN: p_drop 0.019945 cwnd 2
+Data Limit reached for connection 14000
+#62 Starting Transfer of gb.jpg. Started at 1494601080782
+goBackN: p_drop 0.014549 cwnd 2
+goBackN: p_drop 0.014744 cwnd 2
+goBackN: p_drop 0.014940 cwnd 2
+goBackN: p_drop 0.015135 cwnd 2
+Data Limit reached for connection 14000
+#63 Starting Transfer of gb.jpg. Started at 1494601115155
+goBackN: p_drop 0.014546 cwnd 2
+goBackN: p_drop 0.014742 cwnd 2
+goBackN: p_drop 0.014938 cwnd 2
+goBackN: p_drop 0.015133 cwnd 2
+Data Limit reached for connection 14000
+#64 Starting Transfer of gb.jpg. Started at 1494601149047
+goBackN: p_drop 0.019655 cwnd 2
+goBackN: p_drop 0.019849 cwnd 2
+goBackN: p_drop 0.020043 cwnd 2
+goBackN: p_drop 0.020237 cwnd 2
+Data Limit reached for connection 14000
+#65 Starting Transfer of gb.jpg. Started at 1494601181627
+goBackN: p_drop 0.014643 cwnd 2
+goBackN: p_drop 0.014838 cwnd 2
+goBackN: p_drop 0.015034 cwnd 2
+goBackN: p_drop 0.015229 cwnd 2
+Data Limit reached for connection 14000
+#66 Starting Transfer of gb.jpg. Started at 1494601217012
+goBackN: p_drop 0.014447 cwnd 2
+goBackN: p_drop 0.014643 cwnd 2
+goBackN: p_drop 0.014838 cwnd 2
+goBackN: p_drop 0.015034 cwnd 2
+Data Limit reached for connection 14000
+#67 Starting Transfer of gb.jpg. Started at 1494601251467
+goBackN: p_drop 0.014547 cwnd 2
+goBackN: p_drop 0.014743 cwnd 2
+goBackN: p_drop 0.014938 cwnd 2
+goBackN: p_drop 0.015134 cwnd 2
+Data Limit reached for connection 14000
+#68 Starting Transfer of gb.jpg. Started at 1494601288976
+goBackN: p_drop 0.014454 cwnd 2
+goBackN: p_drop 0.014650 cwnd 2
+goBackN: p_drop 0.014846 cwnd 2
+goBackN: p_drop 0.015041 cwnd 2
+Data Limit reached for connection 14000
+#69 Starting Transfer of gb.jpg. Started at 1494601325002
+goBackN: p_drop 0.019461 cwnd 2
+goBackN: p_drop 0.019655 cwnd 2
+goBackN: p_drop 0.019849 cwnd 2
+goBackN: p_drop 0.020043 cwnd 2
+Data Limit reached for connection 14000
+#70 Starting Transfer of gb.jpg. Started at 1494601360904
+goBackN: p_drop 0.014646 cwnd 2
+goBackN: p_drop 0.014842 cwnd 2
+goBackN: p_drop 0.015037 cwnd 2
+goBackN: p_drop 0.015233 cwnd 2
+Data Limit reached for connection 14000
+#71 Starting Transfer of gb.jpg. Started at 1494601388406
+goBackN: p_drop 0.014547 cwnd 2
+goBackN: p_drop 0.014743 cwnd 2
+goBackN: p_drop 0.014938 cwnd 2
+goBackN: p_drop 0.015134 cwnd 2
+Data Limit reached for connection 14000
+#72 Starting Transfer of gb.jpg. Started at 1494601422335
+goBackN: p_drop 0.014451 cwnd 2
+goBackN: p_drop 0.014646 cwnd 2
+goBackN: p_drop 0.014842 cwnd 2
+goBackN: p_drop 0.015038 cwnd 2
+Data Limit reached for connection 14000
+#73 Starting Transfer of gb.jpg. Started at 1494601457256
+goBackN: p_drop 0.019855 cwnd 2
+goBackN: p_drop 0.020049 cwnd 2
+goBackN: p_drop 0.020243 cwnd 2
+goBackN: p_drop 0.020437 cwnd 2
+Data Limit reached for connection 14000
+#74 Starting Transfer of gb.jpg. Started at 1494601476443
+goBackN: p_drop 0.014445 cwnd 2
+goBackN: p_drop 0.014641 cwnd 2
+goBackN: p_drop 0.014837 cwnd 2
+goBackN: p_drop 0.015032 cwnd 2
+Data Limit reached for connection 14000
+#75 Starting Transfer of gb.jpg. Started at 1494601510849
+goBackN: p_drop 0.019656 cwnd 2
+goBackN: p_drop 0.019850 cwnd 2
+goBackN: p_drop 0.020044 cwnd 2
+goBackN: p_drop 0.020238 cwnd 2
+Data Limit reached for connection 14000
+#76 Starting Transfer of gb.jpg. Started at 1494601544206
+goBackN: p_drop 0.014456 cwnd 2
+goBackN: p_drop 0.014651 cwnd 2
+goBackN: p_drop 0.014847 cwnd 2
+goBackN: p_drop 0.015043 cwnd 2
+Data Limit reached for connection 14000
+#77 Starting Transfer of gb.jpg. Started at 1494601578854
+goBackN: p_drop 0.014548 cwnd 2
+goBackN: p_drop 0.014743 cwnd 2
+goBackN: p_drop 0.014939 cwnd 2
+goBackN: p_drop 0.015134 cwnd 2
+Data Limit reached for connection 14000
+#78 Starting Transfer of gb.jpg. Started at 1494601616757
+goBackN: p_drop 0.014544 cwnd 2
+goBackN: p_drop 0.014740 cwnd 2
+goBackN: p_drop 0.014935 cwnd 2
+goBackN: p_drop 0.015131 cwnd 2
+Data Limit reached for connection 14000
+#79 Starting Transfer of gb.jpg. Started at 1494601647404
+goBackN: p_drop 0.014157 cwnd 2
+goBackN: p_drop 0.014353 cwnd 2
+goBackN: p_drop 0.014549 cwnd 2
+goBackN: p_drop 0.014745 cwnd 2
+Data Limit reached for connection 14000
+#80 Starting Transfer of gb.jpg. Started at 1494601685384
+goBackN: p_drop 0.019850 cwnd 2
+goBackN: p_drop 0.020044 cwnd 2
+goBackN: p_drop 0.020238 cwnd 2
+goBackN: p_drop 0.020432 cwnd 2
+Data Limit reached for connection 14000
+#81 Starting Transfer of gb.jpg. Started at 1494601720985
+goBackN: p_drop 0.019657 cwnd 2
+goBackN: p_drop 0.019851 cwnd 2
+goBackN: p_drop 0.020045 cwnd 2
+goBackN: p_drop 0.020239 cwnd 2
+Data Limit reached for connection 14000
+#82 Starting Transfer of gb.jpg. Started at 1494601755550
+goBackN: p_drop 0.014550 cwnd 2
+goBackN: p_drop 0.014746 cwnd 2
+goBackN: p_drop 0.014941 cwnd 2
+goBackN: p_drop 0.015137 cwnd 2
+Data Limit reached for connection 14000
+#83 Starting Transfer of gb.jpg. Started at 1494601780150
+goBackN: p_drop 0.019459 cwnd 2
+goBackN: p_drop 0.019653 cwnd 2
+goBackN: p_drop 0.019847 cwnd 2
+goBackN: p_drop 0.020041 cwnd 2
+Data Limit reached for connection 14000
+#84 Starting Transfer of gb.jpg. Started at 1494601813314
+goBackN: p_drop 0.014453 cwnd 2
+goBackN: p_drop 0.014648 cwnd 2
+goBackN: p_drop 0.014844 cwnd 2
+goBackN: p_drop 0.015040 cwnd 2
+Data Limit reached for connection 14000
+#85 Starting Transfer of gb.jpg. Started at 1494601845971
+goBackN: p_drop 0.014546 cwnd 2
+goBackN: p_drop 0.014742 cwnd 2
+goBackN: p_drop 0.014938 cwnd 2
+goBackN: p_drop 0.015133 cwnd 2
+Data Limit reached for connection 14000
+#86 Starting Transfer of gb.jpg. Started at 1494601882041
+goBackN: p_drop 0.014645 cwnd 2
+goBackN: p_drop 0.014840 cwnd 2
+goBackN: p_drop 0.015036 cwnd 2
+goBackN: p_drop 0.015231 cwnd 2
+Data Limit reached for connection 14000
+#87 Starting Transfer of gb.jpg. Started at 1494601912984
+goBackN: p_drop 0.014349 cwnd 2
+goBackN: p_drop 0.014545 cwnd 2
+goBackN: p_drop 0.014741 cwnd 2
+goBackN: p_drop 0.014936 cwnd 2
+Data Limit reached for connection 14000
+#88 Starting Transfer of gb.jpg. Started at 1494601944623
+goBackN: p_drop 0.019948 cwnd 2
+goBackN: p_drop 0.020142 cwnd 2
+goBackN: p_drop 0.020336 cwnd 2
+goBackN: p_drop 0.020530 cwnd 2
+Data Limit reached for connection 14000
+#89 Starting Transfer of gb.jpg. Started at 1494601980042
+goBackN: p_drop 0.019655 cwnd 2
+goBackN: p_drop 0.019849 cwnd 2
+goBackN: p_drop 0.020043 cwnd 2
+goBackN: p_drop 0.020237 cwnd 2
+Data Limit reached for connection 14000
+#90 Starting Transfer of gb.jpg. Started at 1494602012646
+goBackN: p_drop 0.014544 cwnd 2
+goBackN: p_drop 0.014740 cwnd 2
+goBackN: p_drop 0.014935 cwnd 2
+goBackN: p_drop 0.015131 cwnd 2
+Data Limit reached for connection 14000
+#91 Starting Transfer of gb.jpg. Started at 1494602045325
+goBackN: p_drop 0.014447 cwnd 2
+goBackN: p_drop 0.014643 cwnd 2
+goBackN: p_drop 0.014838 cwnd 2
+goBackN: p_drop 0.015034 cwnd 2
+Data Limit reached for connection 14000
+#92 Starting Transfer of gb.jpg. Started at 1494602084702
+goBackN: p_drop 0.014448 cwnd 2
+goBackN: p_drop 0.014644 cwnd 2
+goBackN: p_drop 0.014840 cwnd 2
+goBackN: p_drop 0.015035 cwnd 2
+Data Limit reached for connection 14000
+#93 Starting Transfer of gb.jpg. Started at 1494602119507
+goBackN: p_drop 0.018972 cwnd 2
+goBackN: p_drop 0.019166 cwnd 2
+goBackN: p_drop 0.019360 cwnd 2
+goBackN: p_drop 0.019554 cwnd 2
+Data Limit reached for connection 14000
+#94 Starting Transfer of gb.jpg. Started at 1494602156446
+goBackN: p_drop 0.014643 cwnd 2
+goBackN: p_drop 0.014839 cwnd 2
+goBackN: p_drop 0.015034 cwnd 2
+goBackN: p_drop 0.015230 cwnd 2
+Data Limit reached for connection 14000
+#95 Starting Transfer of gb.jpg. Started at 1494602188847
+goBackN: p_drop 0.020342 cwnd 2
+goBackN: p_drop 0.020536 cwnd 2
+goBackN: p_drop 0.020730 cwnd 2
+goBackN: p_drop 0.020924 cwnd 2
+Data Limit reached for connection 14000
+#96 Starting Transfer of gb.jpg. Started at 1494602226986
+goBackN: p_drop 0.014547 cwnd 2
+goBackN: p_drop 0.014742 cwnd 2
+goBackN: p_drop 0.014938 cwnd 2
+goBackN: p_drop 0.015133 cwnd 2
+Data Limit reached for connection 14000
+#97 Starting Transfer of gb.jpg. Started at 1494602263326
+goBackN: p_drop 0.014645 cwnd 2
+goBackN: p_drop 0.014841 cwnd 2
+goBackN: p_drop 0.015036 cwnd 2
+goBackN: p_drop 0.015232 cwnd 2
+Data Limit reached for connection 14000
+#98 Starting Transfer of gb.jpg. Started at 1494602298734
+goBackN: p_drop 0.019364 cwnd 2
+goBackN: p_drop 0.019559 cwnd 2
+goBackN: p_drop 0.019753 cwnd 2
+goBackN: p_drop 0.019947 cwnd 2
+Data Limit reached for connection 14000
+#99 Starting Transfer of gb.jpg. Started at 1494602336231
+goBackN: p_drop 0.014546 cwnd 2
+goBackN: p_drop 0.014741 cwnd 2
+goBackN: p_drop 0.014937 cwnd 2
+goBackN: p_drop 0.015132 cwnd 2
+Data Limit reached for connection 14000
+../evaluation/data/break/s2_p1_c2_b1_p0.05/
+rm: cannot remove ‘../evaluation/data/break/s2_p1_c2_b1_p0.05/’: No such file or directory
+#0 Starting Transfer of gb.jpg. Started at 1494602365269
+goBackN: p_drop 0.019266 cwnd 2
+goBackN: p_drop 0.019461 cwnd 2
+#1 Starting Transfer of gb.jpg. Started at 1494602373237
+goBackN: p_drop 0.014548 cwnd 2
+goBackN: p_drop 0.014744 cwnd 2
+#2 Starting Transfer of gb.jpg. Started at 1494602381304
+goBackN: p_drop 0.019461 cwnd 2
+goBackN: p_drop 0.019655 cwnd 2
+goBackN: p_drop 0.019850 cwnd 2
+goBackN: p_drop 0.020044 cwnd 2
+Data Limit reached for connection 14000
+#3 Starting Transfer of gb.jpg. Started at 1494602398768
+goBackN: p_drop 0.014544 cwnd 2
+goBackN: p_drop 0.014740 cwnd 2
+goBackN: p_drop 0.014935 cwnd 2
+goBackN: p_drop 0.015131 cwnd 2
+Data Limit reached for connection 14000
+#4 Starting Transfer of gb.jpg. Started at 1494602426841
+goBackN: p_drop 0.014844 cwnd 2
+goBackN: p_drop 0.015039 cwnd 2
+goBackN: p_drop 0.015235 cwnd 2
+goBackN: p_drop 0.015430 cwnd 2
+Data Limit reached for connection 14000
+#5 Starting Transfer of gb.jpg. Started at 1494602454682
+goBackN: p_drop 0.014350 cwnd 2
+goBackN: p_drop 0.014546 cwnd 2
+goBackN: p_drop 0.014741 cwnd 2
+goBackN: p_drop 0.014937 cwnd 2
+Data Limit reached for connection 14000
+#6 Starting Transfer of gb.jpg. Started at 1494602486374
+goBackN: p_drop 0.014546 cwnd 2
+goBackN: p_drop 0.014742 cwnd 2
+goBackN: p_drop 0.014937 cwnd 2
+goBackN: p_drop 0.015133 cwnd 2
+Data Limit reached for connection 14000
+#7 Starting Transfer of gb.jpg. Started at 1494602517691
+goBackN: p_drop 0.014644 cwnd 2
+goBackN: p_drop 0.014840 cwnd 2
+goBackN: p_drop 0.015035 cwnd 2
+goBackN: p_drop 0.015231 cwnd 2
+Data Limit reached for connection 14000
+#8 Starting Transfer of gb.jpg. Started at 1494602534468
+goBackN: p_drop 0.014454 cwnd 2
+goBackN: p_drop 0.014649 cwnd 2
+goBackN: p_drop 0.014845 cwnd 2
+goBackN: p_drop 0.015040 cwnd 2
+Data Limit reached for connection 14000
+#9 Starting Transfer of gb.jpg. Started at 1494602557297
+goBackN: p_drop 0.014454 cwnd 2
+goBackN: p_drop 0.014649 cwnd 2
+goBackN: p_drop 0.014845 cwnd 2
+goBackN: p_drop 0.015040 cwnd 2
+#10 Starting Transfer of gb.jpg. Started at 1494602569736
+goBackN: p_drop 0.014645 cwnd 2
+goBackN: p_drop 0.014840 cwnd 2
+goBackN: p_drop 0.015036 cwnd 2
+#11 Starting Transfer of gb.jpg. Started at 1494602580629
+goBackN: p_drop 0.014643 cwnd 2
+goBackN: p_drop 0.014838 cwnd 2
+goBackN: p_drop 0.015034 cwnd 2
+goBackN: p_drop 0.015229 cwnd 2
+#12 Starting Transfer of gb.jpg. Started at 1494602592427
+goBackN: p_drop 0.014451 cwnd 2
+goBackN: p_drop 0.014647 cwnd 2
+goBackN: p_drop 0.014842 cwnd 2
+goBackN: p_drop 0.015038 cwnd 2
+Data Limit reached for connection 14000
+#13 Starting Transfer of gb.jpg. Started at 1494602607495
+goBackN: p_drop 0.014541 cwnd 2
+goBackN: p_drop 0.014737 cwnd 2
+goBackN: p_drop 0.014933 cwnd 2
+goBackN: p_drop 0.015128 cwnd 2
+#14 Starting Transfer of gb.jpg. Started at 1494602620829
+goBackN: p_drop 0.019754 cwnd 2
+goBackN: p_drop 0.019949 cwnd 2
+goBackN: p_drop 0.020143 cwnd 2
+goBackN: p_drop 0.020336 cwnd 2
+Data Limit reached for connection 14000
+#15 Starting Transfer of gb.jpg. Started at 1494602649554
+goBackN: p_drop 0.014453 cwnd 2
+goBackN: p_drop 0.014649 cwnd 2
+goBackN: p_drop 0.014844 cwnd 2
+goBackN: p_drop 0.015040 cwnd 2
+Data Limit reached for connection 14000
+#16 Starting Transfer of gb.jpg. Started at 1494602671497
+goBackN: p_drop 0.014742 cwnd 2
+goBackN: p_drop 0.014938 cwnd 2
+goBackN: p_drop 0.015133 cwnd 2
+goBackN: p_drop 0.015329 cwnd 2
+Data Limit reached for connection 14000
+#17 Starting Transfer of gb.jpg. Started at 1494602704340
+goBackN: p_drop 0.019460 cwnd 2
+goBackN: p_drop 0.019654 cwnd 2
+goBackN: p_drop 0.019848 cwnd 2
+goBackN: p_drop 0.020042 cwnd 2
+#18 Starting Transfer of gb.jpg. Started at 1494602717053
+goBackN: p_drop 0.014741 cwnd 2
+goBackN: p_drop 0.014937 cwnd 2
+goBackN: p_drop 0.015132 cwnd 2
+goBackN: p_drop 0.015328 cwnd 2
+Data Limit reached for connection 14000
+#19 Starting Transfer of gb.jpg. Started at 1494602739013
+goBackN: p_drop 0.014745 cwnd 2
+goBackN: p_drop 0.014941 cwnd 2
+goBackN: p_drop 0.015136 cwnd 2
+goBackN: p_drop 0.015332 cwnd 2
+Data Limit reached for connection 14000
+#20 Starting Transfer of gb.jpg. Started at 1494602770794
+goBackN: p_drop 0.014644 cwnd 2
+goBackN: p_drop 0.014840 cwnd 2
+goBackN: p_drop 0.015035 cwnd 2
+goBackN: p_drop 0.015231 cwnd 2
+Data Limit reached for connection 14000
+#21 Starting Transfer of gb.jpg. Started at 1494602799106
+goBackN: p_drop 0.014546 cwnd 2
+goBackN: p_drop 0.014742 cwnd 2
+goBackN: p_drop 0.014937 cwnd 2
+#22 Starting Transfer of gb.jpg. Started at 1494602807818
+goBackN: p_drop 0.014745 cwnd 2
+goBackN: p_drop 0.014940 cwnd 2
+goBackN: p_drop 0.015136 cwnd 2
+goBackN: p_drop 0.015331 cwnd 2
+Data Limit reached for connection 14000
+#23 Starting Transfer of gb.jpg. Started at 1494602827083
+goBackN: p_drop 0.019069 cwnd 2
+goBackN: p_drop 0.019263 cwnd 2
+goBackN: p_drop 0.019457 cwnd 2
+#24 Starting Transfer of gb.jpg. Started at 1494602836496
+goBackN: p_drop 0.014644 cwnd 2
+goBackN: p_drop 0.014840 cwnd 2
+goBackN: p_drop 0.015035 cwnd 2
+#25 Starting Transfer of gb.jpg. Started at 1494602847248
+goBackN: p_drop 0.014545 cwnd 2
+#26 Starting Transfer of gb.jpg. Started at 1494602852607
+goBackN: p_drop 0.019168 cwnd 2
+goBackN: p_drop 0.019362 cwnd 2
+goBackN: p_drop 0.019556 cwnd 2
+goBackN: p_drop 0.019750 cwnd 2
+#27 Starting Transfer of gb.jpg. Started at 1494602865138
+goBackN: p_drop 0.014743 cwnd 2
+goBackN: p_drop 0.014938 cwnd 2
+goBackN: p_drop 0.015134 cwnd 2
+goBackN: p_drop 0.015329 cwnd 2
+#28 Starting Transfer of gb.jpg. Started at 1494602878021
+goBackN: p_drop 0.014547 cwnd 2
+goBackN: p_drop 0.014743 cwnd 2
+goBackN: p_drop 0.014938 cwnd 2
+goBackN: p_drop 0.015134 cwnd 2
+Data Limit reached for connection 14000
+#29 Starting Transfer of gb.jpg. Started at 1494602907657
+goBackN: p_drop 0.014645 cwnd 2
+goBackN: p_drop 0.014840 cwnd 2
+goBackN: p_drop 0.015036 cwnd 2
+goBackN: p_drop 0.015231 cwnd 2
+#30 Starting Transfer of gb.jpg. Started at 1494602919441
+goBackN: p_drop 0.019755 cwnd 2
+goBackN: p_drop 0.019949 cwnd 2
+goBackN: p_drop 0.020143 cwnd 2
+goBackN: p_drop 0.020337 cwnd 2
+Data Limit reached for connection 14000
+#31 Starting Transfer of gb.jpg. Started at 1494602943378
+goBackN: p_drop 0.014350 cwnd 2
+goBackN: p_drop 0.014546 cwnd 2
+goBackN: p_drop 0.014742 cwnd 2
+goBackN: p_drop 0.014937 cwnd 2
+Data Limit reached for connection 14000
+#32 Starting Transfer of gb.jpg. Started at 1494602960601
+goBackN: p_drop 0.019561 cwnd 2
+goBackN: p_drop 0.019755 cwnd 2
+goBackN: p_drop 0.019949 cwnd 2
+goBackN: p_drop 0.020143 cwnd 2
+Data Limit reached for connection 14000
+#33 Starting Transfer of gb.jpg. Started at 1494602975951
+goBackN: p_drop 0.014349 cwnd 2
+goBackN: p_drop 0.014545 cwnd 2
+goBackN: p_drop 0.014740 cwnd 2
+goBackN: p_drop 0.014936 cwnd 2
+Data Limit reached for connection 14000
+#34 Starting Transfer of gb.jpg. Started at 1494602990983
+goBackN: p_drop 0.019852 cwnd 2
+goBackN: p_drop 0.020046 cwnd 2
+goBackN: p_drop 0.020240 cwnd 2
+goBackN: p_drop 0.020434 cwnd 2
+Data Limit reached for connection 14000
+#35 Starting Transfer of gb.jpg. Started at 1494603007501
+goBackN: p_drop 0.014448 cwnd 2
+goBackN: p_drop 0.014644 cwnd 2
+goBackN: p_drop 0.014839 cwnd 2
+goBackN: p_drop 0.015035 cwnd 2
+#36 Starting Transfer of gb.jpg. Started at 1494603019226
+goBackN: p_drop 0.014644 cwnd 2
+goBackN: p_drop 0.014839 cwnd 2
+goBackN: p_drop 0.015035 cwnd 2
+goBackN: p_drop 0.015230 cwnd 2
+Data Limit reached for connection 14000
+#37 Starting Transfer of gb.jpg. Started at 1494603046308
+goBackN: p_drop 0.014454 cwnd 2
+goBackN: p_drop 0.014650 cwnd 2
+goBackN: p_drop 0.014845 cwnd 2
+goBackN: p_drop 0.015041 cwnd 2
+#38 Starting Transfer of gb.jpg. Started at 1494603057362
+goBackN: p_drop 0.014452 cwnd 2
+goBackN: p_drop 0.014647 cwnd 2
+goBackN: p_drop 0.014843 cwnd 2
+goBackN: p_drop 0.015038 cwnd 2
+Data Limit reached for connection 14000
+#39 Starting Transfer of gb.jpg. Started at 1494603074748
+goBackN: p_drop 0.014350 cwnd 2
+goBackN: p_drop 0.014546 cwnd 2
+goBackN: p_drop 0.014741 cwnd 2
+goBackN: p_drop 0.014937 cwnd 2
+Data Limit reached for connection 14000
+#40 Starting Transfer of gb.jpg. Started at 1494603088509
+goBackN: p_drop 0.014841 cwnd 2
+goBackN: p_drop 0.015037 cwnd 2
+goBackN: p_drop 0.015232 cwnd 2
+goBackN: p_drop 0.015428 cwnd 2
+#41 Starting Transfer of gb.jpg. Started at 1494603100885
+goBackN: p_drop 0.019068 cwnd 2
+goBackN: p_drop 0.019262 cwnd 2
+goBackN: p_drop 0.019456 cwnd 2
+goBackN: p_drop 0.019650 cwnd 2
+Data Limit reached for connection 14000
+#42 Starting Transfer of gb.jpg. Started at 1494603115625
+goBackN: p_drop 0.014349 cwnd 2
+goBackN: p_drop 0.014545 cwnd 2
+goBackN: p_drop 0.014741 cwnd 2
+goBackN: p_drop 0.014936 cwnd 2
+Data Limit reached for connection 14000
+#43 Starting Transfer of gb.jpg. Started at 1494603144493
+goBackN: p_drop 0.019557 cwnd 2
+goBackN: p_drop 0.019752 cwnd 2
+goBackN: p_drop 0.019946 cwnd 2
+goBackN: p_drop 0.020140 cwnd 2
+Data Limit reached for connection 14000
+#44 Starting Transfer of gb.jpg. Started at 1494603174215
+goBackN: p_drop 0.019658 cwnd 2
+goBackN: p_drop 0.019852 cwnd 2
+goBackN: p_drop 0.020046 cwnd 2
+goBackN: p_drop 0.020240 cwnd 2
+Data Limit reached for connection 14000
+#45 Starting Transfer of gb.jpg. Started at 1494603203625
+goBackN: p_drop 0.014744 cwnd 2
+goBackN: p_drop 0.014940 cwnd 2
+goBackN: p_drop 0.015135 cwnd 2
+goBackN: p_drop 0.015331 cwnd 2
+Data Limit reached for connection 14000
+#46 Starting Transfer of gb.jpg. Started at 1494603227282
+goBackN: p_drop 0.014544 cwnd 2
+goBackN: p_drop 0.014740 cwnd 2
+goBackN: p_drop 0.014935 cwnd 2
+goBackN: p_drop 0.015131 cwnd 2
+#47 Starting Transfer of gb.jpg. Started at 1494603240710
+goBackN: p_drop 0.015038 cwnd 2
+goBackN: p_drop 0.015233 cwnd 2
+goBackN: p_drop 0.015429 cwnd 2
+goBackN: p_drop 0.015624 cwnd 2
+Data Limit reached for connection 14000
+#48 Starting Transfer of gb.jpg. Started at 1494603264760
+goBackN: p_drop 0.019852 cwnd 2
+goBackN: p_drop 0.020046 cwnd 2
+goBackN: p_drop 0.020240 cwnd 2
+goBackN: p_drop 0.020434 cwnd 2
+Data Limit reached for connection 14000
+#49 Starting Transfer of gb.jpg. Started at 1494603292147
+goBackN: p_drop 0.014450 cwnd 2
+goBackN: p_drop 0.014646 cwnd 2
+goBackN: p_drop 0.014841 cwnd 2
+#50 Starting Transfer of gb.jpg. Started at 1494603301422
+goBackN: p_drop 0.014347 cwnd 2
+goBackN: p_drop 0.014543 cwnd 2
+goBackN: p_drop 0.014738 cwnd 2
+goBackN: p_drop 0.014934 cwnd 2
+Data Limit reached for connection 14000
+#51 Starting Transfer of gb.jpg. Started at 1494603319166
+goBackN: p_drop 0.019167 cwnd 2
+#52 Starting Transfer of gb.jpg. Started at 1494603324850
+goBackN: p_drop 0.014845 cwnd 2
+goBackN: p_drop 0.015041 cwnd 2
+goBackN: p_drop 0.015236 cwnd 2
+goBackN: p_drop 0.015431 cwnd 2
+#53 Starting Transfer of gb.jpg. Started at 1494603338104
+goBackN: p_drop 0.014449 cwnd 2
+goBackN: p_drop 0.014645 cwnd 2
+goBackN: p_drop 0.014841 cwnd 2
+goBackN: p_drop 0.015036 cwnd 2
+Data Limit reached for connection 14000
+#54 Starting Transfer of gb.jpg. Started at 1494603361463
+goBackN: p_drop 0.014544 cwnd 2
+goBackN: p_drop 0.014740 cwnd 2
+goBackN: p_drop 0.014935 cwnd 2
+goBackN: p_drop 0.015131 cwnd 2
+Data Limit reached for connection 14000
+#55 Starting Transfer of gb.jpg. Started at 1494603383195
+goBackN: p_drop 0.019950 cwnd 2
+goBackN: p_drop 0.020144 cwnd 2
+goBackN: p_drop 0.020338 cwnd 2
+goBackN: p_drop 0.020531 cwnd 2
+#56 Starting Transfer of gb.jpg. Started at 1494603395438
+goBackN: p_drop 0.019266 cwnd 2
+goBackN: p_drop 0.019461 cwnd 2
+goBackN: p_drop 0.019655 cwnd 2
+#57 Starting Transfer of gb.jpg. Started at 1494603405808
+goBackN: p_drop 0.014349 cwnd 2
+goBackN: p_drop 0.014545 cwnd 2
+goBackN: p_drop 0.014741 cwnd 2
+goBackN: p_drop 0.014936 cwnd 2
+Data Limit reached for connection 14000
+#58 Starting Transfer of gb.jpg. Started at 1494603430646
+goBackN: p_drop 0.018676 cwnd 2
+goBackN: p_drop 0.018871 cwnd 2
+goBackN: p_drop 0.019065 cwnd 2
+goBackN: p_drop 0.019259 cwnd 2
+#59 Starting Transfer of gb.jpg. Started at 1494603441825
+goBackN: p_drop 0.014052 cwnd 2
+goBackN: p_drop 0.014248 cwnd 2
+goBackN: p_drop 0.014444 cwnd 2
+goBackN: p_drop 0.014640 cwnd 2
+Data Limit reached for connection 14000
+#60 Starting Transfer of gb.jpg. Started at 1494603471933
+goBackN: p_drop 0.014350 cwnd 2
+goBackN: p_drop 0.014546 cwnd 2
+goBackN: p_drop 0.014741 cwnd 2
+goBackN: p_drop 0.014937 cwnd 2
+#61 Starting Transfer of gb.jpg. Started at 1494603485371
+goBackN: p_drop 0.019756 cwnd 2
+goBackN: p_drop 0.019950 cwnd 2
+goBackN: p_drop 0.020144 cwnd 2
+#62 Starting Transfer of gb.jpg. Started at 1494603495453
+goBackN: p_drop 0.014744 cwnd 2
+goBackN: p_drop 0.014939 cwnd 2
+goBackN: p_drop 0.015135 cwnd 2
+goBackN: p_drop 0.015330 cwnd 2
+Data Limit reached for connection 14000
+#63 Starting Transfer of gb.jpg. Started at 1494603526774
+goBackN: p_drop 0.014349 cwnd 2
+goBackN: p_drop 0.014545 cwnd 2
+goBackN: p_drop 0.014740 cwnd 2
+goBackN: p_drop 0.014936 cwnd 2
+Data Limit reached for connection 14000
+#64 Starting Transfer of gb.jpg. Started at 1494603541961
+goBackN: p_drop 0.014446 cwnd 2
+goBackN: p_drop 0.014642 cwnd 2
+goBackN: p_drop 0.014837 cwnd 2
+goBackN: p_drop 0.015033 cwnd 2
+#65 Starting Transfer of gb.jpg. Started at 1494603554898
+goBackN: p_drop 0.019363 cwnd 2
+goBackN: p_drop 0.019557 cwnd 2
+goBackN: p_drop 0.019751 cwnd 2
+goBackN: p_drop 0.019946 cwnd 2
+Data Limit reached for connection 14000
+#66 Starting Transfer of gb.jpg. Started at 1494603583606
+goBackN: p_drop 0.014748 cwnd 2
+goBackN: p_drop 0.014943 cwnd 2
+goBackN: p_drop 0.015139 cwnd 2
+goBackN: p_drop 0.015334 cwnd 2
+Data Limit reached for connection 14000
+#67 Starting Transfer of gb.jpg. Started at 1494603611576
+goBackN: p_drop 0.014744 cwnd 2
+goBackN: p_drop 0.014940 cwnd 2
+goBackN: p_drop 0.015135 cwnd 2
+goBackN: p_drop 0.015331 cwnd 2
+Data Limit reached for connection 14000
+#68 Starting Transfer of gb.jpg. Started at 1494603642429
+goBackN: p_drop 0.014452 cwnd 2
+goBackN: p_drop 0.014647 cwnd 2
+goBackN: p_drop 0.014843 cwnd 2
+goBackN: p_drop 0.015038 cwnd 2
+Data Limit reached for connection 14000
+#69 Starting Transfer of gb.jpg. Started at 1494603672489
+goBackN: p_drop 0.014350 cwnd 2
+goBackN: p_drop 0.014546 cwnd 2
+goBackN: p_drop 0.014741 cwnd 2
+#70 Starting Transfer of gb.jpg. Started at 1494603681539
+goBackN: p_drop 0.014446 cwnd 2
+goBackN: p_drop 0.014641 cwnd 2
+goBackN: p_drop 0.014837 cwnd 2
+goBackN: p_drop 0.015033 cwnd 2
+Data Limit reached for connection 14000
+#71 Starting Transfer of gb.jpg. Started at 1494603714316
+goBackN: p_drop 0.014448 cwnd 2
+goBackN: p_drop 0.014644 cwnd 2
+goBackN: p_drop 0.014839 cwnd 2
+#72 Starting Transfer of gb.jpg. Started at 1494603725619
+goBackN: p_drop 0.014647 cwnd 2
+goBackN: p_drop 0.014842 cwnd 2
+goBackN: p_drop 0.015038 cwnd 2
+goBackN: p_drop 0.015233 cwnd 2
+Data Limit reached for connection 14000
+#73 Starting Transfer of gb.jpg. Started at 1494603753720
+goBackN: p_drop 0.014544 cwnd 2
+goBackN: p_drop 0.014740 cwnd 2
+goBackN: p_drop 0.014936 cwnd 2
+goBackN: p_drop 0.015131 cwnd 2
+Data Limit reached for connection 14000
+#74 Starting Transfer of gb.jpg. Started at 1494603769836
+goBackN: p_drop 0.014644 cwnd 2
+goBackN: p_drop 0.014840 cwnd 2
+goBackN: p_drop 0.015035 cwnd 2
+goBackN: p_drop 0.015231 cwnd 2
+Data Limit reached for connection 14000
+#75 Starting Transfer of gb.jpg. Started at 1494603789488
+goBackN: p_drop 0.014642 cwnd 2
+goBackN: p_drop 0.014838 cwnd 2
+goBackN: p_drop 0.015033 cwnd 2
+#76 Starting Transfer of gb.jpg. Started at 1494603800457
+goBackN: p_drop 0.019950 cwnd 2
+goBackN: p_drop 0.020144 cwnd 2
+goBackN: p_drop 0.020338 cwnd 2
+goBackN: p_drop 0.020532 cwnd 2
+#77 Starting Transfer of gb.jpg. Started at 1494603814027
+goBackN: p_drop 0.014645 cwnd 2
+goBackN: p_drop 0.014841 cwnd 2
+goBackN: p_drop 0.015036 cwnd 2
+goBackN: p_drop 0.015232 cwnd 2
+Data Limit reached for connection 14000
+#78 Starting Transfer of gb.jpg. Started at 1494603844342
+goBackN: p_drop 0.018578 cwnd 2
+goBackN: p_drop 0.018772 cwnd 2
+goBackN: p_drop 0.018966 cwnd 2
+goBackN: p_drop 0.019161 cwnd 2
+Data Limit reached for connection 14000
+#79 Starting Transfer of gb.jpg. Started at 1494603858195
+goBackN: p_drop 0.018775 cwnd 2
+goBackN: p_drop 0.018969 cwnd 2
+goBackN: p_drop 0.019164 cwnd 2
+goBackN: p_drop 0.019358 cwnd 2
+Data Limit reached for connection 14000
+#80 Starting Transfer of gb.jpg. Started at 1494603875747
+goBackN: p_drop 0.019752 cwnd 2
+goBackN: p_drop 0.019946 cwnd 2
+goBackN: p_drop 0.020140 cwnd 2
+goBackN: p_drop 0.020334 cwnd 2
+Data Limit reached for connection 14000
+#81 Starting Transfer of gb.jpg. Started at 1494603890794
+goBackN: p_drop 0.014546 cwnd 2
+goBackN: p_drop 0.014742 cwnd 2
+goBackN: p_drop 0.014937 cwnd 2
+#82 Starting Transfer of gb.jpg. Started at 1494603900203
+goBackN: p_drop 0.014544 cwnd 2
+goBackN: p_drop 0.014740 cwnd 2
+goBackN: p_drop 0.014935 cwnd 2
+goBackN: p_drop 0.015131 cwnd 2
+Data Limit reached for connection 14000
+#83 Starting Transfer of gb.jpg. Started at 1494603916194
+goBackN: p_drop 0.014646 cwnd 2
+goBackN: p_drop 0.014841 cwnd 2
+goBackN: p_drop 0.015037 cwnd 2
+goBackN: p_drop 0.015232 cwnd 2
+Data Limit reached for connection 14000
+#84 Starting Transfer of gb.jpg. Started at 1494603933826
+goBackN: p_drop 0.014845 cwnd 2
+goBackN: p_drop 0.015041 cwnd 2
+goBackN: p_drop 0.015236 cwnd 2
+goBackN: p_drop 0.015432 cwnd 2
+Data Limit reached for connection 14000
+#85 Starting Transfer of gb.jpg. Started at 1494603952138
+goBackN: p_drop 0.014451 cwnd 2
+goBackN: p_drop 0.014646 cwnd 2
+goBackN: p_drop 0.014842 cwnd 2
+goBackN: p_drop 0.015037 cwnd 2
+Data Limit reached for connection 14000
+#86 Starting Transfer of gb.jpg. Started at 1494603983833
+goBackN: p_drop 0.019364 cwnd 2
+goBackN: p_drop 0.019558 cwnd 2
+goBackN: p_drop 0.019752 cwnd 2
+goBackN: p_drop 0.019947 cwnd 2
+Data Limit reached for connection 14000
+#87 Starting Transfer of gb.jpg. Started at 1494604006425
+goBackN: p_drop 0.014460 cwnd 2
+goBackN: p_drop 0.014656 cwnd 2
+goBackN: p_drop 0.014851 cwnd 2
+goBackN: p_drop 0.015047 cwnd 2
+Data Limit reached for connection 14000
+#88 Starting Transfer of gb.jpg. Started at 1494604034820
+goBackN: p_drop 0.014254 cwnd 2
+goBackN: p_drop 0.014449 cwnd 2
+goBackN: p_drop 0.014645 cwnd 2
+goBackN: p_drop 0.014841 cwnd 2
+#89 Starting Transfer of gb.jpg. Started at 1494604048334
+goBackN: p_drop 0.019560 cwnd 2
+goBackN: p_drop 0.019754 cwnd 2
+goBackN: p_drop 0.019948 cwnd 2
+goBackN: p_drop 0.020142 cwnd 2
+Data Limit reached for connection 14000
+#90 Starting Transfer of gb.jpg. Started at 1494604078051
+goBackN: p_drop 0.014646 cwnd 2
+goBackN: p_drop 0.014842 cwnd 2
+goBackN: p_drop 0.015037 cwnd 2
+goBackN: p_drop 0.015233 cwnd 2
+Data Limit reached for connection 14000
+#91 Starting Transfer of gb.jpg. Started at 1494604108377
+goBackN: p_drop 0.019657 cwnd 2
+goBackN: p_drop 0.019852 cwnd 2
+goBackN: p_drop 0.020046 cwnd 2
+goBackN: p_drop 0.020240 cwnd 2
+Data Limit reached for connection 14000
+#92 Starting Transfer of gb.jpg. Started at 1494604137275
+goBackN: p_drop 0.014547 cwnd 2
+goBackN: p_drop 0.014742 cwnd 2
+goBackN: p_drop 0.014938 cwnd 2
+goBackN: p_drop 0.015133 cwnd 2
+Data Limit reached for connection 14000
+#93 Starting Transfer of gb.jpg. Started at 1494604151661
+goBackN: p_drop 0.014445 cwnd 2
+goBackN: p_drop 0.014641 cwnd 2
+goBackN: p_drop 0.014836 cwnd 2
+goBackN: p_drop 0.015032 cwnd 2
+Data Limit reached for connection 14000
+#94 Starting Transfer of gb.jpg. Started at 1494604180178
+goBackN: p_drop 0.014451 cwnd 2
+goBackN: p_drop 0.014646 cwnd 2
+goBackN: p_drop 0.014842 cwnd 2
+goBackN: p_drop 0.015037 cwnd 2
+Data Limit reached for connection 14000
+#95 Starting Transfer of gb.jpg. Started at 1494604201699
+goBackN: p_drop 0.014546 cwnd 2
+goBackN: p_drop 0.014742 cwnd 2
+goBackN: p_drop 0.014937 cwnd 2
+goBackN: p_drop 0.015133 cwnd 2
+Data Limit reached for connection 14000
+#96 Starting Transfer of gb.jpg. Started at 1494604234120
+goBackN: p_drop 0.014447 cwnd 2
+goBackN: p_drop 0.014643 cwnd 2
+goBackN: p_drop 0.014838 cwnd 2
+goBackN: p_drop 0.015034 cwnd 2
+Data Limit reached for connection 14000
+#97 Starting Transfer of gb.jpg. Started at 1494604252414
+goBackN: p_drop 0.019460 cwnd 2
+goBackN: p_drop 0.019654 cwnd 2
+goBackN: p_drop 0.019848 cwnd 2
+goBackN: p_drop 0.020042 cwnd 2
+Data Limit reached for connection 14000
+#98 Starting Transfer of gb.jpg. Started at 1494604266086
+goBackN: p_drop 0.019754 cwnd 2
+goBackN: p_drop 0.019948 cwnd 2
+goBackN: p_drop 0.020142 cwnd 2
+goBackN: p_drop 0.020336 cwnd 2
+Data Limit reached for connection 14000
+#99 Starting Transfer of gb.jpg. Started at 1494604283373
+goBackN: p_drop 0.019657 cwnd 2
+goBackN: p_drop 0.019851 cwnd 2
+goBackN: p_drop 0.020045 cwnd 2
+goBackN: p_drop 0.020239 cwnd 2
+Data Limit reached for connection 14000
+../evaluation/data/break/s2_p2_c2_b1_p0.05/
+rm: cannot remove ‘../evaluation/data/break/s2_p2_c2_b1_p0.05/’: No such file or directory
+#0 Starting Transfer of gb.jpg. Started at 1494604303665
+goBackN: p_drop 0.011852 cwnd 2
+goBackN: p_drop 0.014475 cwnd 2
+goBackN: p_drop 0.012049 cwnd 2
+goBackN: p_drop 0.014671 cwnd 2
+goBackN: p_drop 0.012245 cwnd 2
+goBackN: p_drop 0.014866 cwnd 2
+goBackN: p_drop 0.012441 cwnd 2
+goBackN: p_drop 0.015062 cwnd 2
 Data Limit reached for connection 14001
 Data Limit reached for connection 14000
-#81 Starting Transfer of me.jpg. Started at 1494590669761
-Transfer Complete. Took 2978ms
-#82 Starting Transfer of me.jpg. Started at 1494590673239
-Transfer Complete. Took 2840ms
-#83 Starting Transfer of me.jpg. Started at 1494590676571
+#1 Starting Transfer of gb.jpg. Started at 1494604330480
+goBackN: p_drop 0.014301 cwnd 2
+goBackN: p_drop 0.014397 cwnd 2
+goBackN: p_drop 0.014497 cwnd 2
+goBackN: p_drop 0.014592 cwnd 2
+goBackN: p_drop 0.014693 cwnd 2
+goBackN: p_drop 0.014788 cwnd 2
+goBackN: p_drop 0.014888 cwnd 2
+goBackN: p_drop 0.014984 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#2 Starting Transfer of gb.jpg. Started at 1494604353625
+goBackN: p_drop 0.014489 cwnd 2
+goBackN: p_drop 0.011840 cwnd 2
+goBackN: p_drop 0.014685 cwnd 2
+goBackN: p_drop 0.012037 cwnd 2
+goBackN: p_drop 0.014880 cwnd 2
+goBackN: p_drop 0.012233 cwnd 2
+goBackN: p_drop 0.015076 cwnd 2
+goBackN: p_drop 0.012430 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#3 Starting Transfer of gb.jpg. Started at 1494604376127
+goBackN: p_drop 0.014470 cwnd 2
+goBackN: p_drop 0.011758 cwnd 2
+goBackN: p_drop 0.014665 cwnd 2
+goBackN: p_drop 0.011955 cwnd 2
+goBackN: p_drop 0.014861 cwnd 2
+goBackN: p_drop 0.012151 cwnd 2
+goBackN: p_drop 0.015057 cwnd 2
+goBackN: p_drop 0.012348 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#4 Starting Transfer of gb.jpg. Started at 1494604400495
+goBackN: p_drop 0.014485 cwnd 2
+goBackN: p_drop 0.011744 cwnd 2
+goBackN: p_drop 0.014681 cwnd 2
+goBackN: p_drop 0.011941 cwnd 2
+goBackN: p_drop 0.014876 cwnd 2
+goBackN: p_drop 0.012137 cwnd 2
+goBackN: p_drop 0.015072 cwnd 2
+goBackN: p_drop 0.012334 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#5 Starting Transfer of gb.jpg. Started at 1494604423070
+goBackN: p_drop 0.011942 cwnd 2
+goBackN: p_drop 0.014486 cwnd 2
+goBackN: p_drop 0.012139 cwnd 2
+goBackN: p_drop 0.014682 cwnd 2
+goBackN: p_drop 0.012335 cwnd 2
+goBackN: p_drop 0.014877 cwnd 2
+goBackN: p_drop 0.012531 cwnd 2
+goBackN: p_drop 0.015073 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#6 Starting Transfer of gb.jpg. Started at 1494604445328
+goBackN: p_drop 0.011841 cwnd 2
+goBackN: p_drop 0.014488 cwnd 2
+goBackN: p_drop 0.012038 cwnd 2
+goBackN: p_drop 0.014684 cwnd 2
+goBackN: p_drop 0.012234 cwnd 2
+goBackN: p_drop 0.014879 cwnd 2
+goBackN: p_drop 0.012431 cwnd 2
+goBackN: p_drop 0.015075 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#7 Starting Transfer of gb.jpg. Started at 1494604471662
+goBackN: p_drop 0.011840 cwnd 2
+goBackN: p_drop 0.014392 cwnd 2
+goBackN: p_drop 0.012037 cwnd 2
+goBackN: p_drop 0.014588 cwnd 2
+goBackN: p_drop 0.012233 cwnd 2
+goBackN: p_drop 0.014783 cwnd 2
+goBackN: p_drop 0.012430 cwnd 2
+goBackN: p_drop 0.014979 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#8 Starting Transfer of gb.jpg. Started at 1494604497490
+goBackN: p_drop 0.014298 cwnd 2
+goBackN: p_drop 0.011835 cwnd 2
+goBackN: p_drop 0.014493 cwnd 2
+goBackN: p_drop 0.012032 cwnd 2
+goBackN: p_drop 0.014689 cwnd 2
+goBackN: p_drop 0.012228 cwnd 2
+goBackN: p_drop 0.014885 cwnd 2
+goBackN: p_drop 0.012425 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#9 Starting Transfer of gb.jpg. Started at 1494604518104
+goBackN: p_drop 0.014402 cwnd 2
+goBackN: p_drop 0.014300 cwnd 2
+goBackN: p_drop 0.014597 cwnd 2
+goBackN: p_drop 0.014495 cwnd 2
+goBackN: p_drop 0.014793 cwnd 2
+goBackN: p_drop 0.014691 cwnd 2
+goBackN: p_drop 0.014988 cwnd 2
+goBackN: p_drop 0.014887 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#10 Starting Transfer of gb.jpg. Started at 1494604543310
+goBackN: p_drop 0.014351 cwnd 2
+goBackN: p_drop 0.014547 cwnd 2
+goBackN: p_drop 0.014743 cwnd 2
+goBackN: p_drop 0.014938 cwnd 2
+Data Limit reached for connection 14000
+#11 Starting Transfer of gb.jpg. Started at 1494604568590
+goBackN: p_drop 0.014401 cwnd 2
+goBackN: p_drop 0.014394 cwnd 2
+goBackN: p_drop 0.014596 cwnd 2
+goBackN: p_drop 0.014590 cwnd 2
+goBackN: p_drop 0.014792 cwnd 2
+goBackN: p_drop 0.014785 cwnd 2
+goBackN: p_drop 0.014987 cwnd 2
+goBackN: p_drop 0.014981 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#12 Starting Transfer of gb.jpg. Started at 1494604594651
+goBackN: p_drop 0.011758 cwnd 2
+goBackN: p_drop 0.014372 cwnd 2
+goBackN: p_drop 0.011955 cwnd 2
+goBackN: p_drop 0.014568 cwnd 2
+goBackN: p_drop 0.012151 cwnd 2
+goBackN: p_drop 0.014763 cwnd 2
+goBackN: p_drop 0.012348 cwnd 2
+goBackN: p_drop 0.014959 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#13 Starting Transfer of gb.jpg. Started at 1494604620282
+goBackN: p_drop 0.011749 cwnd 2
+goBackN: p_drop 0.014481 cwnd 2
+goBackN: p_drop 0.011946 cwnd 2
+goBackN: p_drop 0.014677 cwnd 2
+goBackN: p_drop 0.012142 cwnd 2
+goBackN: p_drop 0.014872 cwnd 2
+goBackN: p_drop 0.012338 cwnd 2
+goBackN: p_drop 0.015068 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#14 Starting Transfer of gb.jpg. Started at 1494604645843
+goBackN: p_drop 0.011845 cwnd 2
+goBackN: p_drop 0.014481 cwnd 2
+goBackN: p_drop 0.012042 cwnd 2
+goBackN: p_drop 0.014677 cwnd 2
+goBackN: p_drop 0.012238 cwnd 2
+goBackN: p_drop 0.014872 cwnd 2
+goBackN: p_drop 0.012434 cwnd 2
+goBackN: p_drop 0.015068 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#15 Starting Transfer of gb.jpg. Started at 1494604671420
+goBackN: p_drop 0.014483 cwnd 2
+goBackN: p_drop 0.011948 cwnd 2
+goBackN: p_drop 0.014679 cwnd 2
+goBackN: p_drop 0.012145 cwnd 2
+goBackN: p_drop 0.014874 cwnd 2
+goBackN: p_drop 0.012341 cwnd 2
+goBackN: p_drop 0.015070 cwnd 2
+goBackN: p_drop 0.012537 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+Exception in thread "Thread-41" java.lang.NullPointerException
+	at MSTCP.vegas.more.SourceCoder.canDecode(SourceCoder.java:109)
+	at MSTCP.vegas.more.SourceCoder.processPacket(SourceCoder.java:88)
+	at MSTCP.vegas.more.SourceCoder.run(SourceCoder.java:40)
+#16 Starting Transfer of gb.jpg. Started at 1494604697009
+goBackN: p_drop 0.014655 cwnd 2
+goBackN: p_drop 0.010881 cwnd 2
+goBackN: p_drop 0.014851 cwnd 2
+goBackN: p_drop 0.011077 cwnd 2
+goBackN: p_drop 0.015046 cwnd 2
+goBackN: p_drop 0.011274 cwnd 2
+goBackN: p_drop 0.015242 cwnd 2
+goBackN: p_drop 0.011471 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#17 Starting Transfer of gb.jpg. Started at 1494604723312
+goBackN: p_drop 0.014399 cwnd 2
+goBackN: p_drop 0.014496 cwnd 2
+goBackN: p_drop 0.014595 cwnd 2
+goBackN: p_drop 0.014692 cwnd 2
+goBackN: p_drop 0.014790 cwnd 2
+goBackN: p_drop 0.014887 cwnd 2
+goBackN: p_drop 0.014986 cwnd 2
+goBackN: p_drop 0.015083 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#18 Starting Transfer of gb.jpg. Started at 1494604747476
+goBackN: p_drop 0.014662 cwnd 2
+goBackN: p_drop 0.010777 cwnd 2
+goBackN: p_drop 0.014858 cwnd 2
+goBackN: p_drop 0.010973 cwnd 2
+goBackN: p_drop 0.015053 cwnd 2
+goBackN: p_drop 0.011170 cwnd 2
+goBackN: p_drop 0.015249 cwnd 2
+goBackN: p_drop 0.011367 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#19 Starting Transfer of gb.jpg. Started at 1494604773807
+goBackN: p_drop 0.014183 cwnd 2
+goBackN: p_drop 0.011948 cwnd 2
+goBackN: p_drop 0.014379 cwnd 2
+goBackN: p_drop 0.012144 cwnd 2
+goBackN: p_drop 0.014575 cwnd 2
+goBackN: p_drop 0.012341 cwnd 2
+goBackN: p_drop 0.014770 cwnd 2
+goBackN: p_drop 0.012537 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#20 Starting Transfer of gb.jpg. Started at 1494604795539
+goBackN: p_drop 0.014461 cwnd 2
+goBackN: p_drop 0.010783 cwnd 2
+goBackN: p_drop 0.014657 cwnd 2
+goBackN: p_drop 0.010979 cwnd 2
+goBackN: p_drop 0.014853 cwnd 2
+goBackN: p_drop 0.011176 cwnd 2
+goBackN: p_drop 0.015048 cwnd 2
+goBackN: p_drop 0.011373 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#21 Starting Transfer of gb.jpg. Started at 1494604820388
+goBackN: p_drop 0.011844 cwnd 2
+goBackN: p_drop 0.014385 cwnd 2
+goBackN: p_drop 0.012041 cwnd 2
+goBackN: p_drop 0.014581 cwnd 2
+goBackN: p_drop 0.012237 cwnd 2
+goBackN: p_drop 0.014777 cwnd 2
+goBackN: p_drop 0.014972 cwnd 2
+goBackN: p_drop 0.012433 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#22 Starting Transfer of gb.jpg. Started at 1494604846114
+goBackN: p_drop 0.014381 cwnd 2
+goBackN: p_drop 0.011849 cwnd 2
+goBackN: p_drop 0.014577 cwnd 2
+goBackN: p_drop 0.012046 cwnd 2
+goBackN: p_drop 0.014772 cwnd 2
+goBackN: p_drop 0.012242 cwnd 2
+goBackN: p_drop 0.014968 cwnd 2
+goBackN: p_drop 0.012438 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#23 Starting Transfer of gb.jpg. Started at 1494604870650
+goBackN: p_drop 0.014690 cwnd 2
+goBackN: p_drop 0.011939 cwnd 2
+goBackN: p_drop 0.014885 cwnd 2
+goBackN: p_drop 0.012136 cwnd 2
+goBackN: p_drop 0.015081 cwnd 2
+goBackN: p_drop 0.012332 cwnd 2
+goBackN: p_drop 0.015276 cwnd 2
+goBackN: p_drop 0.012528 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#24 Starting Transfer of gb.jpg. Started at 1494604896054
+goBackN: p_drop 0.011845 cwnd 2
+goBackN: p_drop 0.014582 cwnd 2
+goBackN: p_drop 0.012042 cwnd 2
+goBackN: p_drop 0.014778 cwnd 2
+goBackN: p_drop 0.012238 cwnd 2
+goBackN: p_drop 0.014973 cwnd 2
+goBackN: p_drop 0.012434 cwnd 2
+goBackN: p_drop 0.015169 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#25 Starting Transfer of gb.jpg. Started at 1494604917780
+goBackN: p_drop 0.014487 cwnd 2
+goBackN: p_drop 0.011838 cwnd 2
+goBackN: p_drop 0.014683 cwnd 2
+goBackN: p_drop 0.012035 cwnd 2
+goBackN: p_drop 0.014878 cwnd 2
+goBackN: p_drop 0.012231 cwnd 2
+goBackN: p_drop 0.015074 cwnd 2
+goBackN: p_drop 0.012428 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#26 Starting Transfer of gb.jpg. Started at 1494604943649
+goBackN: p_drop 0.014088 cwnd 2
+goBackN: p_drop 0.013721 cwnd 2
+goBackN: p_drop 0.014284 cwnd 2
+goBackN: p_drop 0.013917 cwnd 2
+goBackN: p_drop 0.014480 cwnd 2
+goBackN: p_drop 0.014112 cwnd 2
+goBackN: p_drop 0.014675 cwnd 2
+goBackN: p_drop 0.014308 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#27 Starting Transfer of gb.jpg. Started at 1494604969636
+goBackN: p_drop 0.011845 cwnd 2
+goBackN: p_drop 0.014483 cwnd 2
+goBackN: p_drop 0.012042 cwnd 2
+goBackN: p_drop 0.014679 cwnd 2
+goBackN: p_drop 0.012238 cwnd 2
+goBackN: p_drop 0.014874 cwnd 2
+goBackN: p_drop 0.012434 cwnd 2
+goBackN: p_drop 0.015070 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#28 Starting Transfer of gb.jpg. Started at 1494604991748
+goBackN: p_drop 0.011753 cwnd 2
+goBackN: p_drop 0.014293 cwnd 2
+goBackN: p_drop 0.011950 cwnd 2
+goBackN: p_drop 0.014489 cwnd 2
+goBackN: p_drop 0.012146 cwnd 2
+goBackN: p_drop 0.014685 cwnd 2
+goBackN: p_drop 0.012343 cwnd 2
+goBackN: p_drop 0.014880 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#29 Starting Transfer of gb.jpg. Started at 1494605012282
+goBackN: p_drop 0.011851 cwnd 2
+goBackN: p_drop 0.014775 cwnd 2
+goBackN: p_drop 0.012048 cwnd 2
+goBackN: p_drop 0.014971 cwnd 2
+goBackN: p_drop 0.012244 cwnd 2
+goBackN: p_drop 0.015166 cwnd 2
+goBackN: p_drop 0.012440 cwnd 2
+goBackN: p_drop 0.015362 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#30 Starting Transfer of gb.jpg. Started at 1494605038122
+goBackN: p_drop 0.014387 cwnd 2
+goBackN: p_drop 0.011846 cwnd 2
+goBackN: p_drop 0.014583 cwnd 2
+goBackN: p_drop 0.012043 cwnd 2
+goBackN: p_drop 0.014779 cwnd 2
+goBackN: p_drop 0.012239 cwnd 2
+goBackN: p_drop 0.014974 cwnd 2
+goBackN: p_drop 0.012435 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#31 Starting Transfer of gb.jpg. Started at 1494605060923
+goBackN: p_drop 0.014941 cwnd 2
+goBackN: p_drop 0.015137 cwnd 2
+goBackN: p_drop 0.015332 cwnd 2
+goBackN: p_drop 0.015528 cwnd 2
+Data Limit reached for connection 14000
+#32 Starting Transfer of gb.jpg. Started at 1494605087392
+goBackN: p_drop 0.011841 cwnd 2
+goBackN: p_drop 0.014489 cwnd 2
+goBackN: p_drop 0.012038 cwnd 2
+goBackN: p_drop 0.014685 cwnd 2
+goBackN: p_drop 0.012234 cwnd 2
+goBackN: p_drop 0.014880 cwnd 2
+goBackN: p_drop 0.012431 cwnd 2
+goBackN: p_drop 0.015076 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#33 Starting Transfer of gb.jpg. Started at 1494605113124
+goBackN: p_drop 0.014486 cwnd 2
+goBackN: p_drop 0.011839 cwnd 2
+goBackN: p_drop 0.014682 cwnd 2
+goBackN: p_drop 0.012036 cwnd 2
+goBackN: p_drop 0.014877 cwnd 2
+goBackN: p_drop 0.012232 cwnd 2
+goBackN: p_drop 0.015073 cwnd 2
+goBackN: p_drop 0.012429 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#34 Starting Transfer of gb.jpg. Started at 1494605133866
+goBackN: p_drop 0.011849 cwnd 2
+goBackN: p_drop 0.014479 cwnd 2
+goBackN: p_drop 0.014675 cwnd 2
+goBackN: p_drop 0.012046 cwnd 2
+goBackN: p_drop 0.014871 cwnd 2
+goBackN: p_drop 0.012242 cwnd 2
+goBackN: p_drop 0.015066 cwnd 2
+goBackN: p_drop 0.012438 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#35 Starting Transfer of gb.jpg. Started at 1494605158902
+goBackN: p_drop 0.014369 cwnd 2
+goBackN: p_drop 0.010876 cwnd 2
+goBackN: p_drop 0.014565 cwnd 2
+goBackN: p_drop 0.011072 cwnd 2
+goBackN: p_drop 0.014761 cwnd 2
+goBackN: p_drop 0.011269 cwnd 2
+goBackN: p_drop 0.014956 cwnd 2
+goBackN: p_drop 0.011466 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#36 Starting Transfer of gb.jpg. Started at 1494605184546
+goBackN: p_drop 0.014489 cwnd 2
+goBackN: p_drop 0.014108 cwnd 2
+goBackN: p_drop 0.014685 cwnd 2
+goBackN: p_drop 0.014304 cwnd 2
+goBackN: p_drop 0.014880 cwnd 2
+goBackN: p_drop 0.014500 cwnd 2
+goBackN: p_drop 0.015076 cwnd 2
+goBackN: p_drop 0.014695 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#37 Starting Transfer of gb.jpg. Started at 1494605209064
+goBackN: p_drop 0.011848 cwnd 2
+goBackN: p_drop 0.014479 cwnd 2
+goBackN: p_drop 0.012045 cwnd 2
+goBackN: p_drop 0.014675 cwnd 2
+goBackN: p_drop 0.012241 cwnd 2
+goBackN: p_drop 0.014871 cwnd 2
+goBackN: p_drop 0.012437 cwnd 2
+goBackN: p_drop 0.015066 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#38 Starting Transfer of gb.jpg. Started at 1494605230990
+goBackN: p_drop 0.014460 cwnd 2
+goBackN: p_drop 0.011668 cwnd 2
+goBackN: p_drop 0.014656 cwnd 2
+goBackN: p_drop 0.011864 cwnd 2
+goBackN: p_drop 0.014851 cwnd 2
+goBackN: p_drop 0.012060 cwnd 2
+goBackN: p_drop 0.015047 cwnd 2
+goBackN: p_drop 0.012257 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#39 Starting Transfer of gb.jpg. Started at 1494605254168
+goBackN: p_drop 0.011763 cwnd 2
+goBackN: p_drop 0.014563 cwnd 2
+goBackN: p_drop 0.011960 cwnd 2
+goBackN: p_drop 0.014758 cwnd 2
+goBackN: p_drop 0.012156 cwnd 2
+goBackN: p_drop 0.014954 cwnd 2
+goBackN: p_drop 0.012353 cwnd 2
+goBackN: p_drop 0.015149 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#40 Starting Transfer of gb.jpg. Started at 1494605279507
+goBackN: p_drop 0.014489 cwnd 2
+goBackN: p_drop 0.011838 cwnd 2
+goBackN: p_drop 0.014685 cwnd 2
+goBackN: p_drop 0.012035 cwnd 2
+goBackN: p_drop 0.014880 cwnd 2
+goBackN: p_drop 0.012231 cwnd 2
+goBackN: p_drop 0.015076 cwnd 2
+goBackN: p_drop 0.012428 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#41 Starting Transfer of gb.jpg. Started at 1494605303111
+goBackN: p_drop 0.011761 cwnd 2
+goBackN: p_drop 0.014469 cwnd 2
+goBackN: p_drop 0.011958 cwnd 2
+goBackN: p_drop 0.014665 cwnd 2
+goBackN: p_drop 0.012154 cwnd 2
+goBackN: p_drop 0.014861 cwnd 2
+goBackN: p_drop 0.012351 cwnd 2
+goBackN: p_drop 0.015056 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+goBackN: p_drop 0.010295 cwnd 2
+#42 Starting Transfer of gb.jpg. Started at 1494605329380
+goBackN: p_drop 0.014465 cwnd 2
+goBackN: p_drop 0.010777 cwnd 2
+goBackN: p_drop 0.014661 cwnd 2
+goBackN: p_drop 0.010973 cwnd 2
+goBackN: p_drop 0.014856 cwnd 2
+goBackN: p_drop 0.011170 cwnd 2
+goBackN: p_drop 0.015052 cwnd 2
+goBackN: p_drop 0.011367 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#43 Starting Transfer of gb.jpg. Started at 1494605351646
+goBackN: p_drop 0.014389 cwnd 2
+goBackN: p_drop 0.011839 cwnd 2
+goBackN: p_drop 0.014584 cwnd 2
+goBackN: p_drop 0.012036 cwnd 2
+goBackN: p_drop 0.014780 cwnd 2
+goBackN: p_drop 0.012232 cwnd 2
+goBackN: p_drop 0.014975 cwnd 2
+goBackN: p_drop 0.012429 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#44 Starting Transfer of gb.jpg. Started at 1494605376391
+goBackN: p_drop 0.014567 cwnd 2
+goBackN: p_drop 0.011759 cwnd 2
+goBackN: p_drop 0.014762 cwnd 2
+goBackN: p_drop 0.011956 cwnd 2
+goBackN: p_drop 0.014958 cwnd 2
+goBackN: p_drop 0.012152 cwnd 2
+goBackN: p_drop 0.015153 cwnd 2
+goBackN: p_drop 0.012349 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#45 Starting Transfer of gb.jpg. Started at 1494605402726
+goBackN: p_drop 0.011849 cwnd 2
+goBackN: p_drop 0.014479 cwnd 2
+goBackN: p_drop 0.012046 cwnd 2
+goBackN: p_drop 0.014675 cwnd 2
+goBackN: p_drop 0.012242 cwnd 2
+goBackN: p_drop 0.014870 cwnd 2
+goBackN: p_drop 0.012438 cwnd 2
+goBackN: p_drop 0.015066 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#46 Starting Transfer of gb.jpg. Started at 1494605421948
+goBackN: p_drop 0.014489 cwnd 2
+goBackN: p_drop 0.011838 cwnd 2
+goBackN: p_drop 0.014685 cwnd 2
+goBackN: p_drop 0.012035 cwnd 2
+goBackN: p_drop 0.014880 cwnd 2
+goBackN: p_drop 0.012231 cwnd 2
+goBackN: p_drop 0.015076 cwnd 2
+goBackN: p_drop 0.012428 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#47 Starting Transfer of gb.jpg. Started at 1494605448094
+goBackN: p_drop 0.014283 cwnd 2
+goBackN: p_drop 0.011944 cwnd 2
+goBackN: p_drop 0.014479 cwnd 2
+goBackN: p_drop 0.012140 cwnd 2
+goBackN: p_drop 0.014675 cwnd 2
+goBackN: p_drop 0.012337 cwnd 2
+goBackN: p_drop 0.014870 cwnd 2
+goBackN: p_drop 0.012533 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#48 Starting Transfer of gb.jpg. Started at 1494605469184
+goBackN: p_drop 0.011858 cwnd 2
+goBackN: p_drop 0.014669 cwnd 2
+goBackN: p_drop 0.012055 cwnd 2
+goBackN: p_drop 0.014864 cwnd 2
+goBackN: p_drop 0.012251 cwnd 2
+goBackN: p_drop 0.015060 cwnd 2
+goBackN: p_drop 0.012447 cwnd 2
+goBackN: p_drop 0.015255 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#49 Starting Transfer of gb.jpg. Started at 1494605493841
+goBackN: p_drop 0.011835 cwnd 2
+goBackN: p_drop 0.014491 cwnd 2
+goBackN: p_drop 0.012032 cwnd 2
+goBackN: p_drop 0.014687 cwnd 2
+goBackN: p_drop 0.012228 cwnd 2
+goBackN: p_drop 0.014882 cwnd 2
+goBackN: p_drop 0.012425 cwnd 2
+goBackN: p_drop 0.015078 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+Exception in thread "Thread-40" java.lang.NullPointerException
+	at MSTCP.vegas.more.SourceCoder.canDecode(SourceCoder.java:109)
+	at MSTCP.vegas.more.SourceCoder.processPacket(SourceCoder.java:88)
+	at MSTCP.vegas.more.SourceCoder.run(SourceCoder.java:40)
+#50 Starting Transfer of gb.jpg. Started at 1494605515937
+goBackN: p_drop 0.014446 cwnd 2
+goBackN: p_drop 0.014641 cwnd 2
+goBackN: p_drop 0.014837 cwnd 2
+goBackN: p_drop 0.015032 cwnd 2
+Data Limit reached for connection 14000
+#51 Starting Transfer of gb.jpg. Started at 1494605538921
+goBackN: p_drop 0.011937 cwnd 2
+goBackN: p_drop 0.014096 cwnd 2
+goBackN: p_drop 0.012133 cwnd 2
+goBackN: p_drop 0.014292 cwnd 2
+goBackN: p_drop 0.012330 cwnd 2
+goBackN: p_drop 0.014487 cwnd 2
+goBackN: p_drop 0.012526 cwnd 2
+goBackN: p_drop 0.014683 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#52 Starting Transfer of gb.jpg. Started at 1494605563910
+goBackN: p_drop 0.014103 cwnd 2
+goBackN: p_drop 0.014494 cwnd 2
+goBackN: p_drop 0.014299 cwnd 2
+goBackN: p_drop 0.014690 cwnd 2
+goBackN: p_drop 0.014495 cwnd 2
+goBackN: p_drop 0.014885 cwnd 2
+goBackN: p_drop 0.014691 cwnd 2
+goBackN: p_drop 0.015081 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#53 Starting Transfer of gb.jpg. Started at 1494605589812
+goBackN: p_drop 0.014574 cwnd 2
+goBackN: p_drop 0.011952 cwnd 2
+goBackN: p_drop 0.014769 cwnd 2
+goBackN: p_drop 0.012148 cwnd 2
+goBackN: p_drop 0.014965 cwnd 2
+goBackN: p_drop 0.012345 cwnd 2
+goBackN: p_drop 0.015160 cwnd 2
+goBackN: p_drop 0.012541 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#54 Starting Transfer of gb.jpg. Started at 1494605615168
+goBackN: p_drop 0.014386 cwnd 2
+goBackN: p_drop 0.011845 cwnd 2
+goBackN: p_drop 0.014582 cwnd 2
+goBackN: p_drop 0.012042 cwnd 2
+goBackN: p_drop 0.014778 cwnd 2
+goBackN: p_drop 0.012238 cwnd 2
+goBackN: p_drop 0.014973 cwnd 2
+goBackN: p_drop 0.012434 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#55 Starting Transfer of gb.jpg. Started at 1494605641196
+goBackN: p_drop 0.014493 cwnd 2
+goBackN: p_drop 0.014403 cwnd 2
+goBackN: p_drop 0.014689 cwnd 2
+goBackN: p_drop 0.014598 cwnd 2
+goBackN: p_drop 0.014884 cwnd 2
+goBackN: p_drop 0.014794 cwnd 2
+goBackN: p_drop 0.015080 cwnd 2
+goBackN: p_drop 0.014990 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#56 Starting Transfer of gb.jpg. Started at 1494605663510
+goBackN: p_drop 0.011941 cwnd 2
+goBackN: p_drop 0.014289 cwnd 2
+goBackN: p_drop 0.012138 cwnd 2
+goBackN: p_drop 0.014485 cwnd 2
+goBackN: p_drop 0.012334 cwnd 2
+goBackN: p_drop 0.014680 cwnd 2
+goBackN: p_drop 0.012530 cwnd 2
+goBackN: p_drop 0.014876 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#57 Starting Transfer of gb.jpg. Started at 1494605686501
+goBackN: p_drop 0.014482 cwnd 2
+goBackN: p_drop 0.011844 cwnd 2
+goBackN: p_drop 0.014678 cwnd 2
+goBackN: p_drop 0.012041 cwnd 2
+goBackN: p_drop 0.014873 cwnd 2
+goBackN: p_drop 0.012237 cwnd 2
+goBackN: p_drop 0.015069 cwnd 2
+goBackN: p_drop 0.012433 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#58 Starting Transfer of gb.jpg. Started at 1494605712168
+goBackN: p_drop 0.012046 cwnd 2
+goBackN: p_drop 0.014181 cwnd 2
+goBackN: p_drop 0.012243 cwnd 2
+goBackN: p_drop 0.014377 cwnd 2
+goBackN: p_drop 0.012439 cwnd 2
+goBackN: p_drop 0.014572 cwnd 2
+goBackN: p_drop 0.012635 cwnd 2
+goBackN: p_drop 0.014768 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#59 Starting Transfer of gb.jpg. Started at 1494605737629
+goBackN: p_drop 0.014294 cwnd 2
+goBackN: p_drop 0.011837 cwnd 2
+goBackN: p_drop 0.014489 cwnd 2
+goBackN: p_drop 0.012034 cwnd 2
+goBackN: p_drop 0.014685 cwnd 2
+goBackN: p_drop 0.012230 cwnd 2
+goBackN: p_drop 0.014881 cwnd 2
+goBackN: p_drop 0.012427 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#60 Starting Transfer of gb.jpg. Started at 1494605761644
+goBackN: p_drop 0.014582 cwnd 2
+goBackN: p_drop 0.011651 cwnd 2
+goBackN: p_drop 0.014777 cwnd 2
+goBackN: p_drop 0.011848 cwnd 2
+goBackN: p_drop 0.014973 cwnd 2
+goBackN: p_drop 0.012044 cwnd 2
+goBackN: p_drop 0.015168 cwnd 2
+goBackN: p_drop 0.012241 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#61 Starting Transfer of gb.jpg. Started at 1494605787690
+goBackN: p_drop 0.014489 cwnd 2
+goBackN: p_drop 0.014109 cwnd 2
+goBackN: p_drop 0.014685 cwnd 2
+goBackN: p_drop 0.014305 cwnd 2
+goBackN: p_drop 0.014880 cwnd 2
+goBackN: p_drop 0.014501 cwnd 2
+goBackN: p_drop 0.015076 cwnd 2
+goBackN: p_drop 0.014696 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#62 Starting Transfer of gb.jpg. Started at 1494605807918
+goBackN: p_drop 0.014565 cwnd 2
+goBackN: p_drop 0.011763 cwnd 2
+goBackN: p_drop 0.014761 cwnd 2
+goBackN: p_drop 0.011960 cwnd 2
+goBackN: p_drop 0.014956 cwnd 2
+goBackN: p_drop 0.012156 cwnd 2
+goBackN: p_drop 0.015152 cwnd 2
+goBackN: p_drop 0.012353 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#63 Starting Transfer of gb.jpg. Started at 1494605829818
+goBackN: p_drop 0.011853 cwnd 2
+goBackN: p_drop 0.014474 cwnd 2
+goBackN: p_drop 0.012050 cwnd 2
+goBackN: p_drop 0.014670 cwnd 2
+goBackN: p_drop 0.012246 cwnd 2
+goBackN: p_drop 0.014865 cwnd 2
+goBackN: p_drop 0.012442 cwnd 2
+goBackN: p_drop 0.015061 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#64 Starting Transfer of gb.jpg. Started at 1494605851575
+goBackN: p_drop 0.011667 cwnd 2
+goBackN: p_drop 0.014470 cwnd 2
+goBackN: p_drop 0.011863 cwnd 2
+goBackN: p_drop 0.014666 cwnd 2
+goBackN: p_drop 0.012060 cwnd 2
+goBackN: p_drop 0.014862 cwnd 2
+goBackN: p_drop 0.012256 cwnd 2
+goBackN: p_drop 0.015057 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#65 Starting Transfer of gb.jpg. Started at 1494605876117
+goBackN: p_drop 0.014277 cwnd 2
+goBackN: p_drop 0.011950 cwnd 2
+goBackN: p_drop 0.014473 cwnd 2
+goBackN: p_drop 0.012146 cwnd 2
+goBackN: p_drop 0.014669 cwnd 2
+goBackN: p_drop 0.012343 cwnd 2
+goBackN: p_drop 0.014864 cwnd 2
+goBackN: p_drop 0.012539 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#66 Starting Transfer of gb.jpg. Started at 1494605901869
+goBackN: p_drop 0.014398 cwnd 2
+goBackN: p_drop 0.014398 cwnd 2
+goBackN: p_drop 0.014594 cwnd 2
+goBackN: p_drop 0.014593 cwnd 2
+goBackN: p_drop 0.014790 cwnd 2
+goBackN: p_drop 0.014789 cwnd 2
+goBackN: p_drop 0.014985 cwnd 2
+goBackN: p_drop 0.014985 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#67 Starting Transfer of gb.jpg. Started at 1494605927386
+goBackN: p_drop 0.014595 cwnd 2
+goBackN: p_drop 0.013611 cwnd 2
+goBackN: p_drop 0.014791 cwnd 2
+goBackN: p_drop 0.013807 cwnd 2
+goBackN: p_drop 0.014986 cwnd 2
+goBackN: p_drop 0.014003 cwnd 2
+goBackN: p_drop 0.015182 cwnd 2
+goBackN: p_drop 0.014198 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#68 Starting Transfer of gb.jpg. Started at 1494605949052
+goBackN: p_drop 0.014478 cwnd 2
+goBackN: p_drop 0.011853 cwnd 2
+goBackN: p_drop 0.014674 cwnd 2
+goBackN: p_drop 0.012050 cwnd 2
+goBackN: p_drop 0.014869 cwnd 2
+goBackN: p_drop 0.012246 cwnd 2
+goBackN: p_drop 0.015065 cwnd 2
+goBackN: p_drop 0.012442 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#69 Starting Transfer of gb.jpg. Started at 1494605974616
+goBackN: p_drop 0.014299 cwnd 2
+goBackN: p_drop 0.014299 cwnd 2
+goBackN: p_drop 0.014495 cwnd 2
+goBackN: p_drop 0.014495 cwnd 2
+goBackN: p_drop 0.014691 cwnd 2
+goBackN: p_drop 0.014690 cwnd 2
+goBackN: p_drop 0.014886 cwnd 2
+goBackN: p_drop 0.014886 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#70 Starting Transfer of gb.jpg. Started at 1494606000391
+goBackN: p_drop 0.010783 cwnd 2
+goBackN: p_drop 0.014265 cwnd 2
+goBackN: p_drop 0.010979 cwnd 2
+goBackN: p_drop 0.014461 cwnd 2
+goBackN: p_drop 0.011176 cwnd 2
+goBackN: p_drop 0.014657 cwnd 2
+goBackN: p_drop 0.011373 cwnd 2
+goBackN: p_drop 0.014852 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#71 Starting Transfer of gb.jpg. Started at 1494606027333
+goBackN: p_drop 0.011849 cwnd 2
+goBackN: p_drop 0.014676 cwnd 2
+goBackN: p_drop 0.012046 cwnd 2
+goBackN: p_drop 0.014871 cwnd 2
+goBackN: p_drop 0.012242 cwnd 2
+goBackN: p_drop 0.015067 cwnd 2
+goBackN: p_drop 0.012438 cwnd 2
+goBackN: p_drop 0.015262 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#72 Starting Transfer of gb.jpg. Started at 1494606053522
+goBackN: p_drop 0.014957 cwnd 2
+goBackN: p_drop 0.011767 cwnd 2
+goBackN: p_drop 0.015152 cwnd 2
+goBackN: p_drop 0.011964 cwnd 2
+goBackN: p_drop 0.015348 cwnd 2
+goBackN: p_drop 0.012160 cwnd 2
+goBackN: p_drop 0.015543 cwnd 2
+goBackN: p_drop 0.012357 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#73 Starting Transfer of gb.jpg. Started at 1494606079982
+goBackN: p_drop 0.014478 cwnd 2
+goBackN: p_drop 0.011951 cwnd 2
+goBackN: p_drop 0.014674 cwnd 2
+goBackN: p_drop 0.012147 cwnd 2
+goBackN: p_drop 0.014869 cwnd 2
+goBackN: p_drop 0.012344 cwnd 2
+goBackN: p_drop 0.015065 cwnd 2
+goBackN: p_drop 0.012540 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#74 Starting Transfer of gb.jpg. Started at 1494606104717
+goBackN: p_drop 0.012032 cwnd 2
+goBackN: p_drop 0.013903 cwnd 2
+goBackN: p_drop 0.012229 cwnd 2
+goBackN: p_drop 0.014099 cwnd 2
+goBackN: p_drop 0.012425 cwnd 2
+goBackN: p_drop 0.014295 cwnd 2
+goBackN: p_drop 0.012621 cwnd 2
+goBackN: p_drop 0.014490 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#75 Starting Transfer of gb.jpg. Started at 1494606129801
+goBackN: p_drop 0.014489 cwnd 2
+goBackN: p_drop 0.011839 cwnd 2
+goBackN: p_drop 0.014685 cwnd 2
+goBackN: p_drop 0.012036 cwnd 2
+goBackN: p_drop 0.014880 cwnd 2
+goBackN: p_drop 0.012232 cwnd 2
+goBackN: p_drop 0.015076 cwnd 2
+goBackN: p_drop 0.012429 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#76 Starting Transfer of gb.jpg. Started at 1494606155694
+goBackN: p_drop 0.011748 cwnd 2
+goBackN: p_drop 0.014484 cwnd 2
+goBackN: p_drop 0.011945 cwnd 2
+goBackN: p_drop 0.014680 cwnd 2
+goBackN: p_drop 0.012141 cwnd 2
+goBackN: p_drop 0.014876 cwnd 2
+goBackN: p_drop 0.012338 cwnd 2
+goBackN: p_drop 0.015071 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#77 Starting Transfer of gb.jpg. Started at 1494606176823
+goBackN: p_drop 0.011762 cwnd 2
+goBackN: p_drop 0.014568 cwnd 2
+goBackN: p_drop 0.011959 cwnd 2
+goBackN: p_drop 0.014763 cwnd 2
+goBackN: p_drop 0.012155 cwnd 2
+goBackN: p_drop 0.014959 cwnd 2
+goBackN: p_drop 0.012352 cwnd 2
+goBackN: p_drop 0.015154 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#78 Starting Transfer of gb.jpg. Started at 1494606204593
+goBackN: p_drop 0.011846 cwnd 2
+goBackN: p_drop 0.014383 cwnd 2
+goBackN: p_drop 0.012043 cwnd 2
+goBackN: p_drop 0.014579 cwnd 2
+goBackN: p_drop 0.012239 cwnd 2
+goBackN: p_drop 0.014774 cwnd 2
+goBackN: p_drop 0.012435 cwnd 2
+goBackN: p_drop 0.014970 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#79 Starting Transfer of gb.jpg. Started at 1494606228159
+goBackN: p_drop 0.014195 cwnd 2
+goBackN: p_drop 0.011839 cwnd 2
+goBackN: p_drop 0.014391 cwnd 2
+goBackN: p_drop 0.012036 cwnd 2
+goBackN: p_drop 0.014586 cwnd 2
+goBackN: p_drop 0.012232 cwnd 2
+goBackN: p_drop 0.014782 cwnd 2
+goBackN: p_drop 0.012428 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#80 Starting Transfer of gb.jpg. Started at 1494606249652
+goBackN: p_drop 0.011746 cwnd 2
+goBackN: p_drop 0.014088 cwnd 2
+goBackN: p_drop 0.011943 cwnd 2
+goBackN: p_drop 0.014283 cwnd 2
+goBackN: p_drop 0.012139 cwnd 2
+goBackN: p_drop 0.014479 cwnd 2
+goBackN: p_drop 0.012336 cwnd 2
+goBackN: p_drop 0.014675 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#81 Starting Transfer of gb.jpg. Started at 1494606271730
+goBackN: p_drop 0.014471 cwnd 2
+goBackN: p_drop 0.011856 cwnd 2
+goBackN: p_drop 0.014667 cwnd 2
+goBackN: p_drop 0.012053 cwnd 2
+goBackN: p_drop 0.014862 cwnd 2
+goBackN: p_drop 0.012249 cwnd 2
+goBackN: p_drop 0.015058 cwnd 2
+goBackN: p_drop 0.012445 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#82 Starting Transfer of gb.jpg. Started at 1494606297598
+goBackN: p_drop 0.011756 cwnd 2
+goBackN: p_drop 0.014183 cwnd 2
+goBackN: p_drop 0.011953 cwnd 2
+goBackN: p_drop 0.014378 cwnd 2
+goBackN: p_drop 0.012149 cwnd 2
+goBackN: p_drop 0.014574 cwnd 2
+goBackN: p_drop 0.012346 cwnd 2
+goBackN: p_drop 0.014770 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#83 Starting Transfer of gb.jpg. Started at 1494606319357
+goBackN: p_drop 0.011836 cwnd 2
+goBackN: p_drop 0.014491 cwnd 2
+goBackN: p_drop 0.012033 cwnd 2
+goBackN: p_drop 0.014686 cwnd 2
+goBackN: p_drop 0.012229 cwnd 2
+goBackN: p_drop 0.014882 cwnd 2
+goBackN: p_drop 0.012426 cwnd 2
+goBackN: p_drop 0.015077 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#84 Starting Transfer of gb.jpg. Started at 1494606345605
+goBackN: p_drop 0.011841 cwnd 2
+goBackN: p_drop 0.014487 cwnd 2
+goBackN: p_drop 0.012038 cwnd 2
+goBackN: p_drop 0.014682 cwnd 2
+goBackN: p_drop 0.012234 cwnd 2
+goBackN: p_drop 0.014878 cwnd 2
+goBackN: p_drop 0.012431 cwnd 2
+goBackN: p_drop 0.015073 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#85 Starting Transfer of gb.jpg. Started at 1494606371537
+goBackN: p_drop 0.014574 cwnd 2
+goBackN: p_drop 0.011950 cwnd 2
+goBackN: p_drop 0.014770 cwnd 2
+goBackN: p_drop 0.012146 cwnd 2
+goBackN: p_drop 0.014965 cwnd 2
+goBackN: p_drop 0.012343 cwnd 2
+goBackN: p_drop 0.015161 cwnd 2
+goBackN: p_drop 0.012539 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#86 Starting Transfer of gb.jpg. Started at 1494606397434
+goBackN: p_drop 0.011937 cwnd 2
+goBackN: p_drop 0.014392 cwnd 2
+goBackN: p_drop 0.012133 cwnd 2
+goBackN: p_drop 0.014588 cwnd 2
+goBackN: p_drop 0.012330 cwnd 2
+goBackN: p_drop 0.014784 cwnd 2
+goBackN: p_drop 0.012526 cwnd 2
+goBackN: p_drop 0.014979 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+goBackN: p_drop 0.010393 cwnd 2
+#87 Starting Transfer of gb.jpg. Started at 1494606423063
+goBackN: p_drop 0.014391 cwnd 2
+goBackN: p_drop 0.011836 cwnd 2
+goBackN: p_drop 0.014587 cwnd 2
+goBackN: p_drop 0.012033 cwnd 2
+goBackN: p_drop 0.014783 cwnd 2
+goBackN: p_drop 0.012229 cwnd 2
+goBackN: p_drop 0.014978 cwnd 2
+goBackN: p_drop 0.012426 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#88 Starting Transfer of gb.jpg. Started at 1494606446344
+goBackN: p_drop 0.014470 cwnd 2
+goBackN: p_drop 0.011760 cwnd 2
+goBackN: p_drop 0.014665 cwnd 2
+goBackN: p_drop 0.011957 cwnd 2
+goBackN: p_drop 0.014861 cwnd 2
+goBackN: p_drop 0.012153 cwnd 2
+goBackN: p_drop 0.015056 cwnd 2
+goBackN: p_drop 0.012350 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#89 Starting Transfer of gb.jpg. Started at 1494606470021
+goBackN: p_drop 0.011668 cwnd 2
+goBackN: p_drop 0.014561 cwnd 2
+goBackN: p_drop 0.011864 cwnd 2
+goBackN: p_drop 0.014756 cwnd 2
+goBackN: p_drop 0.012060 cwnd 2
+goBackN: p_drop 0.014952 cwnd 2
+goBackN: p_drop 0.012257 cwnd 2
+goBackN: p_drop 0.015147 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#90 Starting Transfer of gb.jpg. Started at 1494606491829
+goBackN: p_drop 0.014494 cwnd 2
+goBackN: p_drop 0.014497 cwnd 2
+goBackN: p_drop 0.014690 cwnd 2
+goBackN: p_drop 0.014692 cwnd 2
+goBackN: p_drop 0.014885 cwnd 2
+goBackN: p_drop 0.014888 cwnd 2
+goBackN: p_drop 0.015081 cwnd 2
+goBackN: p_drop 0.015083 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#91 Starting Transfer of gb.jpg. Started at 1494606512993
+goBackN: p_drop 0.011953 cwnd 2
+goBackN: p_drop 0.014472 cwnd 2
+goBackN: p_drop 0.012149 cwnd 2
+goBackN: p_drop 0.014668 cwnd 2
+goBackN: p_drop 0.012346 cwnd 2
+goBackN: p_drop 0.014863 cwnd 2
+goBackN: p_drop 0.012542 cwnd 2
+goBackN: p_drop 0.015059 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#92 Starting Transfer of gb.jpg. Started at 1494606538379
+goBackN: p_drop 0.014399 cwnd 2
+goBackN: p_drop 0.014400 cwnd 2
+goBackN: p_drop 0.014595 cwnd 2
+goBackN: p_drop 0.014596 cwnd 2
+goBackN: p_drop 0.014791 cwnd 2
+goBackN: p_drop 0.014791 cwnd 2
+goBackN: p_drop 0.014986 cwnd 2
+goBackN: p_drop 0.014987 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#93 Starting Transfer of gb.jpg. Started at 1494606564646
+goBackN: p_drop 0.014586 cwnd 2
+goBackN: p_drop 0.012037 cwnd 2
+goBackN: p_drop 0.014782 cwnd 2
+goBackN: p_drop 0.012233 cwnd 2
+goBackN: p_drop 0.014977 cwnd 2
+goBackN: p_drop 0.012429 cwnd 2
+goBackN: p_drop 0.015173 cwnd 2
+goBackN: p_drop 0.012626 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#94 Starting Transfer of gb.jpg. Started at 1494606585194
+goBackN: p_drop 0.010197 cwnd 2
+goBackN: p_drop 0.014450 cwnd 2
+goBackN: p_drop 0.010394 cwnd 2
+goBackN: p_drop 0.014646 cwnd 2
+goBackN: p_drop 0.010591 cwnd 2
+goBackN: p_drop 0.014841 cwnd 2
+goBackN: p_drop 0.010788 cwnd 2
+goBackN: p_drop 0.015037 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#95 Starting Transfer of gb.jpg. Started at 1494606608922
+goBackN: p_drop 0.011955 cwnd 2
+goBackN: p_drop 0.014471 cwnd 2
+goBackN: p_drop 0.012151 cwnd 2
+goBackN: p_drop 0.014667 cwnd 2
+goBackN: p_drop 0.012348 cwnd 2
+goBackN: p_drop 0.014863 cwnd 2
+goBackN: p_drop 0.012544 cwnd 2
+goBackN: p_drop 0.015058 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#96 Starting Transfer of gb.jpg. Started at 1494606634413
+goBackN: p_drop 0.014491 cwnd 2
+goBackN: p_drop 0.011836 cwnd 2
+goBackN: p_drop 0.014687 cwnd 2
+goBackN: p_drop 0.012033 cwnd 2
+goBackN: p_drop 0.014882 cwnd 2
+goBackN: p_drop 0.012229 cwnd 2
+goBackN: p_drop 0.015078 cwnd 2
+goBackN: p_drop 0.012426 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#97 Starting Transfer of gb.jpg. Started at 1494606660277
+goBackN: p_drop 0.014489 cwnd 2
+goBackN: p_drop 0.011839 cwnd 2
+goBackN: p_drop 0.014685 cwnd 2
+goBackN: p_drop 0.012036 cwnd 2
+goBackN: p_drop 0.014880 cwnd 2
+goBackN: p_drop 0.012232 cwnd 2
+goBackN: p_drop 0.015076 cwnd 2
+goBackN: p_drop 0.012429 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#98 Starting Transfer of gb.jpg. Started at 1494606686380
+goBackN: p_drop 0.014400 cwnd 2
+goBackN: p_drop 0.014003 cwnd 2
+goBackN: p_drop 0.014596 cwnd 2
+goBackN: p_drop 0.014199 cwnd 2
+goBackN: p_drop 0.014791 cwnd 2
+goBackN: p_drop 0.014395 cwnd 2
+goBackN: p_drop 0.014987 cwnd 2
+goBackN: p_drop 0.014590 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#99 Starting Transfer of gb.jpg. Started at 1494606712801
+goBackN: p_drop 0.014392 cwnd 2
+goBackN: p_drop 0.014502 cwnd 2
+goBackN: p_drop 0.014588 cwnd 2
+goBackN: p_drop 0.014697 cwnd 2
+goBackN: p_drop 0.014784 cwnd 2
+goBackN: p_drop 0.014893 cwnd 2
+goBackN: p_drop 0.014979 cwnd 2
+goBackN: p_drop 0.015088 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+../evaluation/data/break/s2_p2_c4_b1_p0.05/
+rm: cannot remove ‘../evaluation/data/break/s2_p2_c4_b1_p0.05/’: No such file or directory
+#0 Starting Transfer of gb.jpg. Started at 1494606737325
+goBackN: p_drop 0.014298 cwnd 2
+goBackN: p_drop 0.014400 cwnd 2
+goBackN: p_drop 0.014494 cwnd 2
+goBackN: p_drop 0.014596 cwnd 2
+goBackN: p_drop 0.014690 cwnd 2
+goBackN: p_drop 0.014792 cwnd 2
+goBackN: p_drop 0.014885 cwnd 2
+goBackN: p_drop 0.014987 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#1 Starting Transfer of gb.jpg. Started at 1494606753222
+goBackN: p_drop 0.015064 cwnd 2
+goBackN: p_drop 0.011758 cwnd 2
+goBackN: p_drop 0.015259 cwnd 2
+goBackN: p_drop 0.011955 cwnd 2
+goBackN: p_drop 0.015454 cwnd 2
+goBackN: p_drop 0.012151 cwnd 2
+#2 Starting Transfer of gb.jpg. Started at 1494606763666
+goBackN: p_drop 0.010197 cwnd 2
+goBackN: p_drop 0.014449 cwnd 2
+goBackN: p_drop 0.010394 cwnd 2
+goBackN: p_drop 0.014645 cwnd 2
+goBackN: p_drop 0.010591 cwnd 2
+goBackN: p_drop 0.014840 cwnd 2
+goBackN: p_drop 0.010788 cwnd 2
+goBackN: p_drop 0.015036 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#3 Starting Transfer of gb.jpg. Started at 1494606777674
+goBackN: p_drop 0.011839 cwnd 2
+goBackN: p_drop 0.014293 cwnd 2
+goBackN: p_drop 0.012036 cwnd 2
+goBackN: p_drop 0.014489 cwnd 2
+goBackN: p_drop 0.012232 cwnd 2
+goBackN: p_drop 0.014684 cwnd 2
+goBackN: p_drop 0.012429 cwnd 2
+goBackN: p_drop 0.014880 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#4 Starting Transfer of gb.jpg. Started at 1494606792271
+goBackN: p_drop 0.014372 cwnd 2
+goBackN: p_drop 0.011958 cwnd 2
+goBackN: p_drop 0.014567 cwnd 2
+goBackN: p_drop 0.012154 cwnd 2
+goBackN: p_drop 0.014763 cwnd 2
+goBackN: p_drop 0.012351 cwnd 2
+goBackN: p_drop 0.014959 cwnd 2
+goBackN: p_drop 0.012547 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#5 Starting Transfer of gb.jpg. Started at 1494606808611
+goBackN: p_drop 0.014489 cwnd 2
+goBackN: p_drop 0.011836 cwnd 2
+goBackN: p_drop 0.014685 cwnd 2
+goBackN: p_drop 0.012033 cwnd 2
+goBackN: p_drop 0.014880 cwnd 2
+goBackN: p_drop 0.012229 cwnd 2
+goBackN: p_drop 0.015076 cwnd 2
+goBackN: p_drop 0.012426 cwnd 2
+#6 Starting Transfer of gb.jpg. Started at 1494606821907
+goBackN: p_drop 0.014545 cwnd 2
+goBackN: p_drop 0.014741 cwnd 2
+goBackN: p_drop 0.014936 cwnd 2
+goBackN: p_drop 0.015132 cwnd 2
+#7 Starting Transfer of gb.jpg. Started at 1494606834754
+goBackN: p_drop 0.010874 cwnd 2
+goBackN: p_drop 0.014466 cwnd 2
+goBackN: p_drop 0.011070 cwnd 2
+goBackN: p_drop 0.014661 cwnd 2
+goBackN: p_drop 0.011267 cwnd 2
+goBackN: p_drop 0.014857 cwnd 2
+goBackN: p_drop 0.011464 cwnd 2
+goBackN: p_drop 0.015053 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#8 Starting Transfer of gb.jpg. Started at 1494606855026
+goBackN: p_drop 0.011849 cwnd 2
+goBackN: p_drop 0.014578 cwnd 2
+goBackN: p_drop 0.012046 cwnd 2
+goBackN: p_drop 0.014773 cwnd 2
+goBackN: p_drop 0.012242 cwnd 2
+goBackN: p_drop 0.014969 cwnd 2
+goBackN: p_drop 0.012438 cwnd 2
+goBackN: p_drop 0.015164 cwnd 2
+#9 Starting Transfer of gb.jpg. Started at 1494606868317
+goBackN: p_drop 0.020049 cwnd 2
+goBackN: p_drop 0.020243 cwnd 2
+goBackN: p_drop 0.020437 cwnd 2
+goBackN: p_drop 0.020631 cwnd 2
+Data Limit reached for connection 14000
+#10 Starting Transfer of gb.jpg. Started at 1494606882911
+goBackN: p_drop 0.010295 cwnd 2
+goBackN: p_drop 0.014749 cwnd 2
+goBackN: p_drop 0.010492 cwnd 2
+goBackN: p_drop 0.014945 cwnd 2
+goBackN: p_drop 0.010689 cwnd 2
+goBackN: p_drop 0.015140 cwnd 2
+goBackN: p_drop 0.010885 cwnd 2
+goBackN: p_drop 0.015336 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#11 Starting Transfer of gb.jpg. Started at 1494606904602
+goBackN: p_drop 0.010880 cwnd 2
+goBackN: p_drop 0.014561 cwnd 2
+goBackN: p_drop 0.011076 cwnd 2
+goBackN: p_drop 0.014756 cwnd 2
+goBackN: p_drop 0.014952 cwnd 2
+goBackN: p_drop 0.011273 cwnd 2
+goBackN: p_drop 0.015147 cwnd 2
+goBackN: p_drop 0.011470 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#12 Starting Transfer of gb.jpg. Started at 1494606920584
+goBackN: p_drop 0.014402 cwnd 2
+goBackN: p_drop 0.014493 cwnd 2
+goBackN: p_drop 0.014597 cwnd 2
+goBackN: p_drop 0.014689 cwnd 2
+goBackN: p_drop 0.014793 cwnd 2
+goBackN: p_drop 0.014884 cwnd 2
+goBackN: p_drop 0.014988 cwnd 2
+goBackN: p_drop 0.015080 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#13 Starting Transfer of gb.jpg. Started at 1494606941076
+goBackN: p_drop 0.014400 cwnd 2
+goBackN: p_drop 0.014297 cwnd 2
+goBackN: p_drop 0.014596 cwnd 2
+goBackN: p_drop 0.014493 cwnd 2
+goBackN: p_drop 0.014791 cwnd 2
+goBackN: p_drop 0.014688 cwnd 2
+goBackN: p_drop 0.014987 cwnd 2
+goBackN: p_drop 0.014884 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#14 Starting Transfer of gb.jpg. Started at 1494606958603
+goBackN: p_drop 0.014293 cwnd 2
+goBackN: p_drop 0.011838 cwnd 2
+goBackN: p_drop 0.014489 cwnd 2
+goBackN: p_drop 0.012035 cwnd 2
+goBackN: p_drop 0.014684 cwnd 2
+goBackN: p_drop 0.012231 cwnd 2
+goBackN: p_drop 0.014880 cwnd 2
+goBackN: p_drop 0.012428 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#15 Starting Transfer of gb.jpg. Started at 1494606975077
+goBackN: p_drop 0.014104 cwnd 2
+goBackN: p_drop 0.014491 cwnd 2
+goBackN: p_drop 0.014687 cwnd 2
+goBackN: p_drop 0.014300 cwnd 2
+goBackN: p_drop 0.014882 cwnd 2
+goBackN: p_drop 0.014496 cwnd 2
+goBackN: p_drop 0.015078 cwnd 2
+goBackN: p_drop 0.014691 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#16 Starting Transfer of gb.jpg. Started at 1494606993083
+goBackN: p_drop 0.014153 cwnd 2
+goBackN: p_drop 0.014349 cwnd 2
+goBackN: p_drop 0.014545 cwnd 2
+#17 Starting Transfer of gb.jpg. Started at 1494607004096
+goBackN: p_drop 0.010878 cwnd 2
+goBackN: p_drop 0.014566 cwnd 2
+goBackN: p_drop 0.011074 cwnd 2
+goBackN: p_drop 0.014762 cwnd 2
+goBackN: p_drop 0.011271 cwnd 2
+goBackN: p_drop 0.014958 cwnd 2
+goBackN: p_drop 0.011468 cwnd 2
+goBackN: p_drop 0.015153 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#18 Starting Transfer of gb.jpg. Started at 1494607020688
+goBackN: p_drop 0.014397 cwnd 2
+goBackN: p_drop 0.014300 cwnd 2
+goBackN: p_drop 0.014593 cwnd 2
+goBackN: p_drop 0.014495 cwnd 2
+goBackN: p_drop 0.014789 cwnd 2
+goBackN: p_drop 0.014691 cwnd 2
+goBackN: p_drop 0.014984 cwnd 2
+goBackN: p_drop 0.014887 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#19 Starting Transfer of gb.jpg. Started at 1494607038656
+goBackN: p_drop 0.014374 cwnd 2
+goBackN: p_drop 0.011960 cwnd 2
+goBackN: p_drop 0.014570 cwnd 2
+goBackN: p_drop 0.012156 cwnd 2
+goBackN: p_drop 0.014766 cwnd 2
+goBackN: p_drop 0.012353 cwnd 2
+goBackN: p_drop 0.014961 cwnd 2
+goBackN: p_drop 0.012549 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#20 Starting Transfer of gb.jpg. Started at 1494607055062
+goBackN: p_drop 0.014392 cwnd 2
+goBackN: p_drop 0.011840 cwnd 2
+goBackN: p_drop 0.014587 cwnd 2
+goBackN: p_drop 0.012037 cwnd 2
+goBackN: p_drop 0.014783 cwnd 2
+goBackN: p_drop 0.012233 cwnd 2
+goBackN: p_drop 0.014978 cwnd 2
+goBackN: p_drop 0.012430 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#21 Starting Transfer of gb.jpg. Started at 1494607071157
+goBackN: p_drop 0.011856 cwnd 2
+goBackN: p_drop 0.014274 cwnd 2
+goBackN: p_drop 0.012053 cwnd 2
+goBackN: p_drop 0.014470 cwnd 2
+goBackN: p_drop 0.012249 cwnd 2
+goBackN: p_drop 0.014666 cwnd 2
+goBackN: p_drop 0.012445 cwnd 2
+goBackN: p_drop 0.014861 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#22 Starting Transfer of gb.jpg. Started at 1494607091910
+goBackN: p_drop 0.014298 cwnd 2
+goBackN: p_drop 0.014301 cwnd 2
+goBackN: p_drop 0.014493 cwnd 2
+goBackN: p_drop 0.014497 cwnd 2
+goBackN: p_drop 0.014689 cwnd 2
+goBackN: p_drop 0.014692 cwnd 2
+#23 Starting Transfer of gb.jpg. Started at 1494607101374
+goBackN: p_drop 0.012053 cwnd 2
+goBackN: p_drop 0.014481 cwnd 2
+goBackN: p_drop 0.012249 cwnd 2
+goBackN: p_drop 0.014677 cwnd 2
+goBackN: p_drop 0.014873 cwnd 2
+goBackN: p_drop 0.012445 cwnd 2
+goBackN: p_drop 0.015068 cwnd 2
+goBackN: p_drop 0.012642 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#24 Starting Transfer of gb.jpg. Started at 1494607117021
+goBackN: p_drop 0.011761 cwnd 2
+goBackN: p_drop 0.014372 cwnd 2
+goBackN: p_drop 0.011958 cwnd 2
+goBackN: p_drop 0.014568 cwnd 2
+goBackN: p_drop 0.012154 cwnd 2
+goBackN: p_drop 0.014763 cwnd 2
+goBackN: p_drop 0.012351 cwnd 2
+goBackN: p_drop 0.014959 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#25 Starting Transfer of gb.jpg. Started at 1494607137954
+goBackN: p_drop 0.011841 cwnd 2
+goBackN: p_drop 0.014486 cwnd 2
+goBackN: p_drop 0.012038 cwnd 2
+goBackN: p_drop 0.014682 cwnd 2
+goBackN: p_drop 0.012234 cwnd 2
+goBackN: p_drop 0.014877 cwnd 2
+goBackN: p_drop 0.012431 cwnd 2
+goBackN: p_drop 0.015073 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#26 Starting Transfer of gb.jpg. Started at 1494607153334
+goBackN: p_drop 0.014488 cwnd 2
+goBackN: p_drop 0.012138 cwnd 2
+goBackN: p_drop 0.014684 cwnd 2
+goBackN: p_drop 0.012335 cwnd 2
+goBackN: p_drop 0.014879 cwnd 2
+goBackN: p_drop 0.012531 cwnd 2
+goBackN: p_drop 0.015075 cwnd 2
+goBackN: p_drop 0.012727 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#27 Starting Transfer of gb.jpg. Started at 1494607173232
+goBackN: p_drop 0.010783 cwnd 2
+goBackN: p_drop 0.014461 cwnd 2
+goBackN: p_drop 0.010979 cwnd 2
+goBackN: p_drop 0.014657 cwnd 2
+goBackN: p_drop 0.011176 cwnd 2
+goBackN: p_drop 0.014852 cwnd 2
+goBackN: p_drop 0.011373 cwnd 2
+goBackN: p_drop 0.015048 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#28 Starting Transfer of gb.jpg. Started at 1494607194203
+goBackN: p_drop 0.014297 cwnd 2
+goBackN: p_drop 0.014499 cwnd 2
+goBackN: p_drop 0.014492 cwnd 2
+goBackN: p_drop 0.014695 cwnd 2
+goBackN: p_drop 0.014688 cwnd 2
+goBackN: p_drop 0.014891 cwnd 2
+goBackN: p_drop 0.014884 cwnd 2
+goBackN: p_drop 0.015086 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#29 Starting Transfer of gb.jpg. Started at 1494607214888
+goBackN: p_drop 0.014481 cwnd 2
+goBackN: p_drop 0.011848 cwnd 2
+goBackN: p_drop 0.014677 cwnd 2
+goBackN: p_drop 0.012045 cwnd 2
+goBackN: p_drop 0.014872 cwnd 2
+goBackN: p_drop 0.012241 cwnd 2
+goBackN: p_drop 0.012437 cwnd 2
+goBackN: p_drop 0.015068 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
 goBackN: p_drop 0.010294 cwnd 2
-goBackN: p_drop 0.014437 cwnd 2
-goBackN: p_drop 0.020649 cwnd 2
-Transfer Complete. Took 7926ms
-#84 Starting Transfer of me.jpg. Started at 1494590684998
-Transfer Complete. Took 3615ms
-#85 Starting Transfer of me.jpg. Started at 1494590689110
-Transfer Complete. Took 2957ms
-#86 Starting Transfer of me.jpg. Started at 1494590692565
-Transfer Complete. Took 3667ms
-#87 Starting Transfer of me.jpg. Started at 1494590696729
-Transfer Complete. Took 2899ms
-#88 Starting Transfer of me.jpg. Started at 1494590700153
-Transfer Complete. Took 2864ms
-#89 Starting Transfer of me.jpg. Started at 1494590703515
-Transfer Complete. Took 3536ms
-#90 Starting Transfer of me.jpg. Started at 1494590707552
-Transfer Complete. Took 2985ms
-#91 Starting Transfer of me.jpg. Started at 1494590711036
-Transfer Complete. Took 2930ms
-#92 Starting Transfer of me.jpg. Started at 1494590714459
-Transfer Complete. Took 3020ms
-#93 Starting Transfer of me.jpg. Started at 1494590717978
-Transfer Complete. Took 2897ms
-#94 Starting Transfer of me.jpg. Started at 1494590721379
-Transfer Complete. Took 3318ms
-#95 Starting Transfer of me.jpg. Started at 1494590725206
-Transfer Complete. Took 3136ms
-#96 Starting Transfer of me.jpg. Started at 1494590728843
-Transfer Complete. Took 3137ms
-#97 Starting Transfer of me.jpg. Started at 1494590732482
-Transfer Complete. Took 2922ms
-#98 Starting Transfer of me.jpg. Started at 1494590735913
-Transfer Complete. Took 2991ms
-#99 Starting Transfer of me.jpg. Started at 1494590739525
-Transfer Complete. Took 3438ms
+#30 Starting Transfer of gb.jpg. Started at 1494607235188
+goBackN: p_drop 0.014391 cwnd 2
+goBackN: p_drop 0.011936 cwnd 2
+goBackN: p_drop 0.014586 cwnd 2
+goBackN: p_drop 0.012132 cwnd 2
+goBackN: p_drop 0.014782 cwnd 2
+goBackN: p_drop 0.012329 cwnd 2
+goBackN: p_drop 0.014977 cwnd 2
+goBackN: p_drop 0.012525 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#31 Starting Transfer of gb.jpg. Started at 1494607256323
+goBackN: p_drop 0.014304 cwnd 2
+goBackN: p_drop 0.013707 cwnd 2
+goBackN: p_drop 0.014500 cwnd 2
+goBackN: p_drop 0.013903 cwnd 2
+goBackN: p_drop 0.014696 cwnd 2
+goBackN: p_drop 0.014099 cwnd 2
+goBackN: p_drop 0.014891 cwnd 2
+goBackN: p_drop 0.014295 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#32 Starting Transfer of gb.jpg. Started at 1494607278046
+goBackN: p_drop 0.014487 cwnd 2
+goBackN: p_drop 0.011939 cwnd 2
+goBackN: p_drop 0.014683 cwnd 2
+goBackN: p_drop 0.012136 cwnd 2
+goBackN: p_drop 0.014878 cwnd 2
+goBackN: p_drop 0.012332 cwnd 2
+goBackN: p_drop 0.015074 cwnd 2
+goBackN: p_drop 0.012528 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#33 Starting Transfer of gb.jpg. Started at 1494607295790
+goBackN: p_drop 0.014447 cwnd 2
+goBackN: p_drop 0.014642 cwnd 2
+goBackN: p_drop 0.014838 cwnd 2
+goBackN: p_drop 0.015033 cwnd 2
+Data Limit reached for connection 14000
+#34 Starting Transfer of gb.jpg. Started at 1494607309481
+goBackN: p_drop 0.014498 cwnd 2
+goBackN: p_drop 0.014299 cwnd 2
+goBackN: p_drop 0.014694 cwnd 2
+goBackN: p_drop 0.014494 cwnd 2
+goBackN: p_drop 0.014889 cwnd 2
+goBackN: p_drop 0.014690 cwnd 2
+goBackN: p_drop 0.015085 cwnd 2
+goBackN: p_drop 0.014886 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#35 Starting Transfer of gb.jpg. Started at 1494607326451
+goBackN: p_drop 0.014646 cwnd 2
+goBackN: p_drop 0.014842 cwnd 2
+goBackN: p_drop 0.015037 cwnd 2
+goBackN: p_drop 0.015233 cwnd 2
+Data Limit reached for connection 14000
+#36 Starting Transfer of gb.jpg. Started at 1494607342153
+goBackN: p_drop 0.011835 cwnd 2
+goBackN: p_drop 0.014391 cwnd 2
+goBackN: p_drop 0.012032 cwnd 2
+goBackN: p_drop 0.014587 cwnd 2
+goBackN: p_drop 0.012228 cwnd 2
+goBackN: p_drop 0.014783 cwnd 2
+goBackN: p_drop 0.012425 cwnd 2
+goBackN: p_drop 0.014978 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#37 Starting Transfer of gb.jpg. Started at 1494607359206
+goBackN: p_drop 0.011934 cwnd 2
+goBackN: p_drop 0.014491 cwnd 2
+goBackN: p_drop 0.012130 cwnd 2
+goBackN: p_drop 0.014687 cwnd 2
+goBackN: p_drop 0.012327 cwnd 2
+goBackN: p_drop 0.014882 cwnd 2
+goBackN: p_drop 0.012523 cwnd 2
+goBackN: p_drop 0.015078 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#38 Starting Transfer of gb.jpg. Started at 1494607373894
+goBackN: p_drop 0.014303 cwnd 2
+goBackN: p_drop 0.014490 cwnd 2
+goBackN: p_drop 0.014499 cwnd 2
+goBackN: p_drop 0.014686 cwnd 2
+goBackN: p_drop 0.014695 cwnd 2
+goBackN: p_drop 0.014881 cwnd 2
+goBackN: p_drop 0.014890 cwnd 2
+goBackN: p_drop 0.015077 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#39 Starting Transfer of gb.jpg. Started at 1494607391442
+goBackN: p_drop 0.014292 cwnd 2
+goBackN: p_drop 0.014109 cwnd 2
+goBackN: p_drop 0.014305 cwnd 2
+goBackN: p_drop 0.014488 cwnd 2
+goBackN: p_drop 0.014501 cwnd 2
+goBackN: p_drop 0.014684 cwnd 2
+goBackN: p_drop 0.014697 cwnd 2
+goBackN: p_drop 0.014879 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#40 Starting Transfer of gb.jpg. Started at 1494607408758
+goBackN: p_drop 0.014489 cwnd 2
+goBackN: p_drop 0.011936 cwnd 2
+goBackN: p_drop 0.012132 cwnd 2
+goBackN: p_drop 0.014685 cwnd 2
+goBackN: p_drop 0.012329 cwnd 2
+goBackN: p_drop 0.014880 cwnd 2
+goBackN: p_drop 0.015076 cwnd 2
+goBackN: p_drop 0.012525 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#41 Starting Transfer of gb.jpg. Started at 1494607424550
+goBackN: p_drop 0.014574 cwnd 2
+goBackN: p_drop 0.011949 cwnd 2
+goBackN: p_drop 0.014770 cwnd 2
+goBackN: p_drop 0.012145 cwnd 2
+goBackN: p_drop 0.014965 cwnd 2
+goBackN: p_drop 0.012342 cwnd 2
+goBackN: p_drop 0.015161 cwnd 2
+goBackN: p_drop 0.012538 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#42 Starting Transfer of gb.jpg. Started at 1494607440861
+goBackN: p_drop 0.013815 cwnd 2
+goBackN: p_drop 0.014389 cwnd 2
+goBackN: p_drop 0.014011 cwnd 2
+goBackN: p_drop 0.014585 cwnd 2
+goBackN: p_drop 0.014207 cwnd 2
+goBackN: p_drop 0.014781 cwnd 2
+goBackN: p_drop 0.014403 cwnd 2
+goBackN: p_drop 0.014976 cwnd 2
+#43 Starting Transfer of gb.jpg. Started at 1494607453347
+goBackN: p_drop 0.014392 cwnd 2
+goBackN: p_drop 0.014207 cwnd 2
+goBackN: p_drop 0.014588 cwnd 2
+goBackN: p_drop 0.014403 cwnd 2
+goBackN: p_drop 0.014784 cwnd 2
+goBackN: p_drop 0.014598 cwnd 2
+goBackN: p_drop 0.014979 cwnd 2
+goBackN: p_drop 0.014794 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#44 Starting Transfer of gb.jpg. Started at 1494607475216
+goBackN: p_drop 0.010877 cwnd 2
+goBackN: p_drop 0.014567 cwnd 2
+goBackN: p_drop 0.011073 cwnd 2
+goBackN: p_drop 0.014763 cwnd 2
+goBackN: p_drop 0.011270 cwnd 2
+goBackN: p_drop 0.014958 cwnd 2
+goBackN: p_drop 0.011467 cwnd 2
+goBackN: p_drop 0.015154 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#45 Starting Transfer of gb.jpg. Started at 1494607495920
+goBackN: p_drop 0.014489 cwnd 2
+goBackN: p_drop 0.011837 cwnd 2
+goBackN: p_drop 0.014685 cwnd 2
+goBackN: p_drop 0.012034 cwnd 2
+goBackN: p_drop 0.014880 cwnd 2
+goBackN: p_drop 0.012230 cwnd 2
+goBackN: p_drop 0.015076 cwnd 2
+goBackN: p_drop 0.012427 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#46 Starting Transfer of gb.jpg. Started at 1494607513813
+goBackN: p_drop 0.010881 cwnd 2
+goBackN: p_drop 0.014459 cwnd 2
+goBackN: p_drop 0.011077 cwnd 2
+goBackN: p_drop 0.014654 cwnd 2
+goBackN: p_drop 0.011274 cwnd 2
+goBackN: p_drop 0.014850 cwnd 2
+goBackN: p_drop 0.011471 cwnd 2
+goBackN: p_drop 0.015045 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#47 Starting Transfer of gb.jpg. Started at 1494607534855
+goBackN: p_drop 0.011841 cwnd 2
+goBackN: p_drop 0.014586 cwnd 2
+goBackN: p_drop 0.012038 cwnd 2
+goBackN: p_drop 0.014781 cwnd 2
+goBackN: p_drop 0.014977 cwnd 2
+goBackN: p_drop 0.012234 cwnd 2
+goBackN: p_drop 0.015172 cwnd 2
+goBackN: p_drop 0.012431 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#48 Starting Transfer of gb.jpg. Started at 1494607554045
+goBackN: p_drop 0.014488 cwnd 2
+goBackN: p_drop 0.011845 cwnd 2
+goBackN: p_drop 0.014684 cwnd 2
+goBackN: p_drop 0.012041 cwnd 2
+goBackN: p_drop 0.014879 cwnd 2
+goBackN: p_drop 0.012238 cwnd 2
+goBackN: p_drop 0.015075 cwnd 2
+goBackN: p_drop 0.012434 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#49 Starting Transfer of gb.jpg. Started at 1494607571381
+goBackN: p_drop 0.011761 cwnd 2
+goBackN: p_drop 0.014367 cwnd 2
+goBackN: p_drop 0.011958 cwnd 2
+goBackN: p_drop 0.014563 cwnd 2
+goBackN: p_drop 0.012154 cwnd 2
+goBackN: p_drop 0.014759 cwnd 2
+goBackN: p_drop 0.012351 cwnd 2
+goBackN: p_drop 0.014954 cwnd 2
+#50 Starting Transfer of gb.jpg. Started at 1494607583652
+goBackN: p_drop 0.014353 cwnd 2
+goBackN: p_drop 0.014549 cwnd 2
+goBackN: p_drop 0.014745 cwnd 2
+goBackN: p_drop 0.014940 cwnd 2
+Data Limit reached for connection 14000
+#51 Starting Transfer of gb.jpg. Started at 1494607599248
+goBackN: p_drop 0.014488 cwnd 2
+goBackN: p_drop 0.012040 cwnd 2
+goBackN: p_drop 0.014684 cwnd 2
+goBackN: p_drop 0.012237 cwnd 2
+goBackN: p_drop 0.014879 cwnd 2
+goBackN: p_drop 0.012433 cwnd 2
+goBackN: p_drop 0.015075 cwnd 2
+goBackN: p_drop 0.012629 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#52 Starting Transfer of gb.jpg. Started at 1494607615030
+goBackN: p_drop 0.011845 cwnd 2
+goBackN: p_drop 0.014583 cwnd 2
+goBackN: p_drop 0.012042 cwnd 2
+goBackN: p_drop 0.014778 cwnd 2
+goBackN: p_drop 0.012238 cwnd 2
+goBackN: p_drop 0.014974 cwnd 2
+goBackN: p_drop 0.012434 cwnd 2
+goBackN: p_drop 0.015169 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#53 Starting Transfer of gb.jpg. Started at 1494607636152
+goBackN: p_drop 0.011857 cwnd 2
+goBackN: p_drop 0.014669 cwnd 2
+goBackN: p_drop 0.012054 cwnd 2
+goBackN: p_drop 0.014864 cwnd 2
+goBackN: p_drop 0.015060 cwnd 2
+goBackN: p_drop 0.012250 cwnd 2
+goBackN: p_drop 0.015255 cwnd 2
+goBackN: p_drop 0.012446 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#54 Starting Transfer of gb.jpg. Started at 1494607650990
+goBackN: p_drop 0.014472 cwnd 2
+goBackN: p_drop 0.011858 cwnd 2
+goBackN: p_drop 0.014668 cwnd 2
+goBackN: p_drop 0.012055 cwnd 2
+goBackN: p_drop 0.014864 cwnd 2
+goBackN: p_drop 0.012251 cwnd 2
+goBackN: p_drop 0.015059 cwnd 2
+goBackN: p_drop 0.012447 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#55 Starting Transfer of gb.jpg. Started at 1494607671657
+goBackN: p_drop 0.011750 cwnd 2
+goBackN: p_drop 0.014484 cwnd 2
+goBackN: p_drop 0.011947 cwnd 2
+goBackN: p_drop 0.014680 cwnd 2
+goBackN: p_drop 0.012143 cwnd 2
+goBackN: p_drop 0.014875 cwnd 2
+goBackN: p_drop 0.012339 cwnd 2
+goBackN: p_drop 0.015071 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#56 Starting Transfer of gb.jpg. Started at 1494607687415
+goBackN: p_drop 0.014490 cwnd 2
+goBackN: p_drop 0.011838 cwnd 2
+goBackN: p_drop 0.014686 cwnd 2
+goBackN: p_drop 0.012035 cwnd 2
+goBackN: p_drop 0.012231 cwnd 2
+goBackN: p_drop 0.014881 cwnd 2
+goBackN: p_drop 0.012428 cwnd 2
+goBackN: p_drop 0.015077 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#57 Starting Transfer of gb.jpg. Started at 1494607707717
+goBackN: p_drop 0.011839 cwnd 2
+goBackN: p_drop 0.014487 cwnd 2
+goBackN: p_drop 0.012036 cwnd 2
+goBackN: p_drop 0.014683 cwnd 2
+goBackN: p_drop 0.012232 cwnd 2
+goBackN: p_drop 0.014878 cwnd 2
+goBackN: p_drop 0.012429 cwnd 2
+goBackN: p_drop 0.015074 cwnd 2
+#58 Starting Transfer of gb.jpg. Started at 1494607719790
+goBackN: p_drop 0.011836 cwnd 2
+goBackN: p_drop 0.014392 cwnd 2
+goBackN: p_drop 0.012033 cwnd 2
+goBackN: p_drop 0.014588 cwnd 2
+goBackN: p_drop 0.012229 cwnd 2
+goBackN: p_drop 0.014784 cwnd 2
+goBackN: p_drop 0.012426 cwnd 2
+goBackN: p_drop 0.014979 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#59 Starting Transfer of gb.jpg. Started at 1494607739946
+goBackN: p_drop 0.014400 cwnd 2
+goBackN: p_drop 0.014392 cwnd 2
+goBackN: p_drop 0.014596 cwnd 2
+goBackN: p_drop 0.014588 cwnd 2
+goBackN: p_drop 0.014783 cwnd 2
+goBackN: p_drop 0.014792 cwnd 2
+goBackN: p_drop 0.014979 cwnd 2
+goBackN: p_drop 0.014987 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#60 Starting Transfer of gb.jpg. Started at 1494607754553
+goBackN: p_drop 0.014394 cwnd 2
+goBackN: p_drop 0.013908 cwnd 2
+goBackN: p_drop 0.014590 cwnd 2
+goBackN: p_drop 0.014104 cwnd 2
+goBackN: p_drop 0.014786 cwnd 2
+goBackN: p_drop 0.014300 cwnd 2
+goBackN: p_drop 0.014981 cwnd 2
+goBackN: p_drop 0.014495 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#61 Starting Transfer of gb.jpg. Started at 1494607772665
+goBackN: p_drop 0.014389 cwnd 2
+goBackN: p_drop 0.011742 cwnd 2
+goBackN: p_drop 0.014584 cwnd 2
+goBackN: p_drop 0.011939 cwnd 2
+goBackN: p_drop 0.014780 cwnd 2
+goBackN: p_drop 0.012135 cwnd 2
+goBackN: p_drop 0.014975 cwnd 2
+goBackN: p_drop 0.012332 cwnd 2
+#62 Starting Transfer of gb.jpg. Started at 1494607784012
+goBackN: p_drop 0.012038 cwnd 2
+goBackN: p_drop 0.014392 cwnd 2
+goBackN: p_drop 0.012235 cwnd 2
+goBackN: p_drop 0.014588 cwnd 2
+goBackN: p_drop 0.012431 cwnd 2
+goBackN: p_drop 0.014783 cwnd 2
+goBackN: p_drop 0.012627 cwnd 2
+goBackN: p_drop 0.014979 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#63 Starting Transfer of gb.jpg. Started at 1494607799371
+goBackN: p_drop 0.014489 cwnd 2
+goBackN: p_drop 0.011937 cwnd 2
+goBackN: p_drop 0.014685 cwnd 2
+goBackN: p_drop 0.012134 cwnd 2
+goBackN: p_drop 0.014880 cwnd 2
+goBackN: p_drop 0.012330 cwnd 2
+#64 Starting Transfer of gb.jpg. Started at 1494607809223
+goBackN: p_drop 0.011838 cwnd 2
+goBackN: p_drop 0.014389 cwnd 2
+goBackN: p_drop 0.012035 cwnd 2
+goBackN: p_drop 0.014585 cwnd 2
+goBackN: p_drop 0.012231 cwnd 2
+goBackN: p_drop 0.014781 cwnd 2
+goBackN: p_drop 0.012428 cwnd 2
+goBackN: p_drop 0.014976 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#65 Starting Transfer of gb.jpg. Started at 1494607824892
+goBackN: p_drop 0.011936 cwnd 2
+goBackN: p_drop 0.014294 cwnd 2
+goBackN: p_drop 0.012132 cwnd 2
+goBackN: p_drop 0.014490 cwnd 2
+goBackN: p_drop 0.012329 cwnd 2
+goBackN: p_drop 0.014685 cwnd 2
+goBackN: p_drop 0.012525 cwnd 2
+goBackN: p_drop 0.014881 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#66 Starting Transfer of gb.jpg. Started at 1494607847086
+goBackN: p_drop 0.010295 cwnd 2
+goBackN: p_drop 0.014301 cwnd 2
+goBackN: p_drop 0.014496 cwnd 2
+goBackN: p_drop 0.014496 cwnd 2
+goBackN: p_drop 0.014692 cwnd 2
+goBackN: p_drop 0.014692 cwnd 2
+goBackN: p_drop 0.014887 cwnd 2
+goBackN: p_drop 0.014888 cwnd 2
+goBackN: p_drop 0.015083 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#67 Starting Transfer of gb.jpg. Started at 1494607868672
+goBackN: p_drop 0.014572 cwnd 2
+goBackN: p_drop 0.011852 cwnd 2
+goBackN: p_drop 0.014768 cwnd 2
+goBackN: p_drop 0.012049 cwnd 2
+goBackN: p_drop 0.014964 cwnd 2
+goBackN: p_drop 0.012245 cwnd 2
+goBackN: p_drop 0.015159 cwnd 2
+goBackN: p_drop 0.012441 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#68 Starting Transfer of gb.jpg. Started at 1494607884089
+goBackN: p_drop 0.014484 cwnd 2
+goBackN: p_drop 0.012043 cwnd 2
+goBackN: p_drop 0.014680 cwnd 2
+goBackN: p_drop 0.012239 cwnd 2
+goBackN: p_drop 0.014875 cwnd 2
+goBackN: p_drop 0.012436 cwnd 2
+goBackN: p_drop 0.015071 cwnd 2
+goBackN: p_drop 0.012632 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#69 Starting Transfer of gb.jpg. Started at 1494607900863
+goBackN: p_drop 0.014207 cwnd 2
+goBackN: p_drop 0.014590 cwnd 2
+goBackN: p_drop 0.014402 cwnd 2
+goBackN: p_drop 0.014786 cwnd 2
+goBackN: p_drop 0.014598 cwnd 2
+goBackN: p_drop 0.014981 cwnd 2
+#70 Starting Transfer of gb.jpg. Started at 1494607911571
+goBackN: p_drop 0.014488 cwnd 2
+goBackN: p_drop 0.011841 cwnd 2
+goBackN: p_drop 0.014684 cwnd 2
+goBackN: p_drop 0.012038 cwnd 2
+goBackN: p_drop 0.014879 cwnd 2
+goBackN: p_drop 0.012234 cwnd 2
+goBackN: p_drop 0.015075 cwnd 2
+goBackN: p_drop 0.012431 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#71 Starting Transfer of gb.jpg. Started at 1494607927905
+goBackN: p_drop 0.014202 cwnd 2
+goBackN: p_drop 0.014100 cwnd 2
+goBackN: p_drop 0.014397 cwnd 2
+goBackN: p_drop 0.014296 cwnd 2
+goBackN: p_drop 0.014593 cwnd 2
+goBackN: p_drop 0.014492 cwnd 2
+goBackN: p_drop 0.014789 cwnd 2
+goBackN: p_drop 0.014687 cwnd 2
+#72 Starting Transfer of gb.jpg. Started at 1494607941022
+goBackN: p_drop 0.014663 cwnd 2
+goBackN: p_drop 0.011663 cwnd 2
+goBackN: p_drop 0.014859 cwnd 2
+goBackN: p_drop 0.011860 cwnd 2
+goBackN: p_drop 0.015055 cwnd 2
+goBackN: p_drop 0.012056 cwnd 2
+goBackN: p_drop 0.015250 cwnd 2
+goBackN: p_drop 0.012253 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#73 Starting Transfer of gb.jpg. Started at 1494607956026
+goBackN: p_drop 0.014843 cwnd 2
+goBackN: p_drop 0.015038 cwnd 2
+goBackN: p_drop 0.015234 cwnd 2
+goBackN: p_drop 0.015429 cwnd 2
+Data Limit reached for connection 14000
+#74 Starting Transfer of gb.jpg. Started at 1494607970134
+goBackN: p_drop 0.014488 cwnd 2
+goBackN: p_drop 0.014109 cwnd 2
+goBackN: p_drop 0.014684 cwnd 2
+goBackN: p_drop 0.014305 cwnd 2
+goBackN: p_drop 0.014879 cwnd 2
+goBackN: p_drop 0.014501 cwnd 2
+goBackN: p_drop 0.015075 cwnd 2
+goBackN: p_drop 0.014696 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#75 Starting Transfer of gb.jpg. Started at 1494607990394
+goBackN: p_drop 0.014471 cwnd 2
+goBackN: p_drop 0.011857 cwnd 2
+goBackN: p_drop 0.012054 cwnd 2
+goBackN: p_drop 0.014667 cwnd 2
+goBackN: p_drop 0.012250 cwnd 2
+goBackN: p_drop 0.014862 cwnd 2
+goBackN: p_drop 0.012446 cwnd 2
+goBackN: p_drop 0.015058 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#76 Starting Transfer of gb.jpg. Started at 1494608005865
+goBackN: p_drop 0.014492 cwnd 2
+goBackN: p_drop 0.011937 cwnd 2
+goBackN: p_drop 0.014687 cwnd 2
+goBackN: p_drop 0.012134 cwnd 2
+goBackN: p_drop 0.014883 cwnd 2
+goBackN: p_drop 0.012330 cwnd 2
+goBackN: p_drop 0.015078 cwnd 2
+goBackN: p_drop 0.012526 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#77 Starting Transfer of gb.jpg. Started at 1494608026534
+goBackN: p_drop 0.014057 cwnd 2
+goBackN: p_drop 0.014253 cwnd 2
+goBackN: p_drop 0.014449 cwnd 2
+goBackN: p_drop 0.014645 cwnd 2
+Data Limit reached for connection 14000
+#78 Starting Transfer of gb.jpg. Started at 1494608041498
+goBackN: p_drop 0.014481 cwnd 2
+goBackN: p_drop 0.011947 cwnd 2
+goBackN: p_drop 0.012143 cwnd 2
+goBackN: p_drop 0.014677 cwnd 2
+goBackN: p_drop 0.012340 cwnd 2
+goBackN: p_drop 0.014872 cwnd 2
+goBackN: p_drop 0.012536 cwnd 2
+goBackN: p_drop 0.015068 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#79 Starting Transfer of gb.jpg. Started at 1494608059155
+goBackN: p_drop 0.014303 cwnd 2
+goBackN: p_drop 0.014495 cwnd 2
+goBackN: p_drop 0.014498 cwnd 2
+goBackN: p_drop 0.014691 cwnd 2
+goBackN: p_drop 0.014694 cwnd 2
+goBackN: p_drop 0.014886 cwnd 2
+goBackN: p_drop 0.014889 cwnd 2
+goBackN: p_drop 0.015082 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#80 Starting Transfer of gb.jpg. Started at 1494608073759
+goBackN: p_drop 0.011855 cwnd 2
+goBackN: p_drop 0.014574 cwnd 2
+goBackN: p_drop 0.014770 cwnd 2
+goBackN: p_drop 0.012052 cwnd 2
+goBackN: p_drop 0.012248 cwnd 2
+goBackN: p_drop 0.014965 cwnd 2
+goBackN: p_drop 0.012444 cwnd 2
+goBackN: p_drop 0.015161 cwnd 2
+#81 Starting Transfer of gb.jpg. Started at 1494608085117
+goBackN: p_drop 0.014484 cwnd 2
+goBackN: p_drop 0.011849 cwnd 2
+goBackN: p_drop 0.014680 cwnd 2
+goBackN: p_drop 0.012046 cwnd 2
+goBackN: p_drop 0.014875 cwnd 2
+goBackN: p_drop 0.012242 cwnd 2
+goBackN: p_drop 0.015071 cwnd 2
+goBackN: p_drop 0.012438 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#82 Starting Transfer of gb.jpg. Started at 1494608103117
+goBackN: p_drop 0.011847 cwnd 2
+goBackN: p_drop 0.014481 cwnd 2
+goBackN: p_drop 0.012044 cwnd 2
+goBackN: p_drop 0.014677 cwnd 2
+goBackN: p_drop 0.012240 cwnd 2
+goBackN: p_drop 0.014872 cwnd 2
+goBackN: p_drop 0.012436 cwnd 2
+goBackN: p_drop 0.015068 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#83 Starting Transfer of gb.jpg. Started at 1494608122258
+goBackN: p_drop 0.014485 cwnd 2
+goBackN: p_drop 0.012041 cwnd 2
+goBackN: p_drop 0.014681 cwnd 2
+goBackN: p_drop 0.012237 cwnd 2
+goBackN: p_drop 0.014876 cwnd 2
+goBackN: p_drop 0.012434 cwnd 2
+goBackN: p_drop 0.015072 cwnd 2
+goBackN: p_drop 0.012630 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#84 Starting Transfer of gb.jpg. Started at 1494608137280
+goBackN: p_drop 0.014571 cwnd 2
+goBackN: p_drop 0.011753 cwnd 2
+goBackN: p_drop 0.014767 cwnd 2
+goBackN: p_drop 0.011950 cwnd 2
+goBackN: p_drop 0.014962 cwnd 2
+goBackN: p_drop 0.012146 cwnd 2
+goBackN: p_drop 0.015158 cwnd 2
+goBackN: p_drop 0.012343 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#85 Starting Transfer of gb.jpg. Started at 1494608153883
+goBackN: p_drop 0.011849 cwnd 2
+goBackN: p_drop 0.014285 cwnd 2
+goBackN: p_drop 0.012046 cwnd 2
+goBackN: p_drop 0.014481 cwnd 2
+goBackN: p_drop 0.012242 cwnd 2
+goBackN: p_drop 0.014676 cwnd 2
+goBackN: p_drop 0.012438 cwnd 2
+goBackN: p_drop 0.014872 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#86 Starting Transfer of gb.jpg. Started at 1494608174088
+goBackN: p_drop 0.014297 cwnd 2
+goBackN: p_drop 0.014496 cwnd 2
+goBackN: p_drop 0.014492 cwnd 2
+goBackN: p_drop 0.014692 cwnd 2
+goBackN: p_drop 0.014688 cwnd 2
+goBackN: p_drop 0.014887 cwnd 2
+goBackN: p_drop 0.014884 cwnd 2
+goBackN: p_drop 0.015083 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#87 Starting Transfer of gb.jpg. Started at 1494608195121
+goBackN: p_drop 0.014191 cwnd 2
+goBackN: p_drop 0.011754 cwnd 2
+goBackN: p_drop 0.014386 cwnd 2
+goBackN: p_drop 0.011951 cwnd 2
+goBackN: p_drop 0.014582 cwnd 2
+goBackN: p_drop 0.012147 cwnd 2
+goBackN: p_drop 0.014778 cwnd 2
+goBackN: p_drop 0.012343 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#88 Starting Transfer of gb.jpg. Started at 1494608209255
+goBackN: p_drop 0.011957 cwnd 2
+goBackN: p_drop 0.014470 cwnd 2
+goBackN: p_drop 0.012153 cwnd 2
+goBackN: p_drop 0.014666 cwnd 2
+goBackN: p_drop 0.012350 cwnd 2
+goBackN: p_drop 0.014862 cwnd 2
+goBackN: p_drop 0.012546 cwnd 2
+goBackN: p_drop 0.015057 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#89 Starting Transfer of gb.jpg. Started at 1494608230329
+goBackN: p_drop 0.014479 cwnd 2
+goBackN: p_drop 0.012046 cwnd 2
+goBackN: p_drop 0.014675 cwnd 2
+goBackN: p_drop 0.012242 cwnd 2
+goBackN: p_drop 0.014870 cwnd 2
+goBackN: p_drop 0.012438 cwnd 2
+goBackN: p_drop 0.015066 cwnd 2
+goBackN: p_drop 0.012635 cwnd 2
+#90 Starting Transfer of gb.jpg. Started at 1494608243588
+goBackN: p_drop 0.014392 cwnd 2
+goBackN: p_drop 0.011847 cwnd 2
+goBackN: p_drop 0.014588 cwnd 2
+goBackN: p_drop 0.012044 cwnd 2
+goBackN: p_drop 0.014784 cwnd 2
+goBackN: p_drop 0.012240 cwnd 2
+goBackN: p_drop 0.014979 cwnd 2
+goBackN: p_drop 0.012436 cwnd 2
+Data Limit reached for connection 14000
+Data Limit reached for connection 14001
+#91 Starting Transfer of gb.jpg. Started at 1494608263364
+goBackN: p_drop 0.014379 cwnd 2
+goBackN: p_drop 0.011758 cwnd 2
+goBackN: p_drop 0.014575 cwnd 2
+goBackN: p_drop 0.011955 cwnd 2
+goBackN: p_drop 0.014770 cwnd 2
+goBackN: p_drop 0.012151 cwnd 2
+goBackN: p_drop 0.014966 cwnd 2
+goBackN: p_drop 0.012348 cwnd 2
+#92 Starting Transfer of gb.jpg. Started at 1494608276050
+goBackN: p_drop 0.011759 cwnd 2
+goBackN: p_drop 0.014372 cwnd 2
+goBackN: p_drop 0.011956 cwnd 2
+goBackN: p_drop 0.014567 cwnd 2
+goBackN: p_drop 0.012152 cwnd 2
+goBackN: p_drop 0.014763 cwnd 2
+goBackN: p_drop 0.012349 cwnd 2
+goBackN: p_drop 0.014959 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#93 Starting Transfer of gb.jpg. Started at 1494608291566
+goBackN: p_drop 0.014498 cwnd 2
+goBackN: p_drop 0.014199 cwnd 2
+goBackN: p_drop 0.014694 cwnd 2
+goBackN: p_drop 0.014395 cwnd 2
+goBackN: p_drop 0.014889 cwnd 2
+goBackN: p_drop 0.014590 cwnd 2
+goBackN: p_drop 0.015085 cwnd 2
+goBackN: p_drop 0.014786 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#94 Starting Transfer of gb.jpg. Started at 1494608306584
+goBackN: p_drop 0.014480 cwnd 2
+goBackN: p_drop 0.011949 cwnd 2
+goBackN: p_drop 0.014676 cwnd 2
+goBackN: p_drop 0.012145 cwnd 2
+goBackN: p_drop 0.014871 cwnd 2
+goBackN: p_drop 0.012342 cwnd 2
+goBackN: p_drop 0.015067 cwnd 2
+goBackN: p_drop 0.012538 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#95 Starting Transfer of gb.jpg. Started at 1494608326852
+goBackN: p_drop 0.011750 cwnd 2
+goBackN: p_drop 0.014282 cwnd 2
+goBackN: p_drop 0.011947 cwnd 2
+goBackN: p_drop 0.014478 cwnd 2
+goBackN: p_drop 0.012143 cwnd 2
+goBackN: p_drop 0.014673 cwnd 2
+goBackN: p_drop 0.012339 cwnd 2
+goBackN: p_drop 0.014869 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#96 Starting Transfer of gb.jpg. Started at 1494608342762
+goBackN: p_drop 0.014470 cwnd 2
+goBackN: p_drop 0.011662 cwnd 2
+goBackN: p_drop 0.014665 cwnd 2
+goBackN: p_drop 0.011858 cwnd 2
+goBackN: p_drop 0.014861 cwnd 2
+goBackN: p_drop 0.012054 cwnd 2
+#97 Starting Transfer of gb.jpg. Started at 1494608353769
+goBackN: p_drop 0.014448 cwnd 2
+goBackN: p_drop 0.014644 cwnd 2
+goBackN: p_drop 0.014839 cwnd 2
+goBackN: p_drop 0.015035 cwnd 2
+Data Limit reached for connection 14000
+#98 Starting Transfer of gb.jpg. Started at 1494608374123
+goBackN: p_drop 0.014395 cwnd 2
+goBackN: p_drop 0.014104 cwnd 2
+goBackN: p_drop 0.014591 cwnd 2
+goBackN: p_drop 0.014300 cwnd 2
+goBackN: p_drop 0.014787 cwnd 2
+goBackN: p_drop 0.014496 cwnd 2
+goBackN: p_drop 0.014982 cwnd 2
+goBackN: p_drop 0.014691 cwnd 2
+Data Limit reached for connection 14001
+Data Limit reached for connection 14000
+#99 Starting Transfer of gb.jpg. Started at 1494608392151
+goBackN: p_drop 0.012137 cwnd 2
+goBackN: p_drop 0.014395 cwnd 2
+goBackN: p_drop 0.012333 cwnd 2
+goBackN: p_drop 0.014591 cwnd 2
+goBackN: p_drop 0.012529 cwnd 2
+goBackN: p_drop 0.014786 cwnd 2
 We Done Here.
