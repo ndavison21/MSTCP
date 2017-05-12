@@ -12,7 +12,8 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 public final class Utils {
-    public static Logger logger;
+    public static Logger requests_logger;
+    public static Logger received_logger;
     
     public static final int DATA_ENUM = 0;
     public static final int SYN_ENUM  = 1;

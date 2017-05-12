@@ -4,7 +4,7 @@ javac -d ../bin MSTCP/vegas/more/*.java
 cd ../bin
 
 DIRECTORY="timing"
-FILE="gb.jpg"
+FILE="me.jpg"
 PACKET_LIMIT=-1
 
 P_DROP=0.01

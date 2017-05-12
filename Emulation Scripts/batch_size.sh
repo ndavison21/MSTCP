@@ -4,7 +4,7 @@ javac -d ../bin MSTCP/vegas/more/*.java
 cd ../bin
 
 DIRECTORY="batch"
-FILE="gb.jpg"
+FILE="me.jpg"
 PACKET_LIMIT=-1
 
 SOURCES=2

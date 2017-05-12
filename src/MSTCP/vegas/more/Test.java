@@ -110,7 +110,7 @@ public class Test {
             //String file = "gb.jpg";
             
             for(i=0; i<1; i++) {
-                Utils.logger =  Utils.getLogger("experiment_" + i, "." + path + "/", Level.FINE);
+//                Utils.logger =  Utils.getLogger("experiment_" + i, "." + path + "/", Level.FINE);
                 
                 long start = System.currentTimeMillis();
                 System.out.println("#" + i + " Starting Transfer of " + file + ". Started at " + start);

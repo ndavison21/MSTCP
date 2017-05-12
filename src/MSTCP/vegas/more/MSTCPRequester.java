@@ -255,6 +255,7 @@ public class MSTCPRequester {
             logger.info("Additional Request for batch " + batch + ".");
         }
         
+        Utils.requests_logger.fine(System.nanoTime() + " " + recvPort + " " + p_drop);
         batchSize = Math.min(Utils.batchSize, sourceCoder.fileBlocks - (batch * Utils.batchSize));
         if (batchSize <= 0)
             batchSize = sourceCoder.fileBlocks;

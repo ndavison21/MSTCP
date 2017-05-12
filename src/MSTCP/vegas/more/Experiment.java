@@ -46,7 +46,8 @@ public class Experiment {
         if (res.exists())
             res.delete();
         
-        Utils.logger = Utils.getLogger("#" + experiment, path, Level.ALL, Integer.MAX_VALUE);
+        Utils.requests_logger = Utils.getLogger("#" + experiment + "_requests", path, Level.ALL, Integer.MAX_VALUE);
+        Utils.received_logger = Utils.getLogger("#" + experiment + "_received", path, Level.ALL, Integer.MAX_VALUE);
         
         /** Source Vector **/    
         int sourcePort  = 16000;
@@ -128,7 +129,9 @@ public class Experiment {
         new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null), 14000, 16000, "./", file);
         System.out.println("Transfer Complete. Took " + (System.currentTimeMillis() - start) + "ms");
         
-        for (Handler handler: Utils.logger.getHandlers())
+        for (Handler handler: Utils.received_logger.getHandlers())
+            handler.close();
+        for (Handler handler: Utils.requests_logger.getHandlers())
             handler.close();
         
         System.exit(1);

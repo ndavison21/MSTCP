@@ -6,14 +6,14 @@ cd ../bin
 DIRECTORY="break"
 FILE="me.jpg"
 P_DROP=0.05
-PACKET_LIMIT=300
+PACKET_LIMIT=200
 SOURCES=2
 
 BATCH_SIZE=64
 
 for PATHS in 1 2
 do
-    for CONNECTIONS in 4 #1 2 4
+    for CONNECTIONS in 1 2 4
     do
         if [ "$CONNECTIONS" -le "$(($SOURCES * $PATHS))" ]
         then
