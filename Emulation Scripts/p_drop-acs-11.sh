@@ -20,7 +20,7 @@ do
             echo $path
             rm -r $path
             mkdir -p $path
-            for i in {10..99}
+            for i in {0..99}
             do
                 java -Djava.util.logging.SimpleFormatter.format='%5$s%6$s%n' MSTCP.vegas.more.Experiment $DIRECTORY $SOURCES $PATHS $CONNECTIONS $BATCH_SIZE $P_DROP $PACKET_LIMIT $i $FILE
             done      

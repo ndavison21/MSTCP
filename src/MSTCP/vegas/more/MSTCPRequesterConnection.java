@@ -32,6 +32,7 @@ public class MSTCPRequesterConnection extends Thread {
     ConcurrentHashMap<Integer, TCPPacket> sentRequests;
     
     Timer timer;
+    Bool timer_monitor = new Bool(false);
     int synAttempts = 0;
     int dataAttempts = 0;
     int finAttempts = 0;
@@ -80,8 +81,10 @@ public class MSTCPRequesterConnection extends Thread {
      * Timeout stuff
      */
     private void stopTimer() {
-        if (timer != null)
-            timer.cancel(); // stop the current timer
+        synchronized(timer_monitor) {
+            if (timer != null)
+                timer.cancel(); // stop the current timer
+        }
     }
     
     /**
@@ -91,13 +94,15 @@ public class MSTCPRequesterConnection extends Thread {
      */
     private void setTimer(int type) {
         stopTimer();
-        timer = new Timer(); // start a new one if necessary
-        if (type == Utils.DATA_ENUM)
-            timer.schedule(new DataTimeout(),  5*Utils.dataTimeout);
-        else if (type == Utils.SYN_ENUM)
-            timer.schedule(new SYNTimeout(), Utils.synTimeout);
-        else if (type == Utils.FIN_ENUM)
-            timer.schedule(new FINTimeout(), Utils.finTimeout);
+        synchronized(timer_monitor) {
+            timer = new Timer(); // start a new one if necessary
+            if (type == Utils.DATA_ENUM)
+                timer.schedule(new DataTimeout(),  5*Utils.dataTimeout);
+            else if (type == Utils.SYN_ENUM)
+                timer.schedule(new SYNTimeout(), Utils.synTimeout);
+            else if (type == Utils.FIN_ENUM)
+                timer.schedule(new FINTimeout(), Utils.finTimeout);
+        }
     }
     
     /**
