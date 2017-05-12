@@ -4,9 +4,9 @@ javac -d ../bin MSTCP/vegas/more/*.java
 cd ../bin
 
 DIRECTORY="break"
-FILE="me.jpg"
+FILE="gb.jpg"
 P_DROP=0.05
-PACKET_LIMIT=200
+PACKET_LIMIT=100
 SOURCES=2
 
 BATCH_SIZE=1
