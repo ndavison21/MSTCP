@@ -19,6 +19,7 @@ public class ResponderForwarder {
     
     int packets = 0;
     final int packetLimit;
+    final int terminate;
     
     private class FlowData { // class to store data and functionalilty for flow
         // final int flowID;
@@ -31,13 +32,14 @@ public class ResponderForwarder {
     }
     
     public ResponderForwarder(int recvPort) throws SocketException {
-        this(recvPort, Integer.MAX_VALUE);
+        this(recvPort, Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
     
-    public ResponderForwarder(int recvPort, int packetLimit) throws SocketException {
+    public ResponderForwarder(int recvPort, int packetLimit, int terminate) throws SocketException {
         this.logger = Utils.getLogger(this.getClass().getName() + "_" + recvPort);
         this.socket = new MSTCPSocket(logger, recvPort);
         this.packetLimit = packetLimit;
+        this.terminate = terminate;
         try {
             this.localhost = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
@@ -53,7 +55,11 @@ public class ResponderForwarder {
         
             for (;;) {
                 data = socket.receive(); // TODO: get from pcap
-                if (packets > packetLimit) {
+                
+                if (packets > terminate) {
+                    logger.info("Received more than " + terminate + " packets. Exiting.");
+                    System.exit(1);
+                } else if (packets > packetLimit) {
                     logger.info("Received more than " + packetLimit + " packets. Not processing any more.");
                     continue;
                 } else {
