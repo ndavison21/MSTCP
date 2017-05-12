@@ -13,9 +13,9 @@ BATCH_SIZE=64
 
 for PATHS in 1 2
 do
-    for CONNECTIONS in 1 2 4
+    for CONNECTIONS in 4 #1 2 4
     do
-        if [ "$CONNECTIONS" -lt "$(($SOURCES * $PATHS))" ]
+        if [ "$CONNECTIONS" -le "$(($SOURCES * $PATHS))" ]
         then
             if [ "$PATHS" -le "$CONNECTIONS" ]
             then
