@@ -1,0 +1,43 @@
+../evaluation/data/timing/s1_p1_c1_b1_p0.01/
+rm: cannot remove ‘../evaluation/data/timing/s1_p1_c1_b1_p0.01/’: No such file or directory
+#0 Starting Transfer of me.jpg. Started at 1494591715208
+Transfer Complete. Took 1254ms
+#1 Starting Transfer of me.jpg. Started at 1494591716949
+Transfer Complete. Took 1316ms
+#2 Starting Transfer of me.jpg. Started at 1494591718746
+Transfer Complete. Took 1228ms
+#3 Starting Transfer of me.jpg. Started at 1494591720468
+Transfer Complete. Took 1346ms
+#4 Starting Transfer of me.jpg. Started at 1494591722299
+Transfer Complete. Took 1156ms
+#5 Starting Transfer of me.jpg. Started at 1494591723930
+Transfer Complete. Took 1287ms
+#6 Starting Transfer of me.jpg. Started at 1494591725698
+Transfer Complete. Took 1143ms
+#7 Starting Transfer of me.jpg. Started at 1494591727309
+Transfer Complete. Took 1304ms
+#8 Starting Transfer of me.jpg. Started at 1494591729090
+Transfer Complete. Took 1216ms
+#9 Starting Transfer of me.jpg. Started at 1494591730782
+Transfer Complete. Took 1351ms
+../evaluation/data/timing/s1_p1_c1_b16_p0.01/
+rm: cannot remove ‘../evaluation/data/timing/s1_p1_c1_b16_p0.01/’: No such file or directory
+#0 Starting Transfer of me.jpg. Started at 1494591732650
+Transfer Complete. Took 1044ms
+#1 Starting Transfer of me.jpg. Started at 1494591734179
+Transfer Complete. Took 864ms
+#2 Starting Transfer of me.jpg. Started at 1494591735520
+Transfer Complete. Took 964ms
+#3 Starting Transfer of me.jpg. Started at 1494591736963
+Transfer Complete. Took 874ms
+#4 Starting Transfer of me.jpg. Started at 1494591738306
+Exception in thread "main" java.lang.IllegalStateException: Timer already cancelled.
+	at java.util.Timer.sched(Timer.java:397)
+	at java.util.Timer.schedule(Timer.java:193)
+	at MSTCP.vegas.more.MSTCPRequesterConnection.setTimer(MSTCPRequesterConnection.java:100)
+	at MSTCP.vegas.more.MSTCPRequesterConnection.sendFIN(MSTCPRequesterConnection.java:130)
+	at MSTCP.vegas.more.MSTCPRequesterConnection.close(MSTCPRequesterConnection.java:156)
+	at MSTCP.vegas.more.MSTCPRequester$ConnectionHandler.close(MSTCPRequester.java:203)
+	at MSTCP.vegas.more.MSTCPRequester.<init>(MSTCPRequester.java:117)
+	at MSTCP.vegas.more.Experiment.main(Experiment.java:129)
+goBackN: p_drop 0.020320 cwnd 2
