@@ -17,7 +17,7 @@ do
     do
         if [ "$CONNECTIONS" -lt "$(($SOURCES * $PATHS))" ]
         then
-            if [ "$PATHS" -le "$CONNECTIONS"]
+            if [ "$PATHS" -le "$CONNECTIONS" ]
             then
                 path="../evaluation/data/${DIRECTORY}/s${SOURCES}_p${PATHS}_c${CONNECTIONS}_b${BATCH_SIZE}_p${P_DROP}/"
                 echo $path
