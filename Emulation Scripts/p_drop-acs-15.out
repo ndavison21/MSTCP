@@ -1,0 +1,264 @@
+../evaluation/data/timing/s1_p1_c1_b1_p0.05/
+#0 Starting Transfer of me.jpg. Started at 1494592250190
+Transfer Complete. Took 1322ms
+#1 Starting Transfer of me.jpg. Started at 1494592251985
+Transfer Complete. Took 1425ms
+#2 Starting Transfer of me.jpg. Started at 1494592253904
+Transfer Complete. Took 1378ms
+#3 Starting Transfer of me.jpg. Started at 1494592255764
+Transfer Complete. Took 1345ms
+#4 Starting Transfer of me.jpg. Started at 1494592257594
+Transfer Complete. Took 1519ms
+#5 Starting Transfer of me.jpg. Started at 1494592259594
+Transfer Complete. Took 1423ms
+#6 Starting Transfer of me.jpg. Started at 1494592261496
+Transfer Complete. Took 1477ms
+#7 Starting Transfer of me.jpg. Started at 1494592263454
+Transfer Complete. Took 1391ms
+#8 Starting Transfer of me.jpg. Started at 1494592265316
+Transfer Complete. Took 1842ms
+#9 Starting Transfer of me.jpg. Started at 1494592267651
+Transfer Complete. Took 1410ms
+../evaluation/data/timing/s1_p1_c1_b16_p0.05/
+#0 Starting Transfer of me.jpg. Started at 1494592269574
+Transfer Complete. Took 1112ms
+#1 Starting Transfer of me.jpg. Started at 1494592271158
+Transfer Complete. Took 1215ms
+#2 Starting Transfer of me.jpg. Started at 1494592272852
+Transfer Complete. Took 1094ms
+#3 Starting Transfer of me.jpg. Started at 1494592274427
+Transfer Complete. Took 1119ms
+#4 Starting Transfer of me.jpg. Started at 1494592276026
+Transfer Complete. Took 1153ms
+#5 Starting Transfer of me.jpg. Started at 1494592277657
+Transfer Complete. Took 1134ms
+#6 Starting Transfer of me.jpg. Started at 1494592279283
+Transfer Complete. Took 995ms
+#7 Starting Transfer of me.jpg. Started at 1494592280760
+Transfer Complete. Took 1130ms
+#8 Starting Transfer of me.jpg. Started at 1494592282379
+Transfer Complete. Took 970ms
+#9 Starting Transfer of me.jpg. Started at 1494592283831
+Transfer Complete. Took 1037ms
+../evaluation/data/timing/s1_p1_c1_b64_p0.05/
+#0 Starting Transfer of me.jpg. Started at 1494592285378
+Transfer Complete. Took 1442ms
+#1 Starting Transfer of me.jpg. Started at 1494592287304
+Transfer Complete. Took 1405ms
+#2 Starting Transfer of me.jpg. Started at 1494592289173
+Transfer Complete. Took 1126ms
+#3 Starting Transfer of me.jpg. Started at 1494592290796
+Transfer Complete. Took 1036ms
+#4 Starting Transfer of me.jpg. Started at 1494592292313
+Transfer Complete. Took 1488ms
+#5 Starting Transfer of me.jpg. Started at 1494592294291
+Transfer Complete. Took 961ms
+#6 Starting Transfer of me.jpg. Started at 1494592295724
+Transfer Complete. Took 1325ms
+#7 Starting Transfer of me.jpg. Started at 1494592297524
+Transfer Complete. Took 1557ms
+#8 Starting Transfer of me.jpg. Started at 1494592299549
+Transfer Complete. Took 1225ms
+#9 Starting Transfer of me.jpg. Started at 1494592301254
+Transfer Complete. Took 1579ms
+../evaluation/data/timing/s1_p2_c2_b1_p0.05/
+#0 Starting Transfer of me.jpg. Started at 1494592303342
+Transfer Complete. Took 1166ms
+#1 Starting Transfer of me.jpg. Started at 1494592305018
+Transfer Complete. Took 1209ms
+#2 Starting Transfer of me.jpg. Started at 1494592306713
+Transfer Complete. Took 1469ms
+#3 Starting Transfer of me.jpg. Started at 1494592308667
+Transfer Complete. Took 1294ms
+#4 Starting Transfer of me.jpg. Started at 1494592310436
+Transfer Complete. Took 1595ms
+#5 Starting Transfer of me.jpg. Started at 1494592312527
+Transfer Complete. Took 1240ms
+#6 Starting Transfer of me.jpg. Started at 1494592314254
+Transfer Complete. Took 1340ms
+#7 Starting Transfer of me.jpg. Started at 1494592316076
+Transfer Complete. Took 1393ms
+#8 Starting Transfer of me.jpg. Started at 1494592317960
+Transfer Complete. Took 1292ms
+#9 Starting Transfer of me.jpg. Started at 1494592319736
+Transfer Complete. Took 1224ms
+../evaluation/data/timing/s1_p2_c2_b16_p0.05/
+#0 Starting Transfer of me.jpg. Started at 1494592321464
+Transfer Complete. Took 1109ms
+#1 Starting Transfer of me.jpg. Started at 1494592323060
+Transfer Complete. Took 1255ms
+#2 Starting Transfer of me.jpg. Started at 1494592324820
+Transfer Complete. Took 1340ms
+#3 Starting Transfer of me.jpg. Started at 1494592326649
+Transfer Complete. Took 940ms
+#4 Starting Transfer of me.jpg. Started at 1494592328078
+Transfer Complete. Took 1091ms
+#5 Starting Transfer of me.jpg. Started at 1494592329655
+Transfer Complete. Took 1302ms
+#6 Starting Transfer of me.jpg. Started at 1494592331447
+Transfer Complete. Took 1148ms
+#7 Starting Transfer of me.jpg. Started at 1494592333083
+Transfer Complete. Took 1315ms
+#8 Starting Transfer of me.jpg. Started at 1494592334882
+Transfer Complete. Took 920ms
+#9 Starting Transfer of me.jpg. Started at 1494592336290
+Transfer Complete. Took 1082ms
+../evaluation/data/timing/s1_p2_c2_b64_p0.05/
+#0 Starting Transfer of me.jpg. Started at 1494592337885
+Transfer Complete. Took 1218ms
+#1 Starting Transfer of me.jpg. Started at 1494592339581
+Transfer Complete. Took 1471ms
+#2 Starting Transfer of me.jpg. Started at 1494592341548
+Transfer Complete. Took 1088ms
+#3 Starting Transfer of me.jpg. Started at 1494592343127
+Transfer Complete. Took 1216ms
+#4 Starting Transfer of me.jpg. Started at 1494592344829
+Transfer Complete. Took 1234ms
+#5 Starting Transfer of me.jpg. Started at 1494592346554
+Transfer Complete. Took 1164ms
+#6 Starting Transfer of me.jpg. Started at 1494592348203
+Transfer Complete. Took 1248ms
+#7 Starting Transfer of me.jpg. Started at 1494592349937
+Transfer Complete. Took 1177ms
+#8 Starting Transfer of me.jpg. Started at 1494592351600
+Transfer Complete. Took 1413ms
+#9 Starting Transfer of me.jpg. Started at 1494592353503
+Transfer Complete. Took 997ms
+../evaluation/data/timing/s2_p1_c2_b1_p0.05/
+#0 Starting Transfer of me.jpg. Started at 1494592355002
+Transfer Complete. Took 2269ms
+#1 Starting Transfer of me.jpg. Started at 1494592357768
+Transfer Complete. Took 2130ms
+#2 Starting Transfer of me.jpg. Started at 1494592360382
+Transfer Complete. Took 2265ms
+#3 Starting Transfer of me.jpg. Started at 1494592363140
+Transfer Complete. Took 2107ms
+#4 Starting Transfer of me.jpg. Started at 1494592365737
+Transfer Complete. Took 2243ms
+#5 Starting Transfer of me.jpg. Started at 1494592368475
+Transfer Complete. Took 2160ms
+#6 Starting Transfer of me.jpg. Started at 1494592371132
+Transfer Complete. Took 2062ms
+#7 Starting Transfer of me.jpg. Started at 1494592373682
+Transfer Complete. Took 2102ms
+#8 Starting Transfer of me.jpg. Started at 1494592376283
+Transfer Complete. Took 2829ms
+#9 Starting Transfer of me.jpg. Started at 1494592379604
+Transfer Complete. Took 2656ms
+../evaluation/data/timing/s2_p1_c2_b16_p0.05/
+rm: cannot remove ‘../evaluation/data/timing/s2_p1_c2_b16_p0.05/’: No such file or directory
+#0 Starting Transfer of me.jpg. Started at 1494592382768
+Transfer Complete. Took 1872ms
+#1 Starting Transfer of me.jpg. Started at 1494592385128
+Transfer Complete. Took 1772ms
+#2 Starting Transfer of me.jpg. Started at 1494592387390
+Transfer Complete. Took 2051ms
+#3 Starting Transfer of me.jpg. Started at 1494592389927
+Transfer Complete. Took 1825ms
+#4 Starting Transfer of me.jpg. Started at 1494592392249
+Transfer Complete. Took 2154ms
+#5 Starting Transfer of me.jpg. Started at 1494592394907
+Transfer Complete. Took 1924ms
+#6 Starting Transfer of me.jpg. Started at 1494592397336
+Transfer Complete. Took 1700ms
+#7 Starting Transfer of me.jpg. Started at 1494592399535
+Transfer Complete. Took 2082ms
+#8 Starting Transfer of me.jpg. Started at 1494592402103
+Transfer Complete. Took 2060ms
+#9 Starting Transfer of me.jpg. Started at 1494592404659
+Transfer Complete. Took 1840ms
+../evaluation/data/timing/s2_p1_c2_b64_p0.05/
+rm: cannot remove ‘../evaluation/data/timing/s2_p1_c2_b64_p0.05/’: No such file or directory
+#0 Starting Transfer of me.jpg. Started at 1494592407014
+Transfer Complete. Took 2632ms
+#1 Starting Transfer of me.jpg. Started at 1494592410142
+Transfer Complete. Took 1982ms
+#2 Starting Transfer of me.jpg. Started at 1494592412622
+Transfer Complete. Took 2214ms
+#3 Starting Transfer of me.jpg. Started at 1494592415315
+Transfer Complete. Took 2044ms
+#4 Starting Transfer of me.jpg. Started at 1494592417847
+Transfer Complete. Took 1993ms
+#5 Starting Transfer of me.jpg. Started at 1494592420332
+Transfer Complete. Took 2334ms
+#6 Starting Transfer of me.jpg. Started at 1494592423167
+Transfer Complete. Took 1961ms
+#7 Starting Transfer of me.jpg. Started at 1494592425616
+Transfer Complete. Took 1881ms
+#8 Starting Transfer of me.jpg. Started at 1494592427987
+Transfer Complete. Took 1910ms
+#9 Starting Transfer of me.jpg. Started at 1494592430390
+Transfer Complete. Took 2017ms
+../evaluation/data/timing/s2_p2_c4_b1_p0.05/
+rm: cannot remove ‘../evaluation/data/timing/s2_p2_c4_b1_p0.05/’: No such file or directory
+#0 Starting Transfer of me.jpg. Started at 1494592432919
+Transfer Complete. Took 1684ms
+#1 Starting Transfer of me.jpg. Started at 1494592435111
+Transfer Complete. Took 1806ms
+#2 Starting Transfer of me.jpg. Started at 1494592437429
+Transfer Complete. Took 2371ms
+#3 Starting Transfer of me.jpg. Started at 1494592440307
+Transfer Complete. Took 1740ms
+#4 Starting Transfer of me.jpg. Started at 1494592442557
+Transfer Complete. Took 1533ms
+#5 Starting Transfer of me.jpg. Started at 1494592444594
+Transfer Complete. Took 1801ms
+#6 Starting Transfer of me.jpg. Started at 1494592446910
+Transfer Complete. Took 1959ms
+#7 Starting Transfer of me.jpg. Started at 1494592449369
+Transfer Complete. Took 1303ms
+#8 Starting Transfer of me.jpg. Started at 1494592451183
+Transfer Complete. Took 1974ms
+#9 Starting Transfer of me.jpg. Started at 1494592453672
+Transfer Complete. Took 1538ms
+../evaluation/data/timing/s2_p2_c4_b16_p0.05/
+rm: cannot remove ‘../evaluation/data/timing/s2_p2_c4_b16_p0.05/’: No such file or directory
+#0 Starting Transfer of me.jpg. Started at 1494592455731
+Transfer Complete. Took 1021ms
+#1 Starting Transfer of me.jpg. Started at 1494592457281
+Transfer Complete. Took 1157ms
+#2 Starting Transfer of me.jpg. Started at 1494592458947
+Transfer Complete. Took 1249ms
+#3 Starting Transfer of me.jpg. Started at 1494592460702
+Transfer Complete. Took 1121ms
+#4 Starting Transfer of me.jpg. Started at 1494592462324
+Transfer Complete. Took 1072ms
+#5 Starting Transfer of me.jpg. Started at 1494592463942
+Transfer Complete. Took 1284ms
+#6 Starting Transfer of me.jpg. Started at 1494592465726
+Transfer Complete. Took 1168ms
+#7 Starting Transfer of me.jpg. Started at 1494592467387
+Transfer Complete. Took 1299ms
+#8 Starting Transfer of me.jpg. Started at 1494592469181
+Transfer Complete. Took 943ms
+#9 Starting Transfer of me.jpg. Started at 1494592470639
+Transfer Complete. Took 1188ms
+../evaluation/data/timing/s2_p2_c4_b64_p0.05/
+rm: cannot remove ‘../evaluation/data/timing/s2_p2_c4_b64_p0.05/’: No such file or directory
+#0 Starting Transfer of me.jpg. Started at 1494592472369
+Exception in thread "Thread-37" java.lang.IllegalStateException: Timer already cancelled.
+	at java.util.Timer.sched(Timer.java:397)
+	at java.util.Timer.schedule(Timer.java:193)
+	at MSTCP.vegas.more.MSTCPRequesterConnection.setTimer(MSTCPRequesterConnection.java:96)
+	at MSTCP.vegas.more.MSTCPRequesterConnection.access$700(MSTCPRequesterConnection.java:19)
+	at MSTCP.vegas.more.MSTCPRequesterConnection$InThread.run(MSTCPRequesterConnection.java:410)
+Transfer Complete. Took 1365ms
+#1 Starting Transfer of me.jpg. Started at 1494592474232
+Transfer Complete. Took 1250ms
+#2 Starting Transfer of me.jpg. Started at 1494592475984
+Transfer Complete. Took 1184ms
+#3 Starting Transfer of me.jpg. Started at 1494592477675
+Transfer Complete. Took 1446ms
+#4 Starting Transfer of me.jpg. Started at 1494592479620
+Transfer Complete. Took 1350ms
+#5 Starting Transfer of me.jpg. Started at 1494592481478
+Transfer Complete. Took 1182ms
+#6 Starting Transfer of me.jpg. Started at 1494592483157
+Transfer Complete. Took 1179ms
+#7 Starting Transfer of me.jpg. Started at 1494592484837
+Transfer Complete. Took 1103ms
+#8 Starting Transfer of me.jpg. Started at 1494592486446
+Transfer Complete. Took 1291ms
+#9 Starting Transfer of me.jpg. Started at 1494592488241
+Transfer Complete. Took 1178ms
+We Done Here.
