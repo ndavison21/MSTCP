@@ -75,7 +75,7 @@ public class SourceCoder extends Thread {
             if (!decodedBatches.contains(batch) && isInnovative(batch, batchSize, coefficients, innovMatrix)) {
                 /// SECOND: Is innovative so admit packet to memory
                 logger.info("Received innovative packet for batch " + batch);
-                Utils.received_logger.fine(System.nanoTime() + "True");
+                Utils.received_logger.fine(System.nanoTime() + " True");
                 Vector<MOREPacket> batchBuffer = packetBuffer.get(batch);
                 if (batchBuffer == null)
                     batchBuffer = new Vector<MOREPacket>();
