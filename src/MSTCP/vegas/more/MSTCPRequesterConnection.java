@@ -117,6 +117,7 @@ public class MSTCPRequesterConnection extends Thread {
     
     public void sendFIN(boolean ack) {
         try {
+            stopTimer();
             if (!ack && finAttempts > Utils.finAttempts) {
                 for (int i=0; i<20; i++)
                     socket.send(new DatagramPacket(new byte[0], 0, requester.recvAddr, this.recvPort));
