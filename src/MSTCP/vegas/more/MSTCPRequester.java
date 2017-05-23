@@ -254,6 +254,7 @@ public class MSTCPRequester {
             
             if (complete) { // got all data, just need to decode.
                 logger.info("Got all data, waiting for decocde.");
+		System.exit(1);
                 return null;
             }
             logger.info("Additional Request for batch " + batch + ".");
@@ -270,6 +271,10 @@ public class MSTCPRequester {
         
         Integer nextRow = batchRows.get(batch);
         nextRow = nextRow == null ? 0 : nextRow;
+	if (nextRow > 256) {
+            System.err.println("Received over 256 rows for batch " + batch);
+	    System.exit(1);
+	}
         batchRows.put(batch, nextRow + 1);
         byte[] coefficients = sourceCoder.nextRow(nextRow, batchSize);
         
