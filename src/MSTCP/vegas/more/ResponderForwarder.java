@@ -56,10 +56,7 @@ public class ResponderForwarder {
             for (;;) {
                 data = socket.receive();
                 
-                if (packets > terminate) {
-                    logger.info("Received more than " + terminate + " packets. Exiting.");
-                    System.exit(1);
-                } else if (packets > packetLimit) {
+                if (packets > packetLimit) {
                     logger.info("Received more than " + packetLimit + " packets. Not processing any more.");
                     continue;
                 } else {

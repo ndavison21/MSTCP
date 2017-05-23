@@ -602,7 +602,6 @@ public class MSTCPRequesterConnection extends Thread {
      * Main Methods
      */
     public void run() {
-        //synchronized(startup) {
             if (establishConnection()) {
                 inThread.start();
                 outThread.start();
@@ -613,10 +612,6 @@ public class MSTCPRequesterConnection extends Thread {
                     active.notifyAll();
                 }
             }
-            
-//            startup.b = false;
-//            startup.notifyAll();
-//        }
     }
     
     public MSTCPRequesterConnection(String addr, int recvPort, int dstPort, MSTCPRequester requester, boolean ms_join) throws UnknownHostException, SocketException {
