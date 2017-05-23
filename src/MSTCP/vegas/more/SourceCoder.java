@@ -112,8 +112,12 @@ public class SourceCoder extends Thread {
     
     
     public void decode(int batch) {
-        logger.info("Decoding Batch " + batch);
-        Vector<MOREPacket> batchBuffer = packetBuffer.remove(batch);
+        Vector<MOREPacket> batchBuffer;
+        synchronized(decodedBatches) {
+            logger.info("Decoding Batch " + batch);
+            batchBuffer = packetBuffer.remove(batch);
+            innovChecker.remove(batch);
+        }
         int batchSize = Math.min(Utils.batchSize, fileBlocks - batch * Utils.batchSize);
         if (batchSize < 0)
             batchSize = fileBlocks;
@@ -160,13 +164,12 @@ public class SourceCoder extends Thread {
         }
         logger.info("Decoded Batch " + batch);
         
-        innovChecker.remove(batch);
 
     }
     
     private boolean isInnovative(int batch, int batchSize, double[] coefficients, double[][] innovMatrix) {
-        
-        for (int i=0; i<batchSize; i++) {
+        int i = 0;
+        for (i=0; i<batchSize; i++) {
             if (coefficients[i] != 0) { // if u[i] != 0
                 double ui = coefficients[i];
                 if (innovMatrix[i] != null) { // if M[i] exists
@@ -174,7 +177,6 @@ public class SourceCoder extends Thread {
                     for (int j=0; j<batchSize; j++)
                         coefficients[j] -= innovMatrix[i][j] * ui;
                 } else {
-
                     // M[i] <- u/u[i]
                     for (int j=0; j<batchSize; j++)
                         coefficients[j] /= ui;
