@@ -7,4 +7,6 @@ bin/received_*
 *.bin
 gb.jpg
 received_gb.jpg
+test1mb.dat
 *.out
+evaluation/*
