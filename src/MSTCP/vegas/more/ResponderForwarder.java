@@ -50,12 +50,16 @@ public class ResponderForwarder {
         
         DatagramPacket data;
         try {
-        
+            boolean logged = false;
             for (;;) {
                 data = socket.receive();
                 
                 if (packets > packetLimit) {
                     logger.info("Received more than " + packetLimit + " packets. Not processing any more.");
+                    if (!logged) {
+                        System.out.println("Packet Limit Reached. Dropping any further packets.");
+                        logged = true;
+                    }
                     continue;
                 } else {
                     logger.info("Received " + packets + " packets");

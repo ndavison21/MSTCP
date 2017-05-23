@@ -346,7 +346,6 @@ public class MSTCPRequesterConnection extends Thread {
             rttSeqNum = nextSeqNum + cwnd;
             initialSeqNum.notifyAll();
         }
-        System.out.printf("goBackN: p_drop %f cwnd %d\n", p_drop, cwnd);
 
         dataAttempts++;
     }

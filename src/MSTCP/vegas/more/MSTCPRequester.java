@@ -274,7 +274,7 @@ public class MSTCPRequester {
             Integer nextRow = batchRows.get(batch);
             nextRow = nextRow == null ? 0 : nextRow;
             if (nextRow > 256) {
-                System.err.println("Received over 256 rows for batch " + batch);
+                System.err.println("Requested over 256 rows for batch " + batch);
                 System.exit(1);
             }
             batchRows.put(batch, nextRow + 1);
@@ -302,6 +302,7 @@ public class MSTCPRequester {
             }
             nextBatchReqs -= 1; // packet sent
         } else {
+            logger.info("Uncoded request for Block " + baseBlock + " on connection " + recvPort);
             codeVector = new CodeVectorElement[]{ new CodeVectorElement(baseBlock, (short) 1) };
             nextReqBatch++;
             nextReqBlock++;

@@ -118,7 +118,7 @@ public final class Utils {
     public static Logger getLogger(String filename, String path, Level level, int limit) {
         Logger logger = Logger.getLogger(filename);
         try {
-            FileHandler handler = new FileHandler("./logs/" + path + filename + ".log", limit, 1, true);
+            FileHandler handler = new FileHandler("./logs/" + path + filename + ".log", Integer.MAX_VALUE, 1, true);
             handler.setFormatter(new SimpleFormatter());
             logger.setUseParentHandlers(false);
             logger.addHandler(handler);

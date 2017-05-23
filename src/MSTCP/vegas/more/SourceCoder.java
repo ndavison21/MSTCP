@@ -95,7 +95,7 @@ public class SourceCoder extends Thread {
                 }
             } else {
                 Utils.received_logger.fine(System.nanoTime() + " False");
-                logger.info("Received uninnovative packet for batch " + batch);
+                logger.info("Received uninnovative packet for batch " + batch + ". Is Decoded? " + decodedBatches.contains(batch));
             }
         }
     }
