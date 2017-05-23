@@ -266,39 +266,46 @@ public class MSTCPRequester {
             batchSize = sourceCoder.fileBlocks;
         
         prevReqBatch = batch;
-            
+        
         int baseBlock = (batch == nextReqBatch ? nextReqBlock : batch * Utils.batchSize);
         
-        Integer nextRow = batchRows.get(batch);
-        nextRow = nextRow == null ? 0 : nextRow;
-	if (nextRow > 256) {
-            System.err.println("Received over 256 rows for batch " + batch);
-	    System.exit(1);
-	}
-        batchRows.put(batch, nextRow + 1);
-        byte[] coefficients = sourceCoder.nextRow(nextRow, batchSize);
-        
-        logger.info("Request for batch " + batch + " row " + nextRow + " on connection " + recvPort);
-        
-        CodeVectorElement[] codeVector = new CodeVectorElement[batchSize];
-        for (int i=0; i<codeVector.length; i++) {
-            codeVector[i] = new CodeVectorElement(baseBlock + i, i < coefficients.length ? coefficients[i] : sourceCoder.nextCoefficient());
-        }
-        
-        if (batch == nextReqBatch) {
-            if (nextRow < batchSize) {
-                nextBatchReqs += 1.5 * ((1.0 / (1.0 - p_drop)) - 1.0); // redundancy
-    
-            } else if (nextBatchReqs < 0.5 || sourceCoder.decodedBatches.contains(batch)) {
-                nextReqBatch++;
-                nextReqBlock+= batchSize;
-                batchSize = Math.min(Utils.batchSize, sourceCoder.fileBlocks - nextReqBatch * Utils.batchSize);
-                if (batchSize < 0)
-                    batchSize = sourceCoder.fileBlocks;
-                nextBatchReqs = nextBatchReqs < 0 ? batchSize : nextBatchReqs + batchSize; // preserve redundancy built up
+        CodeVectorElement[] codeVector;
+        if (Utils.batchSize != 1) {
+            Integer nextRow = batchRows.get(batch);
+            nextRow = nextRow == null ? 0 : nextRow;
+            if (nextRow > 256) {
+                System.err.println("Received over 256 rows for batch " + batch);
+                System.exit(1);
             }
+            batchRows.put(batch, nextRow + 1);
+            byte[] coefficients = sourceCoder.nextRow(nextRow, batchSize);
+            
+            logger.info("Request for batch " + batch + " row " + nextRow + " on connection " + recvPort);
+            
+            codeVector = new CodeVectorElement[batchSize];
+            for (int i=0; i<codeVector.length; i++) {
+                codeVector[i] = new CodeVectorElement(baseBlock + i, i < coefficients.length ? coefficients[i] : sourceCoder.nextCoefficient());
+            }
+            
+            if (batch == nextReqBatch) {
+                if (nextRow < batchSize) {
+                    nextBatchReqs += 1.5 * ((1.0 / (1.0 - p_drop)) - 1.0); // redundancy
+        
+                } else if (nextBatchReqs < 0.5 || sourceCoder.decodedBatches.contains(batch)) {
+                    nextReqBatch++;
+                    nextReqBlock+= batchSize;
+                    batchSize = Math.min(Utils.batchSize, sourceCoder.fileBlocks - nextReqBatch * Utils.batchSize);
+                    if (batchSize < 0)
+                        batchSize = sourceCoder.fileBlocks;
+                    nextBatchReqs = nextBatchReqs < 0 ? batchSize : nextBatchReqs + batchSize; // preserve redundancy built up
+                }
+            }
+            nextBatchReqs -= 1; // packet sent
+        } else {
+            codeVector = new CodeVectorElement[]{ new CodeVectorElement(baseBlock, (short) 1) };
+            nextReqBatch++;
+            nextReqBlock++;
         }
-        nextBatchReqs -= 1; // packet sent
         
         return codeVector;
     }
