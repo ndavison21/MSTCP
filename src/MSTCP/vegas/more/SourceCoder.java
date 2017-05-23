@@ -66,11 +66,12 @@ public class SourceCoder extends Thread {
             System.exit(1);
         }
         
-        double[][] innovMatrix = innovChecker.get(batch);
-        if (innovMatrix == null)
-            innovMatrix = new double[batchSize][];
+
         
         synchronized(decodedBatches) {
+            double[][] innovMatrix = innovChecker.get(batch);
+            if (innovMatrix == null)
+                innovMatrix = new double[batchSize][];
             /// FIRST: Check if packet is innovative ///     
             if (!decodedBatches.contains(batch) && isInnovative(batch, batchSize, coefficients, innovMatrix)) {
                 /// SECOND: Is innovative so admit packet to memory
