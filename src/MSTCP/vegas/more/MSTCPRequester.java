@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Vector;
 import java.util.logging.Handler;
@@ -27,7 +28,7 @@ public class MSTCPRequester {
     final int total_alpha = Utils.total_alpha;
     Double total_rate = 0.0; // congestion control parameter (see wVegas paper)
     
-    int prevReqBatch = 0; // previous batch requested (used when requesting dropped packets)
+    HashSet<Integer> prevReqBatch = new HashSet<Integer>(); // previous batch requested (used when requesting dropped packets)
     int nextReqBatch = 0; // next batch to request
     int nextReqBlock   = 0; // first block of the new batch to request
     double nextBatchReqs = 0.0; // number of remaining requests to make for current batch (including redundancy for loss rate) 
@@ -247,8 +248,14 @@ public class MSTCPRequester {
                 if (!sourceCoder.packetBuffer.containsKey(i) || sourceCoder.packetBuffer.get(i).size() < batchSize) {
                     batch = i;
                     complete = false;
-                    if (prevReqBatch != batch)
+                    if (!prevReqBatch.contains(batch)) {
+                        prevReqBatch.add(batch);
                         break;
+                    } else if (i >= sourceCoder.fileBatches) {
+                        prevReqBatch.clear();
+                        complete = true;
+                        i = 0;
+                    }
                 }
             }
             
@@ -265,7 +272,6 @@ public class MSTCPRequester {
         if (batchSize <= 0)
             batchSize = sourceCoder.fileBlocks;
         
-        prevReqBatch = batch;
         
         int baseBlock = (batch == nextReqBatch ? nextReqBlock : batch * Utils.batchSize);
         
