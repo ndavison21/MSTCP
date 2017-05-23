@@ -11,6 +11,7 @@ SOURCES=2
 PATHS=1
 
 for CONNECTIONS in 1 2
+    do
     for BATCH_SIZE in 1 16
     do
         path="../evaluation/data/${DIRECTORY}/s${SOURCES}_p${PATHS}_c${CONNECTIONS}_b${BATCH_SIZE}_p${P_DROP}/"
