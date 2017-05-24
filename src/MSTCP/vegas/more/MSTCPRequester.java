@@ -245,7 +245,7 @@ public class MSTCPRequester {
                 if (batchSize < 0)
                     batchSize = sourceCoder.fileBlocks;
                 
-                if (!sourceCoder.packetBuffer.containsKey(i) || sourceCoder.packetBuffer.get(i).size() < batchSize) {
+                if (!sourceCoder.packetBuffer.containsKey(i) || (sourceCoder.packetBuffer.get(i) != null && sourceCoder.packetBuffer.get(i).size() < batchSize)) {
                     batch = i;
                     complete = false;
                     if (!prevReqBatch.contains(batch)) {

@@ -401,8 +401,6 @@ public class MSTCPRequesterConnection extends Thread {
                                         timedout.add(retransmit);
                                         sentRequests.remove(retransmit);
                                     }
-                                } else {
-                                    logger.info("Packet " + retransmit + " not in sent requests. Assuming is already scheduled for retransmit.");
                                 }
                             }
                             if (!timedout.isEmpty())
