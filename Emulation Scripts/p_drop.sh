@@ -16,7 +16,7 @@ do
         then
             for BATCH_SIZE in 1 16 64
             do
-                for P_DROP in "0.00" "0.05"
+                for P_DROP in "0.05"
                 do
                     path="../evaluation/data/${DIRECTORY}/s${SOURCES}_p${PATHS}_c${CONNECTIONS}_b${BATCH_SIZE}_p${P_DROP}/"
                     echo $path
