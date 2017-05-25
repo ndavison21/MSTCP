@@ -150,7 +150,6 @@ public class MSTCPRequesterConnection extends Thread {
     public void close() {
         logger.info("Closing Connection to (" + dstAddr + ", " + dstPort + ")");
         
-        // Utils.logger.fine(System.nanoTime() + " " + recvPort + " " + 0 + " " + 0 + " " + 0 + " " + 0);
         inThread.interrupt();
         outThread.interrupt();
         stopTimer();
@@ -359,7 +358,6 @@ public class MSTCPRequesterConnection extends Thread {
     public class InThread extends Thread {
         public void run() {
             DatagramPacket data;
-            // Utils.logger.fine(System.nanoTime() + " " + recvPort + " " + cwnd + " " + rtt + " " + p_drop + " " + rttSeqNum);
             
             try {
                 for (;;) {
@@ -372,6 +370,7 @@ public class MSTCPRequesterConnection extends Thread {
                         break;
                     
                     TCPPacket tcpPacket = new TCPPacket(data.getData());
+                    Utils.packet_logger.fine(System.nanoTime() + " REQUESTER RECEIVED " + recvPort + " " + tcpPacket.getSeqNum());
                     
                     if (tcpPacket.verifyChecksum() && tcpPacket.isACK() && base <= tcpPacket.getSeqNum()) { // if packet is corrupted there's not much we can do...
                         stopTimer(); // received a packet so haven't lost connection
@@ -499,9 +498,10 @@ public class MSTCPRequesterConnection extends Thread {
                                 
                                 // prepare for next round
                                 rttSeqNum = nextSeqNum + cwnd;
-                                // Utils.logger.fine(System.nanoTime() + " " + recvPort + " " + cwnd + " " + rtt + " " + p_drop + " " + rttSeqNum);
                                 sampled_num = 0;
                                 sampled_rtt = 0;
+                                
+                                Utils.throughput_logger.fine(cwnd + " " + cwnd_true + " " + base_rtt + " " + rtt + " " + p_drop);
                             }
                             initialSeqNum.notifyAll();
                         }
@@ -580,7 +580,8 @@ public class MSTCPRequesterConnection extends Thread {
                             nextSeqNum++;
                         }
                     }
-
+                    
+                    Utils.packet_logger.fine(System.nanoTime() + " REQUESTER SEND " + recvPort + " " + tcpRequest.getSeqNum());
                     socket.send(new DatagramPacket(request, request.length, dstAddr, routerPort));
                 }
             } catch(IOException e) {

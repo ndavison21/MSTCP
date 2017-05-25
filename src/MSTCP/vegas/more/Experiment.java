@@ -46,8 +46,8 @@ public class Experiment {
         if (res.exists())
             res.delete();
         
-        Utils.requests_logger = Utils.getLogger("#" + experiment + "_requests", path, Level.ALL, Integer.MAX_VALUE);
-        Utils.received_logger = Utils.getLogger("#" + experiment + "_received", path, Level.ALL, Integer.MAX_VALUE);
+        Utils.packet_logger = Utils.getLogger("#" + experiment + "_packets", path, Level.ALL, Integer.MAX_VALUE);
+        Utils.throughput_logger = Utils.getLogger("#" + experiment + "_throughput", path, Level.ALL, Integer.MAX_VALUE);
         
         /** Source Vector **/    
         int sourcePort  = 16000;
@@ -84,7 +84,7 @@ public class Experiment {
                 (new Thread() {
                     public void run() {
                         try {
-                            new MiddleForwarder(midRouterPort, 20, Utils.p_drop);
+                            new MiddleForwarder(midRouterPort, 10, Utils.p_drop);
                         } catch (SocketException e) {
                             e.printStackTrace();
                             System.exit(1);
@@ -129,9 +129,9 @@ public class Experiment {
         new MSTCPRequester(Utils.getIPAddress(null), Utils.getIPAddress(null), 14000, 16000, "./", file);
         System.out.println("Transfer Complete. Took " + (System.currentTimeMillis() - start) + "ms");
         
-        for (Handler handler: Utils.received_logger.getHandlers())
+        for (Handler handler: Utils.packet_logger.getHandlers())
             handler.close();
-        for (Handler handler: Utils.requests_logger.getHandlers())
+        for (Handler handler: Utils.throughput_logger.getHandlers())
             handler.close();
         
         System.exit(1);

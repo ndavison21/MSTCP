@@ -130,6 +130,7 @@ public class MSTCPResponderConnection {
                         logger.info("Sending SYN + ACK to (" + dstAddress + ", " + dstPort + ")");
                         outBytes = generateTCPPacket(initialSeqNum, mstcpInfo.bytes(), true, false, time_req);
                     } else {
+                        Utils.packet_logger.fine(System.nanoTime() + " RESPONDER RECEIVED " + recvPort + " " + inPacket.getSeqNum());
                         time_req = time_recv - inPacket.getTime_req();
                         if (time_req < 0)
                             time_req = (Integer.MAX_VALUE - inPacket.getTime_req()) + time_recv;
@@ -196,6 +197,7 @@ public class MSTCPResponderConnection {
                             
                         }
                     }
+                    Utils.packet_logger.fine(System.nanoTime() + " RESPONDER SEND " + recvPort + " " + inPacket.getSeqNum());
                     responder.socket.send(new DatagramPacket(outBytes, outBytes.length, dstAddress, responder.routerPort));
                 } else {
                     logger.info("Received Corrupted Packet");

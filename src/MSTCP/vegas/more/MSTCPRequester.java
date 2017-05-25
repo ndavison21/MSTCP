@@ -230,13 +230,17 @@ public class MSTCPRequester {
         }
     }
     
-    
+    boolean logged_additional = false;
     // called by connections, returns next needed block and records which connection it'll come on
     public synchronized CodeVectorElement[] codeVector(int recvPort, double p_drop) {
         int batch = nextReqBatch;
         int batchSize = -1;
         
         if (batch >= sourceCoder.fileBatches) { // have we made requests for all batches
+            if (!logged_additional) {
+                Utils.packet_logger.fine("# Starting Additional Requests");
+                logged_additional = true;
+            }
             boolean complete = true;
             for (int i=0; i < sourceCoder.fileBatches; i++) { // find any batches for which we need to repeat requests
                 if (sourceCoder.decodedBatches.contains(i))
@@ -267,7 +271,6 @@ public class MSTCPRequester {
             logger.info("Additional Request for batch " + batch + ".");
         }
         
-        Utils.requests_logger.fine(System.nanoTime() + " " + recvPort + " " + p_drop);
         batchSize = Math.min(Utils.batchSize, sourceCoder.fileBlocks - (batch * Utils.batchSize));
         if (batchSize <= 0)
             batchSize = sourceCoder.fileBlocks;
