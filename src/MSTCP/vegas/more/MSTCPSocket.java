@@ -30,28 +30,8 @@ public class MSTCPSocket {
                 for (;;) {
                     final DatagramPacket d = new DatagramPacket(new byte[Utils.pktSize()], Utils.pktSize());
                     inSocket.receive(d);
-                    
-//                    if (Utils.rand.nextDouble() < p_drop){
-//                        logger.info("Packet Dropped");
-//                        continue;
-//                    }
-//                    
-//                    if (delay > 0) {
-//                        (new Thread() {
-//                            public void run() {
-//                                try {
-//                                    Thread.sleep(delay);
-//                                } catch (InterruptedException e) {
-//                                    logger.log(Level.SEVERE, e.getMessage(), e);
-//                                    e.printStackTrace();
-//                                    System.exit(1);
-//                                }
-//                                inBuffer.add(d);
-//                            }
-//                        }).start();
-//                    } else {
-                        inBuffer.add(d);
-//                    }
+                    if (inBuffer.size() <= Utils.queueCapacity)
+                        inBuffer.offer(d);
                 }
             } catch (IOException e) {
                 if (e instanceof SocketException && inSocket.isClosed()) {

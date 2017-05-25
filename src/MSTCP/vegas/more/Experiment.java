@@ -84,7 +84,7 @@ public class Experiment {
                 (new Thread() {
                     public void run() {
                         try {
-                            new MiddleForwarder(midRouterPort, 10, Utils.p_drop);
+                            new MiddleForwarder(midRouterPort, 5, Utils.p_drop);
                         } catch (SocketException e) {
                             e.printStackTrace();
                             System.exit(1);

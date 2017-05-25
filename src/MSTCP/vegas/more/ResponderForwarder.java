@@ -36,7 +36,7 @@ public class ResponderForwarder {
     
     public ResponderForwarder(int recvPort, int packetLimit, int terminate) throws SocketException {
         this.logger = Utils.getLogger(this.getClass().getName() + "_" + recvPort);
-        this.socket = new MSTCPSocket(logger, recvPort);
+        this.socket = new MSTCPSocket(logger, recvPort, 5, 0);
         this.packetLimit = packetLimit;
         try {
             this.localhost = InetAddress.getLocalHost();

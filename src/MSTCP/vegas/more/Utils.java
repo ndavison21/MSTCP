@@ -46,7 +46,8 @@ public final class Utils {
     public static final int transferSize  = blockSize + 1; // we prefix a byte to avoid bytes being dropped when converting to BigInteger
     public static final int precision     = 2000; // number of decimal places to calculate to  (must be greater than log10(2 ^ blockSize) )
     
-
+    public static final int queueCapacity = 200; // capacity of queues in the network
+    
     // retransmit parameters
     public static final int synAttempts  = 30;
     public static final int synTimeout   = debug ? Integer.MAX_VALUE : 500;
