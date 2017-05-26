@@ -67,6 +67,7 @@ public class ResponderForwarder {
                     socket.cap *= 0.7;
                     socket.delay += 10;
                     socket.p_drop *= 1.32;
+                    logged = true;
                 } else {
                     logger.info("Received " + packets + " packets");
                 }
