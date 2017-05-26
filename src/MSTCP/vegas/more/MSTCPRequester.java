@@ -249,16 +249,18 @@ public class MSTCPRequester {
                 if (batchSize < 0)
                     batchSize = sourceCoder.fileBlocks;
                 
-                if (!sourceCoder.packetBuffer.containsKey(i) || (sourceCoder.packetBuffer.get(i) != null && sourceCoder.packetBuffer.get(i).size() < batchSize)) {
-                    batch = i;
-                    complete = false;
-                    if (!prevReqBatch.contains(batch)) {
-                        prevReqBatch.add(batch);
-                        break;
-                    } else if (i >= sourceCoder.fileBatches) {
-                        prevReqBatch.clear();
-                        complete = true;
-                        i = 0;
+                synchronized(sourceCoder.decodedBatches) {
+                    if (!sourceCoder.packetBuffer.containsKey(i) || (sourceCoder.packetBuffer.get(i) != null && sourceCoder.packetBuffer.get(i).size() < batchSize)) {
+                        batch = i;
+                        complete = false;
+                        if (!prevReqBatch.contains(batch)) {
+                            prevReqBatch.add(batch);
+                            break;
+                        } else if (i >= sourceCoder.fileBatches) {
+                            prevReqBatch.clear();
+                            complete = true;
+                            i = 0;
+                        }
                     }
                 }
             }
