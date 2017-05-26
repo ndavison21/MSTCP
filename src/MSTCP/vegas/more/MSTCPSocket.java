@@ -15,8 +15,8 @@ public class MSTCPSocket {
     private final Receiver receiver;
     private final Sender sender;
     
-    private final int delay;
-    private final double p_drop;
+    int delay;
+    double p_drop;
     
     boolean droppedPrev = false;
     

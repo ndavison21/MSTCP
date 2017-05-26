@@ -19,6 +19,7 @@ public class ResponderForwarder {
     
     int packets = 0;
     final int packetLimit;
+    final int throttleLimit;
     
     private class FlowData { // class to store data and functionalilty for flow
         // final int flowID;
@@ -34,10 +35,11 @@ public class ResponderForwarder {
         this(recvPort, Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
     
-    public ResponderForwarder(int recvPort, int packetLimit, int terminate) throws SocketException {
+    public ResponderForwarder(int recvPort, int packetLimit, int throttleLimit) throws SocketException {
         this.logger = Utils.getLogger(this.getClass().getName() + "_" + recvPort);
         this.socket = new MSTCPSocket(logger, recvPort, 5, 0);
         this.packetLimit = packetLimit;
+        this.throttleLimit = throttleLimit;
         try {
             this.localhost = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
@@ -61,6 +63,9 @@ public class ResponderForwarder {
                         logged = true;
                     }
                     continue;
+                } else if (packets > throttleLimit) {
+                    socket.delay += 10;
+                    socket.p_drop *= 2;
                 } else {
                     logger.info("Received " + packets + " packets");
                 }

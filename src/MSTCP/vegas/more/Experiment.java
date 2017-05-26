@@ -21,6 +21,7 @@ public class Experiment {
         Utils.packetLimit = Integer.parseInt(args[i++]);
         int experiment = Integer.parseInt(args[i++]);
         String file = args.length > i ? args[i++] : "gb.jpg";
+        final int throttleLimit = args.length > i ? Integer.parseInt((args[i++])) : Integer.MAX_VALUE;
         
         if (Utils.packetLimit == -1)
             Utils.packetLimit = Integer.MAX_VALUE;
@@ -103,7 +104,7 @@ public class Experiment {
             (new Thread() {
                 public void run() {
                     try {
-                        new ResponderForwarder(resRouterPort, resRouterPort == 15005 ? Utils.packetLimit : Integer.MAX_VALUE, Utils.packetLimit == Integer.MAX_VALUE ? Integer.MAX_VALUE : 10000+Utils.packetLimit);
+                        new ResponderForwarder(resRouterPort, resRouterPort == 15005 ? Utils.packetLimit : Integer.MAX_VALUE, resRouterPort == 15005 ? throttleLimit : Integer.MAX_VALUE);
                     } catch (SocketException e) {
                         e.printStackTrace();
                         System.exit(1);
