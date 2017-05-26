@@ -501,7 +501,7 @@ public class MSTCPRequesterConnection extends Thread {
                                 sampled_num = 0;
                                 sampled_rtt = 0;
                                 
-                                Utils.throughput_logger.fine(cwnd + " " + cwnd_true + " " + base_rtt + " " + rtt + " " + p_drop);
+                                Utils.throughput_logger.fine(System.nanoTime() + " " + recvPort + " " + cwnd + " " + cwnd_true + " " + base_rtt + " " + rtt + " " + p_drop);
                             }
                             initialSeqNum.notifyAll();
                         }
