@@ -63,9 +63,10 @@ public class ResponderForwarder {
                         logged = true;
                     }
                     continue;
-                } else if (packets > throttleLimit) {
+                } else if (packets > throttleLimit && !logged) {
+                    socket.cap *= 0.7;
                     socket.delay += 10;
-                    socket.p_drop *= 2;
+                    socket.p_drop *= 1.32;
                 } else {
                     logger.info("Received " + packets + " packets");
                 }

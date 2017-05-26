@@ -16,6 +16,7 @@ public class MSTCPSocket {
     private final Sender sender;
     
     int delay;
+    int cap = Utils.queueCapacity;
     double p_drop;
     
     boolean droppedPrev = false;
@@ -30,7 +31,7 @@ public class MSTCPSocket {
                 for (;;) {
                     final DatagramPacket d = new DatagramPacket(new byte[Utils.pktSize()], Utils.pktSize());
                     inSocket.receive(d);
-                    if (inBuffer.size() <= Utils.queueCapacity)
+                    if (inBuffer.size() <= cap)
                         inBuffer.offer(d);
                 }
             } catch (IOException e) {
